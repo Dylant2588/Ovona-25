@@ -1,0 +1,112 @@
+{
+  "chicken breast": {
+    "price": 5.50,
+    "unit": "g",
+    "quantity": 1000
+  },
+  "eggs": {
+    "price": 2.00,
+    "unit": "unit",
+    "quantity": 6
+  },
+  "whole grain bread": {
+    "price": 1.20,
+    "unit": "slice",
+    "quantity": 12
+  },
+  "banana": {
+    "price": 0.85,
+    "unit": "unit",
+    "quantity": 5
+  },
+  "greek yogurt": {
+    "price": 1.75,
+    "unit": "ml",
+    "quantity": 500
+  },
+  "peanut butter": {
+    "price": 2.50,
+    "unit": "g",
+    "quantity": 340
+  },
+  "rolled oats": {
+    "price": 1.50,
+    "unit": "g",
+    "quantity": 1000
+  },
+  "almond milk": {
+    "price": 1.80,
+    "unit": "ml",
+    "quantity": 1000
+  },
+  "milk": {
+    "price": 1.35,
+    "unit": "ml",
+    "quantity": 1000
+  },
+  "olive oil": {
+    "price": 3.00,
+    "unit": "ml",
+    "quantity": 500
+  },
+  "broccoli": {
+    "price": 1.20,
+    "unit": "g",
+    "quantity": 350
+  },
+  "apple": {
+    "price": 2.00,
+    "unit": "unit",
+    "quantity": 6
+  },
+  "salmon fillet": {
+    "price": 4.50,
+    "unit": "g",
+    "quantity": 250
+  },
+  "quinoa": {
+    "price": 2.50,
+    "unit": "g",
+    "quantity": 500
+  },
+  "sweet potato": {
+    "price": 1.50,
+    "unit": "g",
+    "quantity": 1000
+  },
+  "trail mix": {
+    "price": 2.50,
+    "unit": "g",
+    "quantity": 150
+  },
+  "cottage cheese": {
+    "price": 1.75,
+    "unit": "ml",
+    "quantity": 500
+  },
+  "mixed berries": {
+    "price": 3.00,
+    "unit": "g",
+    "quantity": 300
+  },
+  "ground beef": {
+    "price": 4.25,
+    "unit": "g",
+    "quantity": 500
+  },
+  "lentils": {
+    "price": 1.20,
+    "unit": "g",
+    "quantity": 500
+  },
+  "whole wheat spaghetti": {
+    "price": 1.10,
+    "unit": "g",
+    "quantity": 500
+  },
+  "protein powder": {
+    "price": 15.00,
+    "unit": "g",
+    "quantity": 1000
+  }
+}
