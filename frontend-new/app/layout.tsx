@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "@/lib/auth-context";
+import { AppProviders } from "./providers";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
-  title: "Ovona - AI Meal Planner",
-  description: "Personalized meal plans with AI-powered nutrition tracking",
+  title: "Ovona - Smart Nutrition Companion",
+  description:
+    "Plan meals, track nutrition, and onboard smoothly with Ovona's AI assistant.",
 };
 
 export default function RootLayout({
@@ -17,10 +22,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+      <body className={`${inter.className} ${inter.variable}`}>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );
