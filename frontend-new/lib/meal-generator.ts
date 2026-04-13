@@ -1,3 +1,5 @@
+import { priceBasket } from "@/lib/tesco-prices";
+
 export type MealSlot = "breakfast" | "lunch" | "dinner" | "snack";
 export type ComplexityKey = "simple" | "normal" | "adventurous";
 export type GoalType =
@@ -116,6 +118,7 @@ type BaseMeal = {
   name: string;
   description: string;
   steps?: string[];
+  budgetTier?: "standard" | "premium";
   mealTypes: MealSlot[];
   tastes: string[];
   complexity: ComplexityKey;
@@ -160,6 +163,14 @@ const MEAL_LIBRARY: BaseMeal[] = [
     id: "sunrise-egg-wrap",
     name: "Sunrise Egg Wrap",
     description: "Scrambled eggs, smashed avocado, and veggies tucked into a whole-grain wrap.",
+    steps: [
+      "Crack eggs into a bowl, season with salt and pepper, whisk briefly.",
+      "Heat a non-stick pan on medium with a drop of oil.",
+      "Pour in eggs, stir gently until just set (about 2 minutes).",
+      "Warm the wrap in the same pan for 30 seconds.",
+      "Spread mashed avocado down the centre of the wrap.",
+      "Add spinach, scrambled eggs, and halved cherry tomatoes. Roll up and eat.",
+    ],
     mealTypes: ["breakfast"],
     tastes: ["high-protein", "comfort", "quick-minimal"],
     complexity: "simple",
@@ -179,8 +190,8 @@ const MEAL_LIBRARY: BaseMeal[] = [
   },
   {
     id: "harissa-chicken-bowl",
-    name: "Harissa Chicken Bowls",
-    description: "Charred chicken, freekeh, and garlicky yogurt over greens.",
+    name: "Smoky Chicken Rice Bowl",
+    description: "Smoky chicken, rice, tomatoes, and yogurt over spinach.",
     mealTypes: ["lunch", "dinner"],
     tastes: ["high-protein", "meal-prep", "low-carb", "comfort"],
     complexity: "normal",
@@ -190,10 +201,10 @@ const MEAL_LIBRARY: BaseMeal[] = [
       "https://images.unsplash.com/photo-1608039829574-21c84fd37b6b?auto=format&fit=crop&w=600&q=60",
     macros: { calories: 520, protein: 45, carbs: 38, fat: 19 },
     ingredients: [
-      { name: "Chicken breast", amount: 220, unit: "g", category: "Protein" },
-      { name: "Freekeh or farro", amount: 80, unit: "g", category: "Pantry" },
-      { name: "Harissa paste", amount: 20, unit: "g", category: "Pantry" },
-      { name: "Baby greens", amount: 60, unit: "g", category: "Produce" },
+      { name: "Chicken breast", amount: 140, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 60, unit: "g", category: "Pantry" },
+      { name: "Diced tomatoes", amount: 120, unit: "g", category: "Pantry" },
+      { name: "Spinach", amount: 60, unit: "g", category: "Produce" },
       { name: "Greek yogurt", amount: 40, unit: "g", category: "Dairy" },
     ],
     proteinType: "poultry",
@@ -206,6 +217,7 @@ const MEAL_LIBRARY: BaseMeal[] = [
     tastes: ["comfort", "low-carb", "plant-forward"],
     complexity: "adventurous",
     goalFit: ["gain", "calorie_count"],
+    budgetTier: "premium",
     readyInMinutes: 28,
     image:
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=60",
@@ -221,8 +233,8 @@ const MEAL_LIBRARY: BaseMeal[] = [
   },
   {
     id: "miso-soba-salad",
-    name: "Miso Soba Power Salad",
-    description: "Buckwheat noodles tossed with tofu, crunchy veg, and ginger-miso dressing.",
+    name: "Tofu Rice Power Salad",
+    description: "Tofu, brown rice, crunchy veg, and a simple soy dressing.",
     mealTypes: ["lunch", "dinner"],
     tastes: ["plant-forward", "meal-prep", "comfort"],
     complexity: "normal",
@@ -232,10 +244,10 @@ const MEAL_LIBRARY: BaseMeal[] = [
       "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=60",
     macros: { calories: 480, protein: 24, carbs: 62, fat: 16 },
     ingredients: [
-      { name: "Soba noodles", amount: 100, unit: "g", category: "Pantry" },
+      { name: "Brown rice", amount: 55, unit: "g", category: "Pantry" },
       { name: "Tofu", amount: 180, unit: "g", category: "Protein" },
       { name: "Mixed vegetables", amount: 140, unit: "g", category: "Produce" },
-      { name: "Miso paste", amount: 25, unit: "g", category: "Pantry" },
+      { name: "Soy sauce", amount: 15, unit: "ml", category: "Pantry" },
       { name: "Rice vinegar", amount: 15, unit: "ml", category: "Pantry" },
     ],
     proteinType: "plant",
@@ -263,8 +275,8 @@ const MEAL_LIBRARY: BaseMeal[] = [
   },
   {
     id: "lemongrass-tofu-bowl",
-    name: "Lemongrass Tofu Bowls",
-    description: "Sticky lemongrass tofu, pickled veggies, and brown rice.",
+    name: "Soy Ginger Tofu Bowls",
+    description: "Quick tofu rice bowls with soy sauce, veg, and cucumber.",
     mealTypes: ["lunch", "dinner"],
     tastes: ["plant-forward", "quick-minimal", "meal-prep"],
     complexity: "normal",
@@ -275,9 +287,9 @@ const MEAL_LIBRARY: BaseMeal[] = [
     macros: { calories: 510, protein: 28, carbs: 60, fat: 18 },
     ingredients: [
       { name: "Extra-firm tofu", amount: 200, unit: "g", category: "Protein" },
-      { name: "Brown rice", amount: 90, unit: "g", category: "Pantry" },
-      { name: "Lemongrass paste", amount: 15, unit: "g", category: "Pantry" },
-      { name: "Pickled vegetables", amount: 100, unit: "g", category: "Produce" },
+      { name: "Brown rice", amount: 70, unit: "g", category: "Pantry" },
+      { name: "Soy sauce", amount: 15, unit: "ml", category: "Pantry" },
+      { name: "Mixed vegetables", amount: 120, unit: "g", category: "Produce" },
       { name: "Cucumber", amount: 80, unit: "g", category: "Produce" },
     ],
     proteinType: "plant",
@@ -325,7 +337,7 @@ const MEAL_LIBRARY: BaseMeal[] = [
   {
     id: "mediterranean-snack-box",
     name: "Mediterranean Snack Box",
-    description: "Hummus, veggies, olives, and za'atar crisps.",
+    description: "Hummus, veggies, olives, and whole-grain wrap wedges.",
     mealTypes: ["snack", "lunch"],
     tastes: ["plant-forward", "quick-minimal", "comfort"],
     complexity: "simple",
@@ -339,14 +351,14 @@ const MEAL_LIBRARY: BaseMeal[] = [
       { name: "Cucumber", amount: 80, unit: "g", category: "Produce" },
       { name: "Cherry tomatoes", amount: 70, unit: "g", category: "Produce" },
       { name: "Olives", amount: 40, unit: "g", category: "Pantry" },
-      { name: "Za'atar crisps", amount: 50, unit: "g", category: "Bakery" },
+      { name: "Whole-grain wrap", amount: 0.5, unit: "piece", category: "Bakery" },
     ],
     proteinType: "plant",
   },
   {
     id: "matcha-energizer",
-    name: "Matcha Coconut Energizer",
-    description: "Matcha chia pudding topped with toasted coconut.",
+    name: "Berry Chia Energizer",
+    description: "Quick oats, chia, and berries soaked in almond milk.",
     mealTypes: ["snack", "breakfast"],
     tastes: ["quick-minimal", "plant-forward", "low-carb"],
     complexity: "simple",
@@ -356,11 +368,11 @@ const MEAL_LIBRARY: BaseMeal[] = [
       "https://images.unsplash.com/photo-1484980972926-edee96e0960d?auto=format&fit=crop&w=600&q=60",
     macros: { calories: 210, protein: 9, carbs: 18, fat: 11 },
     ingredients: [
-      { name: "Chia seeds", amount: 35, unit: "g", category: "Pantry" },
-      { name: "Light coconut milk", amount: 200, unit: "ml", category: "Pantry" },
-      { name: "Matcha powder", amount: 4, unit: "g", category: "Pantry" },
-      { name: "Shredded coconut", amount: 20, unit: "g", category: "Pantry" },
-      { name: "Honey", amount: 15, unit: "g", category: "Pantry" },
+      { name: "Rolled oats", amount: 30, unit: "g", category: "Pantry" },
+      { name: "Chia seeds", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Almond milk", amount: 200, unit: "ml", category: "Dairy" },
+      { name: "Mixed berries", amount: 80, unit: "g", category: "Produce" },
+      { name: "Honey", amount: 12, unit: "g", category: "Pantry" },
     ],
     proteinType: "plant",
   },
@@ -387,8 +399,8 @@ const MEAL_LIBRARY: BaseMeal[] = [
   },
   {
     id: "thai-crunch-salad",
-    name: "Thai Crunch Salad",
-    description: "Shredded cabbage, herbs, and roasted shrimp with peanut dressing.",
+    name: "Crunch Chicken Salad",
+    description: "Shredded cabbage and carrots with chicken and light peanut dressing.",
     mealTypes: ["lunch", "dinner"],
     tastes: ["plant-forward", "low-carb", "comfort"],
     complexity: "adventurous",
@@ -398,13 +410,13 @@ const MEAL_LIBRARY: BaseMeal[] = [
       "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=600&q=60",
     macros: { calories: 430, protein: 38, carbs: 24, fat: 22 },
     ingredients: [
-      { name: "Shrimp", amount: 200, unit: "g", category: "Protein" },
+      { name: "Chicken breast", amount: 150, unit: "g", category: "Protein" },
       { name: "Cabbage", amount: 150, unit: "g", category: "Produce" },
       { name: "Carrots", amount: 80, unit: "g", category: "Produce" },
-      { name: "Peanut butter", amount: 30, unit: "g", category: "Pantry" },
-      { name: "Fresh herbs", amount: 20, unit: "g", category: "Produce" },
+      { name: "Peanut butter", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Brown rice", amount: 40, unit: "g", category: "Pantry" },
     ],
-    proteinType: "seafood",
+    proteinType: "poultry",
   },
   {
     id: "dark-chocolate-bites",
@@ -414,6 +426,7 @@ const MEAL_LIBRARY: BaseMeal[] = [
     tastes: ["comfort", "low-carb", "meal-prep"],
     complexity: "simple",
     goalFit: ["save_time", "calorie_count"],
+    budgetTier: "premium",
     readyInMinutes: 10,
     image:
       "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=600&q=60",
@@ -429,8 +442,8 @@ const MEAL_LIBRARY: BaseMeal[] = [
   },
   {
     id: "kimchi-fried-rice",
-    name: "Kimchi Cauli Fried Rice",
-    description: "Cauliflower rice with kimchi, edamame, and jammy eggs.",
+    name: "Egg & Veg Fried Rice",
+    description: "Brown rice stir-fried with mixed vegetables and eggs.",
     mealTypes: ["lunch", "dinner"],
     tastes: ["low-carb", "quick-minimal", "plant-forward"],
     complexity: "normal",
@@ -440,10 +453,10 @@ const MEAL_LIBRARY: BaseMeal[] = [
       "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=600&q=60",
     macros: { calories: 410, protein: 29, carbs: 32, fat: 18 },
     ingredients: [
-      { name: "Cauliflower rice", amount: 220, unit: "g", category: "Produce" },
-      { name: "Kimchi", amount: 120, unit: "g", category: "Produce" },
-      { name: "Edamame", amount: 100, unit: "g", category: "Frozen" },
+      { name: "Brown rice", amount: 70, unit: "g", category: "Pantry" },
+      { name: "Mixed vegetables", amount: 140, unit: "g", category: "Frozen" },
       { name: "Eggs", amount: 2, unit: "large", category: "Dairy" },
+      { name: "Soy sauce", amount: 15, unit: "ml", category: "Pantry" },
       { name: "Scallions", amount: 30, unit: "g", category: "Produce" },
     ],
     proteinType: "mixed",
@@ -491,6 +504,13 @@ export const WORKDAY_MEAL_SLOTS: MealSlot[] = [
 const BASE_MEAL_SLOTS: MealSlot[] = [...WORKDAY_MEAL_SLOTS];
 const MACRO_RECONCILE_TOLERANCE = 0.3;
 const MACRO_DEBUG_LOGS = process.env.NODE_ENV !== "production";
+const MAX_PROTEIN_SOURCES_PER_WEEK = 3;
+const MAX_MEAL_USES_PER_WEEK = 2;
+const WEEK_REUSE_PENALTY = 100;
+const CONSECUTIVE_DAY_REUSE_PENALTY = 55;
+const NEAR_DAY_REUSE_PENALTY = 20;
+const COST_WARNING_THRESHOLD_GBP = 70;
+const UNKNOWN_ITEM_PRICE_GBP = 1.5;
 
 const randomId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -659,6 +679,7 @@ const NUTRITION_DB: NutritionEntry[] = [
   { aliases: ["tofu", "extra-firm tofu"], unit: "g", servingSize: 100, macros: { calories: 144, protein: 17, carbs: 3, fat: 8 } },
   { aliases: ["mixed vegetables"], unit: "g", servingSize: 100, macros: { calories: 35, protein: 2, carbs: 6, fat: 0.4 } },
   { aliases: ["miso paste"], unit: "g", servingSize: 100, macros: { calories: 199, protein: 12, carbs: 25, fat: 6 } },
+  { aliases: ["soy sauce"], unit: "ml", servingSize: 100, macros: { calories: 53, protein: 8, carbs: 4.9, fat: 0.6 } },
   { aliases: ["rice vinegar"], unit: "ml", servingSize: 100, macros: { calories: 18, protein: 0, carbs: 0.3, fat: 0 } },
   { aliases: ["ground turkey", "turkey mince"], unit: "g", servingSize: 100, macros: { calories: 170, protein: 22, carbs: 0, fat: 9 } },
   { aliases: ["black beans"], unit: "g", servingSize: 100, macros: { calories: 132, protein: 8.9, carbs: 23.7, fat: 0.5 } },
@@ -1034,6 +1055,25 @@ const buildMealFilterContext = (prefs: PreferencesInput): MealFilterContext => (
   dietaryMode: inferDietaryMode(prefs),
 });
 
+const allowsPremiumMeals = (prefs: PreferencesInput) => {
+  const premiumSignals = [
+    ...(prefs.tastes ?? []),
+    prefs.profile?.notes ?? "",
+    ...(prefs.profile?.deliveryPreferences ?? []),
+  ]
+    .map((value) => normalizeLookupText(value))
+    .join(" ");
+  return premiumSignals.includes("premium") || premiumSignals.includes("gourmet");
+};
+
+const applyBudgetTierFilter = (candidates: BaseMeal[], prefs: PreferencesInput) => {
+  if (allowsPremiumMeals(prefs)) {
+    return candidates;
+  }
+  const budgetSafe = candidates.filter((meal) => (meal.budgetTier ?? "standard") !== "premium");
+  return budgetSafe.length ? budgetSafe : candidates;
+};
+
 const mealMatchesSensitiveTerms = (meal: BaseMeal, terms: string[]) =>
   terms.some((term) =>
     expandsSensitiveTerm(term).some((keyword) => containsKeyword(meal, keyword))
@@ -1043,14 +1083,15 @@ const filterMealsByPreferences = (
   candidates: BaseMeal[],
   prefs: PreferencesInput
 ): BaseMeal[] => {
+  const budgetFiltered = applyBudgetTierFilter(candidates, prefs);
   const filters = buildMealFilterContext(prefs);
   if (!filters.allergies.length && !filters.dislikes.length && !filters.dietaryMode) {
-    return candidates;
+    return budgetFiltered;
   }
 
   const allergySafe = filters.allergies.length
-    ? candidates.filter((meal) => !mealMatchesSensitiveTerms(meal, filters.allergies))
-    : candidates;
+    ? budgetFiltered.filter((meal) => !mealMatchesSensitiveTerms(meal, filters.allergies))
+    : budgetFiltered;
 
   const dietaryMode = filters.dietaryMode;
   const dietarySafe = dietaryMode
@@ -1065,20 +1106,6 @@ const filterMealsByPreferences = (
 
   return dislikeSafe;
 };
-
-const cuisinePreferenceKeywords = (value: string) => {
-  const normalized = normalizeLookupText(value);
-  if (!normalized) return [];
-  if (normalized.includes("middle eastern")) {
-    return ["middle eastern", "harissa", "za atar", "zaatar"];
-  }
-  return [normalized];
-};
-
-const mealMatchesCuisinePreferences = (meal: BaseMeal, cuisines: string[]) =>
-  cuisines.some((cuisine) =>
-    cuisinePreferenceKeywords(cuisine).some((keyword) => containsKeyword(meal, keyword))
-  );
 
 const PROTEIN_STEP_KEYWORDS = [
   "chicken",
@@ -1098,6 +1125,24 @@ const PROTEIN_STEP_KEYWORDS = [
   "yogurt",
 ];
 
+const COOK_REQUIRED_PROTEIN_KEYWORDS = [
+  "chicken",
+  "turkey",
+  "beef",
+  "pork",
+  "lamb",
+  "salmon",
+  "cod",
+  "fish fillet",
+  "shrimp",
+  "prawn",
+  "egg",
+  "tofu",
+  "tempeh",
+  "mince",
+  "steak",
+];
+
 const CARB_STEP_KEYWORDS = [
   "rice",
   "oats",
@@ -1109,6 +1154,47 @@ const CARB_STEP_KEYWORDS = [
   "freekeh",
   "potato",
   "bread",
+];
+
+const COOKABLE_CARB_KEYWORDS = [
+  "rice",
+  "quinoa",
+  "couscous",
+  "pasta",
+  "noodle",
+  "soba",
+  "potato",
+  "sweet potato",
+  "lentil",
+  "freekeh",
+];
+
+const QUICK_HEAT_CARB_KEYWORDS = [
+  "wrap",
+  "tortilla",
+  "bread",
+  "bagel",
+  "pita",
+];
+
+const OVEN_METHOD_HINTS = [
+  "oven",
+  "roast",
+  "roasted",
+  "baked",
+  "sheet pan",
+  "tray bake",
+];
+
+const ASSEMBLY_STEP_HINTS = [
+  "overnight",
+  "smoothie",
+  "parfait",
+  "salad",
+  "no cook",
+  "chia pudding",
+  "yogurt bowl",
+  "protein oats",
 ];
 
 const SAUCE_STEP_KEYWORDS = [
@@ -1176,6 +1262,197 @@ const uniqueNonEmptySteps = (steps: string[]) =>
     )
   );
 
+const STEP_FILTER_PATTERNS: RegExp[] = [
+  /goal vibe:/i,
+  /total active time should be around/i,
+  /^prep .*measure the remaining ingredients\./i,
+  /\b(wrap|tortilla|bread|bagel)\b.*package directions.*tender/i,
+  /according to package directions/i,
+  /^serve (hot and )?enjoy\.?$/i,
+  /^serve and enjoy\.?$/i,
+];
+
+const shouldDropStep = (step: string) =>
+  STEP_FILTER_PATTERNS.some((pattern) => pattern.test(step));
+
+export const sanitizeRecipeSteps = (steps: string[]) =>
+  uniqueNonEmptySteps(
+    steps
+      .map((step) => step.replace(/\s+/g, " ").trim())
+      .filter(Boolean)
+      .filter((step) => !shouldDropStep(step))
+  );
+
+const ingredientIncludesKeyword = (ingredient: IngredientLine, keywords: string[]) => {
+  const normalized = normalizeLookupText(ingredient.name);
+  return keywords.some((keyword) => normalized.includes(keyword));
+};
+
+type CookingMethod = "assembly" | "pan" | "oven";
+
+const mealLooksAssemblyStyle = (input: {
+  mealSlot: MealSlot;
+  title?: string;
+  description?: string;
+  ingredients: IngredientLine[];
+}) => {
+  const titleAndDescription = normalizeLookupText(
+    `${input.title ?? ""} ${input.description ?? ""}`
+  );
+  if (ASSEMBLY_STEP_HINTS.some((keyword) => titleAndDescription.includes(keyword))) {
+    return true;
+  }
+
+  const hasCookProtein = input.ingredients.some((ingredient) =>
+    ingredientIncludesKeyword(ingredient, COOK_REQUIRED_PROTEIN_KEYWORDS)
+  );
+  const hasCookableCarb = input.ingredients.some((ingredient) =>
+    ingredientIncludesKeyword(ingredient, COOKABLE_CARB_KEYWORDS)
+  );
+
+  if (!hasCookProtein && !hasCookableCarb) {
+    return true;
+  }
+  if (input.mealSlot === "snack" && !hasCookProtein) {
+    return true;
+  }
+  return false;
+};
+
+const mealLooksOvenStyle = (input: {
+  title?: string;
+  description?: string;
+  ingredients: IngredientLine[];
+}) => {
+  const titleAndDescription = normalizeLookupText(
+    `${input.title ?? ""} ${input.description ?? ""}`
+  );
+  if (OVEN_METHOD_HINTS.some((keyword) => titleAndDescription.includes(keyword))) {
+    return true;
+  }
+  return input.ingredients.some((ingredient) =>
+    ingredientIncludesKeyword(ingredient, ["potato wedges", "sheet pan", "roast"])
+  );
+};
+
+const resolveCookingMethod = (input: {
+  mealSlot: MealSlot;
+  title?: string;
+  description?: string;
+  ingredients: IngredientLine[];
+}): CookingMethod => {
+  if (mealLooksAssemblyStyle(input)) return "assembly";
+  if (mealLooksOvenStyle(input)) return "oven";
+  return "pan";
+};
+
+const chooseByKeywords = (
+  ingredients: IngredientLine[],
+  keywords: string[],
+  limit: number
+) => ingredientNamesMatching(ingredients, keywords, limit);
+
+const prepInstruction = (
+  ingredients: IngredientLine[],
+  mealSlot: MealSlot
+) => {
+  const sliceItems = chooseByKeywords(
+    ingredients,
+    [
+      "avocado",
+      "tomato",
+      "cucumber",
+      "onion",
+      "pepper",
+      "carrot",
+      "lime",
+      "lemon",
+      "herb",
+      "scallion",
+      "spring onion",
+      "mushroom",
+    ],
+    3
+  );
+  const washItems = chooseByKeywords(
+    ingredients,
+    ["spinach", "greens", "lettuce", "kale", "herb", "cabbage"],
+    2
+  );
+
+  if (sliceItems.length || washItems.length) {
+    const sliceText = sliceItems.length
+      ? `Slice ${formatIngredientSeries(sliceItems)}`
+      : "";
+    const washText = washItems.length
+      ? `wash ${formatIngredientSeries(washItems)}`
+      : "";
+    const joined = [sliceText, washText].filter(Boolean).join(", then ");
+    return `${joined.charAt(0).toUpperCase()}${joined.slice(1)}.`;
+  }
+
+  if (mealSlot === "snack") {
+    return "Set out the ingredients and any containers for assembly.";
+  }
+
+  return "Prep the ingredients that need chopping so everything is ready to cook.";
+};
+
+const proteinCookStep = (ingredients: IngredientLine[]) => {
+  const eggIngredients = chooseByKeywords(ingredients, ["egg"], 1);
+  if (eggIngredients.length) {
+    return "Crack the eggs into a bowl, season, whisk, then cook over medium-low heat for about 2 minutes until just set.";
+  }
+
+  const proteins = chooseByKeywords(ingredients, COOK_REQUIRED_PROTEIN_KEYWORDS, 2);
+  if (proteins.length) {
+    return `Add ${formatIngredientSeries(
+      proteins
+    )} to the pan and cook over medium heat for 4-8 minutes until cooked through.`;
+  }
+
+  return "";
+};
+
+const produceCookStep = (ingredients: IngredientLine[]) => {
+  const hardy = chooseByKeywords(
+    ingredients,
+    ["onion", "pepper", "carrot", "cabbage", "broccoli", "cauliflower"],
+    3
+  );
+  const quick = chooseByKeywords(
+    ingredients,
+    ["spinach", "greens", "tomato", "herb", "scallion", "spring onion"],
+    3
+  );
+
+  if (hardy.length && quick.length) {
+    return `Add ${formatIngredientSeries(
+      hardy
+    )} first for 2-4 minutes, then stir in ${formatIngredientSeries(
+      quick
+    )} for the final minute.`;
+  }
+  if (hardy.length) {
+    return `Cook ${formatIngredientSeries(hardy)} for 2-4 minutes until just tender.`;
+  }
+  if (quick.length) {
+    return `Stir in ${formatIngredientSeries(quick)} and cook briefly until just wilted.`;
+  }
+  return "";
+};
+
+const ovenTemperatureForIngredients = (ingredients: IngredientLine[]) => {
+  const fish = chooseByKeywords(ingredients, ["salmon", "cod", "fish"], 1);
+  if (fish.length) return 200;
+  return 210;
+};
+
+const ovenCookMinutes = (readyInMinutes?: number) => {
+  if (!readyInMinutes || readyInMinutes <= 0) return 20;
+  return Math.max(12, Math.min(35, Math.round(readyInMinutes * 0.7)));
+};
+
 export const buildRecipeSteps = (input: {
   mealSlot: MealSlot;
   title?: string;
@@ -1185,66 +1462,112 @@ export const buildRecipeSteps = (input: {
 }): string[] => {
   const { mealSlot, description, ingredients, readyInMinutes, title } = input;
   const mealTitle = title?.trim() || mealTitleFromSlot(mealSlot);
-  const prepIngredients = ingredients.slice(0, 4).map((ingredient) => ingredient.name);
   const proteinIngredients = ingredientNamesMatching(ingredients, PROTEIN_STEP_KEYWORDS, 2);
   const carbIngredients = ingredientNamesMatching(ingredients, CARB_STEP_KEYWORDS, 2);
+  const cookableCarbIngredients = ingredientNamesMatching(
+    ingredients,
+    COOKABLE_CARB_KEYWORDS,
+    2
+  );
+  const quickHeatCarbs = ingredientNamesMatching(
+    ingredients,
+    QUICK_HEAT_CARB_KEYWORDS,
+    2
+  );
   const sauceIngredients = ingredientNamesMatching(ingredients, SAUCE_STEP_KEYWORDS, 2);
-  const produceIngredients = ingredientNamesMatching(ingredients, PRODUCE_STEP_KEYWORDS, 3);
-  const prepLine = prepIngredients.length
-    ? `Prep ${formatIngredientSeries(prepIngredients)} and measure the remaining ingredients.`
-    : `Gather the ingredients for ${mealTitle.toLowerCase()}.`;
+  const cookingMethod = resolveCookingMethod({
+    mealSlot,
+    title,
+    description,
+    ingredients,
+  });
+  const prepLine = prepInstruction(ingredients, mealSlot);
 
-  if (mealSlot === "snack") {
-    const snackSteps = [
+  if (cookingMethod === "assembly") {
+    const assemblyCore = [
+      ...proteinIngredients,
+      ...carbIngredients,
+      ...ingredientNamesMatching(ingredients, PRODUCE_STEP_KEYWORDS, 3),
+    ].slice(0, 4);
+    const assemblySteps = [
       prepLine,
-      carbIngredients.length
-        ? `Layer or combine ${formatIngredientSeries(carbIngredients)} with ${formatIngredientSeries(
-            proteinIngredients.length ? proteinIngredients : prepIngredients.slice(0, 2)
-          )} in a bowl or container.`
-        : `Combine the ingredients in a bowl and mix until evenly distributed.`,
+      quickHeatCarbs.length
+        ? `Warm ${formatIngredientSeries(
+            quickHeatCarbs
+          )} briefly so they are soft and easy to fold.`
+        : "",
+      assemblyCore.length
+        ? `Combine ${formatIngredientSeries(
+            assemblyCore
+          )} in a bowl, jar, or on a board for assembly.`
+        : `Combine the ingredients in a bowl.`,
       sauceIngredients.length
         ? `Stir in ${formatIngredientSeries(
             sauceIngredients
-          )} to add flavor and moisture, then adjust to taste.`
-        : `Taste and adjust seasoning or sweetness as needed.`,
-      readyInMinutes
-        ? `Serve immediately or chill briefly. This snack should be ready in about ${readyInMinutes} minutes.`
-        : `Serve immediately or chill briefly before eating.`,
+          )} and mix until everything is evenly coated.`
+        : `Mix gently until evenly combined.`,
+      quickHeatCarbs.length
+        ? `Fill the warm ${formatIngredientSeries(
+            quickHeatCarbs
+          )}, roll or fold, and serve.`
+        : `Finish with any toppings and serve, or chill until ready to eat.`,
     ];
-    return uniqueNonEmptySteps(snackSteps);
+    return sanitizeRecipeSteps(assemblySteps).slice(0, 6);
   }
 
-  const savorySteps = [
+  if (cookingMethod === "oven") {
+    const ovenTemp = ovenTemperatureForIngredients(ingredients);
+    const cookMinutes = ovenCookMinutes(readyInMinutes);
+    const trayIngredients = [
+      ...chooseByKeywords(ingredients, COOK_REQUIRED_PROTEIN_KEYWORDS, 2),
+      ...chooseByKeywords(ingredients, ["potato", "sweet potato", "broccoli", "cauliflower"], 3),
+    ];
+    const trayText = trayIngredients.length
+      ? formatIngredientSeries(trayIngredients)
+      : mealTitle.toLowerCase();
+    const toppingIngredients = chooseByKeywords(
+      ingredients,
+      ["yogurt", "herb", "lime", "lemon", "tomato", "spinach"],
+      3
+    );
+
+    const ovenSteps = [
+      `Preheat the oven to ${ovenTemp}°C.`,
+      prepLine,
+      `Arrange ${trayText} on a lined tray, drizzle with oil, season, and spread into a single layer.`,
+      `Roast for ${cookMinutes} minutes until cooked through and lightly golden.`,
+      toppingIngredients.length
+        ? `Rest for 2 minutes, then plate and finish with ${formatIngredientSeries(
+            toppingIngredients
+          )}.`
+        : `Rest for 2 minutes, then plate and serve.`,
+    ];
+    return sanitizeRecipeSteps(ovenSteps).slice(0, 6);
+  }
+
+  const panSteps = [
     prepLine,
-    carbIngredients.length
+    "Heat a pan over medium heat and add a small drizzle of oil.",
+    proteinCookStep(ingredients),
+    produceCookStep(ingredients),
+    cookableCarbIngredients.length
       ? `Cook ${formatIngredientSeries(
-          carbIngredients
-        )} according to package directions until tender.`
+          cookableCarbIngredients
+        )} until tender, then add it to the pan.`
       : "",
-    proteinIngredients.length
-      ? `Cook ${formatIngredientSeries(
-          proteinIngredients
-        )} over medium-high heat until fully done and lightly browned.`
+    quickHeatCarbs.length
+      ? `Warm ${formatIngredientSeries(
+          quickHeatCarbs
+        )} in the pan for 20-30 seconds per side.`
       : "",
     sauceIngredients.length
-      ? `Whisk ${formatIngredientSeries(
+      ? `Stir in ${formatIngredientSeries(
           sauceIngredients
-        )} together in a small bowl to create a quick sauce.`
-      : "",
-    produceIngredients.length
-      ? `Add ${formatIngredientSeries(
-          produceIngredients
-        )} and cook briefly until just tender while keeping texture.`
-      : "",
-    description
-      ? `Finish by combining everything, toss well, and plate. Goal vibe: ${description}`
-      : `Combine all cooked components, toss together, and season to taste.`,
-    readyInMinutes
-      ? `Serve hot and enjoy. Total active time should be around ${readyInMinutes} minutes.`
-      : `Serve warm and adjust portions as needed.`,
+        )}, season to taste, and serve while hot.`
+      : `Season to taste, combine everything, and serve while hot.`,
   ];
 
-  return uniqueNonEmptySteps(savorySteps).slice(0, 6);
+  return sanitizeRecipeSteps(panSteps).slice(0, 6);
 };
 
 const normalizeProteinLabel = (value?: string | null): string | null => {
@@ -1540,71 +1863,269 @@ const findLowerFatAlternative = (
   return ranked[0]?.meal ?? null;
 };
 
-const scoreMeal = (
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+
+const ingredientOverlapScore = (candidateMeal: BaseMeal, alreadySelected: BaseMeal[]) => {
+  const candidateIngredients = candidateMeal.ingredients.map((ingredient) =>
+    normalizeLookupText(ingredient.name)
+  );
+  if (!candidateIngredients.length) return 0;
+  const existingIngredients = new Set(
+    alreadySelected.flatMap((meal) =>
+      meal.ingredients.map((ingredient) => normalizeLookupText(ingredient.name))
+    )
+  );
+  const overlap = candidateIngredients.filter((ingredient) =>
+    existingIngredients.has(ingredient)
+  ).length;
+  return overlap / candidateIngredients.length;
+};
+
+const PRIMARY_PROTEIN_HINTS: Array<{ source: string; terms: string[] }> = [
+  { source: "chicken", terms: ["chicken"] },
+  { source: "turkey", terms: ["turkey"] },
+  { source: "eggs", terms: ["egg"] },
+  { source: "tofu", terms: ["tofu"] },
+  { source: "beef", terms: ["beef"] },
+  { source: "salmon", terms: ["salmon"] },
+  { source: "shrimp", terms: ["shrimp", "prawn"] },
+  { source: "tuna", terms: ["tuna"] },
+  { source: "beans", terms: ["bean", "hummus", "edamame"] },
+  { source: "dairy", terms: ["yogurt", "cottage", "whey"] },
+];
+
+const primaryProteinSourceForMeal = (meal: BaseMeal): string => {
+  const ingredientText = normalizeLookupText(
+    meal.ingredients.map((ingredient) => ingredient.name).join(" ")
+  );
+  const matched = PRIMARY_PROTEIN_HINTS.find(({ terms }) =>
+    terms.some((term) => ingredientText.includes(term))
+  );
+  if (matched) return matched.source;
+  return meal.proteinType ?? "mixed";
+};
+
+const macroFitScore = (
   meal: BaseMeal,
-  prefs: PreferencesInput,
   slot: MealSlot,
-  targets: MacroTargets | null
+  targets: MacroTargets | null,
+  slots: MealSlot[]
 ) => {
+  if (!targets?.calories && !targets?.protein) {
+    return 0.7;
+  }
   const macros = mealMacrosFromIngredients(meal);
-  let score = 1 + Math.random();
-  if (prefs.tastes.length && meal.tastes.some((taste) => prefs.tastes.includes(taste))) {
-    score += 2;
+  const weights = calorieWeightsForSlots(slots);
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+  const slotIndexes = slots
+    .map((slotValue, index) => (slotValue === slot ? index : -1))
+    .filter((index) => index >= 0);
+  const averageSlotWeight =
+    slotIndexes.length > 0
+      ? slotIndexes.reduce((sum, index) => sum + (weights[index] ?? 1), 0) /
+        slotIndexes.length
+      : 1;
+
+  const calorieTarget = targets.calories
+    ? (targets.calories * averageSlotWeight) / totalWeight
+    : null;
+  const proteinTarget = targets.protein ? targets.protein / slots.length : null;
+
+  const calorieScore = calorieTarget
+    ? clamp01(
+        1 -
+          Math.abs(macros.calories - calorieTarget) /
+            Math.max(120, calorieTarget)
+      )
+    : 0.65;
+  const proteinScore = proteinTarget
+    ? clamp01(
+        1 -
+          Math.abs(macros.protein - proteinTarget) /
+            Math.max(8, proteinTarget)
+      )
+    : 0.65;
+
+  return clamp01(calorieScore * 0.45 + proteinScore * 0.55);
+};
+
+type WeeklySelectionState = {
+  dayIndex: number;
+  slots: MealSlot[];
+  selectedMeals: BaseMeal[];
+  mealUsage: Map<string, number>;
+  usedProteinSources: Set<string>;
+  mealDayHistory: Map<string, number[]>;
+};
+
+const createWeeklySelectionState = (slots: MealSlot[]): WeeklySelectionState => ({
+  dayIndex: 0,
+  slots,
+  selectedMeals: [],
+  mealUsage: new Map<string, number>(),
+  usedProteinSources: new Set<string>(),
+  mealDayHistory: new Map<string, number[]>(),
+});
+
+const mealLibraryById = new Map(MEAL_LIBRARY.map((meal) => [meal.id, meal]));
+
+const registerMealSelection = (state: WeeklySelectionState, meal: BaseMeal) => {
+  state.selectedMeals.push(meal);
+  state.mealUsage.set(meal.id, (state.mealUsage.get(meal.id) ?? 0) + 1);
+  state.usedProteinSources.add(primaryProteinSourceForMeal(meal));
+  const days = state.mealDayHistory.get(meal.id) ?? [];
+  days.push(state.dayIndex);
+  state.mealDayHistory.set(meal.id, days);
+};
+
+const mealUsageStats = (
+  candidateMeal: BaseMeal,
+  state: WeeklySelectionState
+) => {
+  const timesUsed = state.mealUsage.get(candidateMeal.id) ?? 0;
+  const usageDays = state.mealDayHistory.get(candidateMeal.id) ?? [];
+  const lastUsedDay = usageDays.length ? usageDays[usageDays.length - 1] : null;
+  const dayGap =
+    typeof lastUsedDay === "number" ? state.dayIndex - lastUsedDay : null;
+  return {
+    timesUsed,
+    lastUsedDay,
+    dayGap,
+  };
+};
+
+const repeatPenaltyScore = (
+  candidateMeal: BaseMeal,
+  state: WeeklySelectionState
+) => {
+  const { timesUsed, dayGap } = mealUsageStats(candidateMeal, state);
+  if (timesUsed === 0) {
+    return 0;
   }
-  if (prefs.goal && meal.goalFit?.includes(prefs.goal)) {
-    score += 1.5;
+
+  let penalty = WEEK_REUSE_PENALTY * timesUsed;
+  if (dayGap !== null && dayGap <= 1) {
+    penalty += CONSECUTIVE_DAY_REUSE_PENALTY;
+  } else if (dayGap !== null && dayGap === 2) {
+    penalty += NEAR_DAY_REUSE_PENALTY;
   }
-  if (prefs.mealComplexity && meal.complexity === prefs.mealComplexity) {
-    score += 1;
+  return penalty;
+};
+
+const isCandidateStrictlyVaried = (
+  candidateMeal: BaseMeal,
+  state: WeeklySelectionState
+) => {
+  const { timesUsed, dayGap } = mealUsageStats(candidateMeal, state);
+  if (timesUsed >= MAX_MEAL_USES_PER_WEEK) {
+    return false;
   }
-  if (prefs.profile?.cuisines?.length) {
-    const preferredCuisines = normalizePreferenceTerms(prefs.profile.cuisines);
-    if (preferredCuisines.length && mealMatchesCuisinePreferences(meal, preferredCuisines)) {
-      score += 1.4;
-    }
+  if (dayGap !== null && dayGap <= 1) {
+    return false;
   }
-  const targetProtein = targets?.protein;
-  if (typeof targetProtein === "number" && targetProtein > 0) {
-    const proteinDensity = macros.protein / Math.max(1, macros.calories);
-    score += proteinDensity * 22;
-    if (slot === "snack") {
-      score += macros.protein * 0.18;
-      if (targetProtein >= 170 && macros.protein >= 20) {
-        score += 2.5;
-      }
-    }
+  return true;
+};
+
+const applyProteinSourceConstraint = (
+  pool: BaseMeal[],
+  state?: WeeklySelectionState
+) => {
+  if (!state) return pool;
+  if (state.usedProteinSources.size < MAX_PROTEIN_SOURCES_PER_WEEK) {
+    return pool;
   }
-  return score;
+  const constrained = pool.filter((meal) =>
+    state.usedProteinSources.has(primaryProteinSourceForMeal(meal))
+  );
+  return constrained.length ? constrained : pool;
+};
+
+const scoreMealForWeekSelection = (
+  candidateMeal: BaseMeal,
+  slot: MealSlot,
+  targets: MacroTargets | null,
+  state: WeeklySelectionState
+) => {
+  const macroScore = macroFitScore(candidateMeal, slot, targets, state.slots);
+  const overlapScore = ingredientOverlapScore(candidateMeal, state.selectedMeals);
+  const { timesUsed } = mealUsageStats(candidateMeal, state);
+  const repeatPenalty = repeatPenaltyScore(candidateMeal, state);
+  const varietyBoost = timesUsed === 0 ? 1 : timesUsed === 1 ? 0.2 : 0;
+  const jitter = Math.random() * 0.03;
+
+  return (
+    macroScore * 0.45 +
+    overlapScore * 0.35 +
+    varietyBoost * 0.2 +
+    jitter -
+    repeatPenalty / 100
+  );
 };
 
 const selectBaseMeal = (
   slot: MealSlot,
   prefs: PreferencesInput,
   targets: MacroTargets | null,
-  excludeBaseIds?: Set<string>
+  options?: {
+    excludeBaseIds?: Set<string>;
+    selectionState?: WeeklySelectionState;
+  }
 ) => {
-  const excludedIds = excludeBaseIds ?? new Set<string>();
+  const excludedIds = options?.excludeBaseIds ?? new Set<string>();
+  const selectionState = options?.selectionState;
   const candidates = MEAL_LIBRARY.filter((meal) => meal.mealTypes.includes(slot));
   const uniqueCandidates = candidates.filter((meal) => !excludedIds.has(meal.id));
   const slotPool = uniqueCandidates.length ? uniqueCandidates : candidates;
   const filtered = filterMealsByPreferences(slotPool, prefs);
-  const pool = filtered;
-  const ranked = pool
-    .map((meal) => ({ meal, score: scoreMeal(meal, prefs, slot, targets) }))
-    .sort((a, b) => b.score - a.score);
-  if (!ranked.length) {
+  const proteinConstrained = applyProteinSourceConstraint(filtered, selectionState);
+  const pool = proteinConstrained.length ? proteinConstrained : filtered;
+  if (!pool.length) {
     console.warn(
       `No preference-safe meals available for slot "${slot}". Falling back to default candidate.`
     );
     return slotPool[0] ?? MEAL_LIBRARY[0];
   }
-  const window = Math.min(5, ranked.length);
-  const index = Math.floor(Math.random() * window);
-  return ranked[index].meal;
+
+  if (!selectionState || selectionState.dayIndex === 0) {
+    const randomIndex = Math.floor(Math.random() * pool.length);
+    return pool[randomIndex] ?? slotPool[0] ?? MEAL_LIBRARY[0];
+  }
+
+  const strictPool = pool.filter((meal) =>
+    isCandidateStrictlyVaried(meal, selectionState)
+  );
+  const cappedPool = pool.filter((meal) => {
+    const { timesUsed } = mealUsageStats(meal, selectionState);
+    return timesUsed < MAX_MEAL_USES_PER_WEEK;
+  });
+  const effectivePool = strictPool.length
+    ? strictPool
+    : cappedPool.length
+    ? cappedPool
+    : pool;
+
+  const ranked = effectivePool
+    .map((meal) => ({
+      meal,
+      score: scoreMealForWeekSelection(meal, slot, targets, selectionState),
+    }))
+    .sort((a, b) => b.score - a.score);
+
+  const topWindow = ranked.slice(0, Math.min(3, ranked.length));
+  const randomTop = topWindow[Math.floor(Math.random() * topWindow.length)];
+  return (
+    randomTop?.meal ??
+    ranked[0]?.meal ??
+    effectivePool[0] ??
+    pool[0] ??
+    slotPool[0] ??
+    MEAL_LIBRARY[0]
+  );
 };
 
 type MealInstanceOptions = {
   excludeBaseIds?: Set<string>;
+  selectionState?: WeeklySelectionState;
 };
 
 const createMealInstanceFromBase = (
@@ -1620,7 +2141,7 @@ const createMealInstanceFromBase = (
   const scaledMacros = scaleMacros(computedBaseMacros, multiplier);
   const recipeSteps =
     base.steps && base.steps.length
-      ? uniqueNonEmptySteps(base.steps)
+      ? sanitizeRecipeSteps(base.steps)
       : buildRecipeSteps({
           mealSlot: slot,
           title: base.name,
@@ -1656,19 +2177,27 @@ const createMealInstance = (
   targets: MacroTargets | null,
   options?: MealInstanceOptions
 ): MealInstance => {
-  const base = selectBaseMeal(slot, prefs, targets, options?.excludeBaseIds);
+  const base = selectBaseMeal(slot, prefs, targets, {
+    excludeBaseIds: options?.excludeBaseIds,
+    selectionState: options?.selectionState,
+  });
+  if (options?.selectionState) {
+    registerMealSelection(options.selectionState, base);
+  }
   return createMealInstanceFromBase(base, slot, prefs);
 };
 
 const createDayMeals = (
   slots: MealSlot[],
   prefs: PreferencesInput,
-  targets: MacroTargets | null
+  targets: MacroTargets | null,
+  selectionState?: WeeklySelectionState
 ) => {
   const usedBaseIds = new Set<string>();
   return slots.map((slot) => {
     const meal = createMealInstance(slot, prefs, targets, {
       excludeBaseIds: usedBaseIds,
+      selectionState,
     });
     usedBaseIds.add(meal.baseId);
     return meal;
@@ -1723,14 +2252,244 @@ const recalcWeek = (plan: WeeklyMealPlan) => {
 const clonePlan = (plan: WeeklyMealPlan): WeeklyMealPlan =>
   JSON.parse(JSON.stringify(plan));
 
+const toBaseMealFromInstance = (meal: MealInstance): BaseMeal => {
+  const libraryMeal = mealLibraryById.get(meal.baseId);
+  if (libraryMeal) {
+    return libraryMeal;
+  }
+  return {
+    id: meal.baseId || meal.instanceId,
+    name: meal.title,
+    description: meal.description,
+    steps: meal.steps,
+    mealTypes: [meal.mealSlot],
+    tastes: meal.tags ?? [],
+    complexity: "normal",
+    readyInMinutes: meal.readyInMinutes,
+    image: meal.image,
+    macros: meal.baseMacros ?? meal.macros,
+    ingredients: meal.baseIngredients?.length ? meal.baseIngredients : meal.ingredients,
+    proteinType: meal.proteinType,
+  };
+};
+
+const mealItemsForPricing = (meal: MealInstance) =>
+  (meal.ingredients ?? []).map((ingredient) => ({
+    name: ingredient.name,
+    quantity: Math.max(0, ingredient.amount),
+    unit: canonicalShoppingUnit(ingredient.unit),
+    category: ingredient.category,
+  }));
+
+const adjustedBasketSubtotal = (basket: ReturnType<typeof priceBasket>) =>
+  Number(
+    (
+      basket.subtotal +
+      basket.unmatchedItems.length * UNKNOWN_ITEM_PRICE_GBP
+    ).toFixed(2)
+  );
+
+const estimateMealCost = (meal: MealInstance) => {
+  const basket = priceBasket(mealItemsForPricing(meal));
+  return adjustedBasketSubtotal(basket);
+};
+
+const estimatePlanCost = (plan: WeeklyMealPlan) => {
+  const basket = priceBasket(buildShoppingList(plan));
+  return {
+    basket,
+    estimatedTotal: adjustedBasketSubtotal(basket),
+  };
+};
+
+const collectBaseMealsFromPlan = (
+  plan: WeeklyMealPlan,
+  exclude?: { dayIndex: number; mealIndex: number }
+) =>
+  plan.days.flatMap((day, dayIndex) =>
+    day.meals
+      .filter((_, mealIndex) =>
+        !exclude ||
+        exclude.dayIndex !== dayIndex ||
+        exclude.mealIndex !== mealIndex
+      )
+      .map((meal) => toBaseMealFromInstance(meal))
+  );
+
+const collectProteinSourcesFromPlan = (
+  plan: WeeklyMealPlan,
+  exclude?: { dayIndex: number; mealIndex: number }
+) => {
+  const sources = new Set<string>();
+  plan.days.forEach((day, dayIndex) => {
+    day.meals.forEach((meal, mealIndex) => {
+      if (
+        exclude &&
+        exclude.dayIndex === dayIndex &&
+        exclude.mealIndex === mealIndex
+      ) {
+        return;
+      }
+      sources.add(primaryProteinSourceForMeal(toBaseMealFromInstance(meal)));
+    });
+  });
+  return sources;
+};
+
+const ingredientFrequencyForPlan = (plan: WeeklyMealPlan) => {
+  const counts = new Map<string, number>();
+  plan.days.forEach((day) => {
+    day.meals.forEach((meal) => {
+      (meal.ingredients ?? []).forEach((ingredient) => {
+        const key = normalizeLookupText(ingredient.name);
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      });
+    });
+  });
+  return counts;
+};
+
+const uniqueIngredientRatio = (
+  meal: MealInstance,
+  ingredientFrequency: Map<string, number>
+) => {
+  const ingredients = meal.ingredients ?? [];
+  if (!ingredients.length) return 0;
+  const uniqueCount = ingredients.filter((ingredient) => {
+    const key = normalizeLookupText(ingredient.name);
+    return (ingredientFrequency.get(key) ?? 0) <= 1;
+  }).length;
+  return uniqueCount / ingredients.length;
+};
+
+const optimizePlanCost = (
+  plan: WeeklyMealPlan,
+  prefs: PreferencesInput,
+  macroTargets: MacroTargets | null,
+  slots: MealSlot[]
+) => {
+  let estimate = estimatePlanCost(plan);
+  if (estimate.estimatedTotal <= COST_WARNING_THRESHOLD_GBP) {
+    return;
+  }
+
+  console.warn(
+    `[budget] Estimated weekly cost £${estimate.estimatedTotal.toFixed(
+      2
+    )} exceeds £${COST_WARNING_THRESHOLD_GBP}. Attempting cheaper swaps.`
+  );
+
+  const frequency = ingredientFrequencyForPlan(plan);
+  const expensiveMeals = plan.days
+    .flatMap((day, dayIndex) =>
+      day.meals.map((meal, mealIndex) => ({
+        dayIndex,
+        mealIndex,
+        meal,
+        cost: estimateMealCost(meal),
+        uniqueness: uniqueIngredientRatio(meal, frequency),
+      }))
+    )
+    .sort(
+      (a, b) =>
+        b.cost * (1 + b.uniqueness) -
+        a.cost * (1 + a.uniqueness)
+    );
+
+  let swaps = 0;
+  for (const entry of expensiveMeals) {
+    if (estimate.estimatedTotal <= COST_WARNING_THRESHOLD_GBP || swaps >= 8) {
+      break;
+    }
+    const day = plan.days[entry.dayIndex];
+    const currentMeal = day?.meals[entry.mealIndex];
+    if (!day || !currentMeal) continue;
+
+    const usedBaseIds = new Set(
+      day.meals
+        .filter((_, index) => index !== entry.mealIndex)
+        .map((meal) => meal.baseId)
+    );
+
+    const baseCandidates = MEAL_LIBRARY.filter(
+      (meal) =>
+        meal.mealTypes.includes(currentMeal.mealSlot) &&
+        meal.id !== currentMeal.baseId &&
+        !usedBaseIds.has(meal.id)
+    );
+    const preferenceFiltered = filterMealsByPreferences(baseCandidates, prefs);
+    const candidatePool = preferenceFiltered.length
+      ? preferenceFiltered
+      : baseCandidates;
+    if (!candidatePool.length) continue;
+
+    const proteinSources = collectProteinSourcesFromPlan(plan, {
+      dayIndex: entry.dayIndex,
+      mealIndex: entry.mealIndex,
+    });
+    const proteinLimitedPool =
+      proteinSources.size >= MAX_PROTEIN_SOURCES_PER_WEEK
+        ? candidatePool.filter((candidate) =>
+            proteinSources.has(primaryProteinSourceForMeal(candidate))
+          )
+        : candidatePool;
+    const pool = proteinLimitedPool.length ? proteinLimitedPool : candidatePool;
+    const selectedMeals = collectBaseMealsFromPlan(plan, {
+      dayIndex: entry.dayIndex,
+      mealIndex: entry.mealIndex,
+    });
+
+    const currentCost = estimateMealCost(currentMeal);
+    const replacement = pool
+      .map((candidate) => {
+        const candidateMeal = createMealInstanceFromBase(
+          candidate,
+          currentMeal.mealSlot,
+          prefs,
+          currentMeal.portionMultiplier
+        );
+        const candidateCost = estimateMealCost(candidateMeal);
+        const savings = currentCost - candidateCost;
+        const overlap = ingredientOverlapScore(candidate, selectedMeals);
+        const macroScore = macroFitScore(candidate, currentMeal.mealSlot, macroTargets, slots);
+        return {
+          candidateMeal,
+          savings,
+          score: savings * 0.65 + overlap * 2.2 + macroScore * 1.5,
+        };
+      })
+      .filter((item) => item.savings > 0.5)
+      .sort((a, b) => b.score - a.score)[0];
+
+    if (!replacement) continue;
+
+    day.meals[entry.mealIndex] = replacement.candidateMeal;
+    optimizeDayForTargets(day, slots, prefs, macroTargets);
+    recalcDay(day);
+    recalcWeek(plan);
+    swaps += 1;
+    estimate = estimatePlanCost(plan);
+  }
+
+  if (estimate.estimatedTotal > COST_WARNING_THRESHOLD_GBP) {
+    console.warn(
+      `[budget] Plan still above threshold after swaps (£${estimate.estimatedTotal.toFixed(
+        2
+      )}).`
+    );
+  }
+};
+
 export const generateFallbackMealPlan = (prefs: PreferencesInput): WeeklyMealPlan => {
   const macroTargets = resolveMacroTargets(prefs);
   const slots = mealSlotsForPreferences(prefs);
   const signature = buildPreferenceSignature(prefs);
   const startOfWeek = getStartOfWeek();
+  const selectionState = createWeeklySelectionState(slots);
   const fullDays: DayPlan[] = Array.from({ length: WORKDAY_COUNT }).map((_, index) => {
     const date = addDays(startOfWeek, index);
-    const meals = createDayMeals(slots, prefs, macroTargets);
+    selectionState.dayIndex = index;
+    const meals = createDayMeals(slots, prefs, macroTargets, selectionState);
     const day: DayPlan = {
       id: randomId(),
       label: date.toLocaleDateString("en-US", { weekday: "long" }),
@@ -1742,7 +2501,7 @@ export const generateFallbackMealPlan = (prefs: PreferencesInput): WeeklyMealPla
     return day;
   });
 
-  return {
+  const plan: WeeklyMealPlan = {
     id: randomId(),
     userId: prefs.userId,
     weekStart: startOfWeek.toISOString(),
@@ -1751,15 +2510,26 @@ export const generateFallbackMealPlan = (prefs: PreferencesInput): WeeklyMealPla
     days: fullDays,
     weeklyTotals: sumMacros(fullDays.map((day) => day.totals)),
   };
+  optimizePlanCost(plan, prefs, macroTargets, slots);
+  recalcWeek(plan);
+  return plan;
 };
 
 const regenerateDayMeals = (
   day: DayPlan,
   prefs: PreferencesInput,
-  macroTargets: MacroTargets | null
+  macroTargets: MacroTargets | null,
+  options?: {
+    slots?: MealSlot[];
+    selectionState?: WeeklySelectionState;
+    dayIndex?: number;
+  }
 ) => {
-  const slots = mealSlotsForPreferences(prefs);
-  day.meals = createDayMeals(slots, prefs, macroTargets);
+  const slots = options?.slots ?? mealSlotsForPreferences(prefs);
+  if (options?.selectionState) {
+    options.selectionState.dayIndex = options.dayIndex ?? 0;
+  }
+  day.meals = createDayMeals(slots, prefs, macroTargets, options?.selectionState);
   optimizeDayForTargets(day, slots, prefs, macroTargets);
   recalcDay(day);
 };
@@ -1774,7 +2544,24 @@ export const regenerateDayInPlan = (
   const day = next.days[dayIndex];
   if (!day) return plan;
   const macroTargets = resolveMacroTargets(prefs);
-  regenerateDayMeals(day, prefs, macroTargets);
+  const slots = mealSlotsForPreferences(prefs);
+  const selectionState = createWeeklySelectionState(slots);
+  selectionState.dayIndex = dayIndex;
+  next.days.forEach((otherDay, index) => {
+    if (index === dayIndex) return;
+    const previousDayIndex = selectionState.dayIndex;
+    selectionState.dayIndex = index;
+    otherDay.meals.forEach((meal) => {
+      registerMealSelection(selectionState, toBaseMealFromInstance(meal));
+    });
+    selectionState.dayIndex = previousDayIndex;
+  });
+  regenerateDayMeals(day, prefs, macroTargets, {
+    slots,
+    dayIndex,
+    selectionState,
+  });
+  optimizePlanCost(next, prefs, macroTargets, slots);
   recalcWeek(next);
   return next;
 };
@@ -1786,9 +2573,16 @@ export const regenerateWeekInPlan = (
   const next = clonePlan(plan);
   next.days = clampDaysToWorkweek(next.days);
   const macroTargets = resolveMacroTargets(prefs);
-  next.days.forEach((day) => {
-    regenerateDayMeals(day, prefs, macroTargets);
+  const slots = mealSlotsForPreferences(prefs);
+  const selectionState = createWeeklySelectionState(slots);
+  next.days.forEach((day, index) => {
+    regenerateDayMeals(day, prefs, macroTargets, {
+      slots,
+      selectionState,
+      dayIndex: index,
+    });
   });
+  optimizePlanCost(next, prefs, macroTargets, slots);
   recalcWeek(next);
   return next;
 };
@@ -1805,6 +2599,20 @@ export const swapMealInPlan = (
   if (!day) return plan;
   const slot = day.meals[mealIndex]?.mealSlot ?? "lunch";
   const macroTargets = resolveMacroTargets(prefs);
+  const slots = mealSlotsForPreferences(prefs);
+  const selectionState = createWeeklySelectionState(slots);
+  selectionState.dayIndex = dayIndex;
+  next.days.forEach((candidateDay, candidateDayIndex) => {
+    const previousDayIndex = selectionState.dayIndex;
+    selectionState.dayIndex = candidateDayIndex;
+    candidateDay.meals.forEach((candidateMeal, candidateMealIndex) => {
+      if (candidateDayIndex === dayIndex && candidateMealIndex === mealIndex) {
+        return;
+      }
+      registerMealSelection(selectionState, toBaseMealFromInstance(candidateMeal));
+    });
+    selectionState.dayIndex = previousDayIndex;
+  });
   const usedBaseIds = new Set(
     day.meals
       .filter((_, index) => index !== mealIndex)
@@ -1812,8 +2620,10 @@ export const swapMealInPlan = (
   );
   day.meals[mealIndex] = createMealInstance(slot, prefs, macroTargets, {
     excludeBaseIds: usedBaseIds,
+    selectionState,
   });
-  optimizeDayForTargets(day, mealSlotsForPreferences(prefs), prefs, macroTargets);
+  optimizeDayForTargets(day, slots, prefs, macroTargets);
+  optimizePlanCost(next, prefs, macroTargets, slots);
   recalcDay(day);
   recalcWeek(next);
   return next;
@@ -1846,9 +2656,28 @@ export type ShoppingListItem = {
   unit: string;
   category?: string;
   displayName?: string;
+  amountNeeded?: number;
+  amountToBuy?: number;
 };
 
 const COUNTABLE_SHOPPING_UNITS = new Set(["large", "each", "piece", "slice", "unit"]);
+const SHOPPING_NAME_ALIASES: Record<string, string> = {
+  "turkey mince": "ground turkey",
+  "tinned tuna": "tuna",
+  tuna: "tuna",
+  "tuna canned": "tuna",
+  "extra firm tofu": "tofu",
+  "firm tofu": "tofu",
+  scallions: "spring onions",
+  "spring onion": "spring onions",
+  "whole grain wrap": "whole-grain wrap",
+  "whole grain wraps": "whole-grain wraps",
+  "whole wheat wrap": "whole-grain wrap",
+  "whole wheat wraps": "whole-grain wraps",
+  "bell pepper": "bell peppers",
+  peppers: "bell peppers",
+  "chopped tomatoes": "diced tomatoes",
+};
 
 const canonicalShoppingUnit = (unit: string) => {
   const normalized = normalizeLookupText(unit);
@@ -1856,6 +2685,11 @@ const canonicalShoppingUnit = (unit: string) => {
     return "piece";
   }
   return normalized || unit;
+};
+
+const canonicalShoppingName = (name: string) => {
+  const normalized = normalizeLookupText(name);
+  return SHOPPING_NAME_ALIASES[normalized] ?? normalized;
 };
 
 const roundMetricQuantity = (value: number) => {
@@ -1893,21 +2727,37 @@ export const buildShoppingList = (plan: WeeklyMealPlan): ShoppingListItem[] => {
   const map = new Map<string, ShoppingListItem>();
   plan.days.forEach((day) => {
     day.meals.forEach((meal) => {
-      (meal.ingredients ?? []).forEach((ingredient) => {
+      const useBaseIngredients = Boolean(meal.baseIngredients?.length);
+      const sourceIngredients = useBaseIngredients
+        ? meal.baseIngredients
+        : meal.ingredients ?? [];
+      sourceIngredients.forEach((ingredient) => {
         const unit = canonicalShoppingUnit(ingredient.unit);
-        const key = `${ingredient.name.toLowerCase()}|${unit}|${
-          ingredient.category ?? ""
-        }`;
+        const canonicalName = canonicalShoppingName(ingredient.name);
+        const key = `${canonicalName}|${unit}`;
         const existing = map.get(key);
-        const quantity = Number(ingredient.amount.toFixed(2));
+        const rawAmount = Number.isFinite(ingredient.amount) ? ingredient.amount : 0;
+        const multiplier = Number.isFinite(meal.portionMultiplier)
+          ? meal.portionMultiplier
+          : 1;
+        const adjustedAmount = useBaseIngredients
+          ? rawAmount * multiplier
+          : rawAmount;
+        const quantity = Number(adjustedAmount.toFixed(4));
         if (existing) {
-          existing.quantity = Number((existing.quantity + quantity).toFixed(2));
+          existing.quantity = Number((existing.quantity + quantity).toFixed(4));
+          existing.amountNeeded = existing.quantity;
+          if (!existing.category && ingredient.category) {
+            existing.category = ingredient.category;
+          }
         } else {
           map.set(key, {
             name: ingredient.name,
+            displayName: ingredient.name,
             unit,
             category: ingredient.category,
             quantity,
+            amountNeeded: quantity,
           });
         }
       });
@@ -1915,7 +2765,11 @@ export const buildShoppingList = (plan: WeeklyMealPlan): ShoppingListItem[] => {
   });
 
   return Array.from(map.values())
-    .map(normalizeShoppingItem)
+    .map((item) => ({
+      ...item,
+      quantity: Number(item.quantity.toFixed(4)),
+      amountNeeded: Number((item.amountNeeded ?? item.quantity).toFixed(4)),
+    }))
     .sort((a, b) => {
     const categoryA = a.category ?? "Pantry";
     const categoryB = b.category ?? "Pantry";

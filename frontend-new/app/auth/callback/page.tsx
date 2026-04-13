@@ -25,17 +25,17 @@ export default function AuthCallbackPage() {
         return;
       }
 
-      const { data: preferences } = await supabase
+      const { data: preferenceRows } = await supabase
         .from("user_preferences")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .limit(1);
 
       if (!active) {
         return;
       }
 
-      if (preferences) {
+      if (preferenceRows?.length) {
         router.replace("/meals");
         return;
       }

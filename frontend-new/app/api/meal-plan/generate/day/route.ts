@@ -7,6 +7,7 @@ import {
   type WeeklyMealPlan,
 } from "@/lib/meal-generator";
 import { enforceMacros, toEnforcementInfo } from "@/lib/macro-enforcement";
+import { resolveRequestAuth } from "@/lib/serverAuth";
 
 type DayGeneratePayload = {
   preferences?: PreferencesInput;
@@ -24,6 +25,14 @@ const findDayIndexByDate = (plan: WeeklyMealPlan, dayDate?: string) => {
 };
 
 export async function POST(request: NextRequest) {
+  const { session, user } = await resolveRequestAuth(request);
+  if (!user) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (!session) {
+    console.warn("[meal-plan/generate/day] using bearer fallback auth");
+  }
+
   let payload: DayGeneratePayload;
   try {
     payload = (await request.json()) as DayGeneratePayload;

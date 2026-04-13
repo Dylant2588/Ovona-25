@@ -1,0 +1,712 @@
+export type MealSlot = "breakfast" | "lunch" | "dinner" | "snack";
+export type ComplexityKey = "simple" | "normal" | "adventurous";
+export type GoalType =
+  | "lose_weight"
+  | "save_time"
+  | "calorie_count"
+  | "lose"
+  | "maintain"
+  | "gain"
+  | "recomp"
+  | string;
+
+export type MacroBreakdown = {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+};
+
+export type ProteinType = "poultry" | "red_meat" | "fish" | "seafood" | "plant" | "mixed";
+
+export type MealInstance = {
+  instanceId: string;
+  baseId: string;
+  mealSlot: MealSlot;
+  title: string;
+  description: string;
+  tags: string[];
+  image: string;
+  readyInMinutes: number;
+  portionMultiplier: number;
+  baseMacros: MacroBreakdown;
+  macros: MacroBreakdown;
+  baseIngredients: IngredientLine[];
+  ingredients: IngredientLine[];
+  proteinType?: ProteinType;
+};
+
+export type DayPlan = {
+  id: string;
+  label: string;
+  date: string;
+  meals: MealInstance[];
+  totals: MacroBreakdown;
+};
+
+export type WeeklyMealPlan = {
+  id: string;
+  userId?: string;
+  weekStart: string;
+  generatedAt: string;
+  preferenceSignature: string;
+  days: DayPlan[];
+  weeklyTotals: MacroBreakdown;
+};
+
+export type MacroTargets = {
+  calories?: number | null;
+  protein?: number | null;
+  carbs?: number | null;
+  fat?: number | null;
+};
+
+export type PreferencesInput = {
+  userId?: string;
+  tastes: string[];
+  goal?: GoalType | null;
+  mealComplexity?: ComplexityKey | null;
+  macroTargets?: MacroTargets | null;
+};
+
+type BaseMeal = {
+  id: string;
+  name: string;
+  description: string;
+  mealTypes: MealSlot[];
+  tastes: string[];
+  complexity: ComplexityKey;
+  goalFit?: GoalType[];
+  readyInMinutes: number;
+  image: string;
+  macros: MacroBreakdown;
+  ingredients: IngredientLine[];
+  proteinType?: ProteinType;
+};
+
+export type IngredientLine = {
+  name: string;
+  amount: number;
+  unit: string;
+  category?: string;
+};
+
+const MEAL_LIBRARY: BaseMeal[] = [
+  {
+    id: "blueberry-protein-oats",
+    name: "Blueberry Protein Oats",
+    description: "Overnight oats layered with chia, cinnamon, and fresh blueberries.",
+    mealTypes: ["breakfast"],
+    tastes: ["plant-forward", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "maintain", "calorie_count"],
+    readyInMinutes: 5,
+    image:
+      "https://images.unsplash.com/photo-1505250469679-203ad9ced0cb?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 380, protein: 27, carbs: 48, fat: 10 },
+    ingredients: [
+      { name: "Rolled oats", amount: 80, unit: "g", category: "Pantry" },
+      { name: "Chia seeds", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Almond milk", amount: 240, unit: "ml", category: "Dairy" },
+      { name: "Blueberries", amount: 75, unit: "g", category: "Produce" },
+      { name: "Maple syrup", amount: 15, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "plant",
+  },
+  {
+    id: "sunrise-egg-wrap",
+    name: "Sunrise Egg Wrap",
+    description: "Scrambled eggs, smashed avocado, and veggies tucked into a whole-grain wrap.",
+    mealTypes: ["breakfast"],
+    tastes: ["high-protein", "comfort", "quick-minimal"],
+    complexity: "simple",
+    goalFit: ["gain", "save_time"],
+    readyInMinutes: 12,
+    image:
+      "https://images.unsplash.com/photo-1495546968767-f0573cca821e?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 420, protein: 32, carbs: 36, fat: 17 },
+    ingredients: [
+      { name: "Eggs", amount: 3, unit: "large", category: "Dairy" },
+      { name: "Whole-grain wrap", amount: 1, unit: "piece", category: "Bakery" },
+      { name: "Avocado", amount: 0.5, unit: "each", category: "Produce" },
+      { name: "Spinach", amount: 40, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 60, unit: "g", category: "Produce" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "harissa-chicken-bowl",
+    name: "Harissa Chicken Bowls",
+    description: "Charred chicken, freekeh, and garlicky yogurt over greens.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["high-protein", "meal-prep", "low-carb", "comfort"],
+    complexity: "normal",
+    goalFit: ["lose_weight", "recomp"],
+    readyInMinutes: 30,
+    image:
+      "https://images.unsplash.com/photo-1608039829574-21c84fd37b6b?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 520, protein: 45, carbs: 38, fat: 19 },
+    ingredients: [
+      { name: "Chicken breast", amount: 220, unit: "g", category: "Protein" },
+      { name: "Freekeh or farro", amount: 80, unit: "g", category: "Pantry" },
+      { name: "Harissa paste", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Baby greens", amount: 60, unit: "g", category: "Produce" },
+      { name: "Greek yogurt", amount: 40, unit: "g", category: "Dairy" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "coconut-lime-salmon",
+    name: "Coconut Lime Salmon",
+    description: "Seared salmon in coconut broth with jasmine rice and snap peas.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["comfort", "low-carb", "plant-forward"],
+    complexity: "adventurous",
+    goalFit: ["gain", "calorie_count"],
+    readyInMinutes: 28,
+    image:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 610, protein: 40, carbs: 52, fat: 26 },
+    ingredients: [
+      { name: "Salmon fillet", amount: 200, unit: "g", category: "Protein" },
+      { name: "Coconut milk", amount: 160, unit: "ml", category: "Pantry" },
+      { name: "Jasmine rice", amount: 90, unit: "g", category: "Pantry" },
+      { name: "Lime", amount: 1, unit: "each", category: "Produce" },
+      { name: "Snap peas", amount: 80, unit: "g", category: "Produce" },
+    ],
+    proteinType: "fish",
+  },
+  {
+    id: "miso-soba-salad",
+    name: "Miso Soba Power Salad",
+    description: "Buckwheat noodles tossed with tofu, crunchy veg, and ginger-miso dressing.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["plant-forward", "meal-prep", "comfort"],
+    complexity: "normal",
+    goalFit: ["lose_weight", "save_time"],
+    readyInMinutes: 20,
+    image:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 480, protein: 24, carbs: 62, fat: 16 },
+    ingredients: [
+      { name: "Soba noodles", amount: 100, unit: "g", category: "Pantry" },
+      { name: "Tofu", amount: 180, unit: "g", category: "Protein" },
+      { name: "Mixed vegetables", amount: 140, unit: "g", category: "Produce" },
+      { name: "Miso paste", amount: 25, unit: "g", category: "Pantry" },
+      { name: "Rice vinegar", amount: 15, unit: "ml", category: "Pantry" },
+    ],
+    proteinType: "plant",
+  },
+  {
+    id: "chipotle-turkey-chili",
+    name: "Chipotle Turkey Chili",
+    description: "Smoky chili with black beans, roasted corn, and cilantro yogurt.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["comfort", "meal-prep", "high-protein"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "maintain"],
+    readyInMinutes: 35,
+    image:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 455, protein: 42, carbs: 37, fat: 17 },
+    ingredients: [
+      { name: "Ground turkey", amount: 300, unit: "g", category: "Protein" },
+      { name: "Black beans", amount: 200, unit: "g", category: "Pantry" },
+      { name: "Diced tomatoes", amount: 200, unit: "g", category: "Pantry" },
+      { name: "Chipotle peppers", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Corn kernels", amount: 120, unit: "g", category: "Produce" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "lemongrass-tofu-bowl",
+    name: "Lemongrass Tofu Bowls",
+    description: "Sticky lemongrass tofu, pickled veggies, and brown rice.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["plant-forward", "quick-minimal", "meal-prep"],
+    complexity: "normal",
+    goalFit: ["save_time", "calorie_count"],
+    readyInMinutes: 22,
+    image:
+      "https://images.unsplash.com/photo-1525755662778-989d0524087e?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 510, protein: 28, carbs: 60, fat: 18 },
+    ingredients: [
+      { name: "Extra-firm tofu", amount: 200, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 90, unit: "g", category: "Pantry" },
+      { name: "Lemongrass paste", amount: 15, unit: "g", category: "Pantry" },
+      { name: "Pickled vegetables", amount: 100, unit: "g", category: "Produce" },
+      { name: "Cucumber", amount: 80, unit: "g", category: "Produce" },
+    ],
+    proteinType: "plant",
+  },
+  {
+    id: "mediterranean-snack-box",
+    name: "Mediterranean Snack Box",
+    description: "Hummus, veggies, olives, and za'atar crisps.",
+    mealTypes: ["snack", "lunch"],
+    tastes: ["plant-forward", "quick-minimal", "comfort"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "maintain"],
+    readyInMinutes: 8,
+    image:
+      "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 320, protein: 12, carbs: 32, fat: 16 },
+    ingredients: [
+      { name: "Hummus", amount: 120, unit: "g", category: "Pantry" },
+      { name: "Cucumber", amount: 80, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 70, unit: "g", category: "Produce" },
+      { name: "Olives", amount: 40, unit: "g", category: "Pantry" },
+      { name: "Za'atar crisps", amount: 50, unit: "g", category: "Bakery" },
+    ],
+    proteinType: "plant",
+  },
+  {
+    id: "matcha-energizer",
+    name: "Matcha Coconut Energizer",
+    description: "Matcha chia pudding topped with toasted coconut.",
+    mealTypes: ["snack", "breakfast"],
+    tastes: ["quick-minimal", "plant-forward", "low-carb"],
+    complexity: "simple",
+    goalFit: ["save_time", "lose_weight"],
+    readyInMinutes: 5,
+    image:
+      "https://images.unsplash.com/photo-1484980972926-edee96e0960d?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 210, protein: 9, carbs: 18, fat: 11 },
+    ingredients: [
+      { name: "Chia seeds", amount: 35, unit: "g", category: "Pantry" },
+      { name: "Light coconut milk", amount: 200, unit: "ml", category: "Pantry" },
+      { name: "Matcha powder", amount: 4, unit: "g", category: "Pantry" },
+      { name: "Shredded coconut", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Honey", amount: 15, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "plant",
+  },
+  {
+    id: "sheet-pan-fajitas",
+    name: "Sheet-Pan Fajitas",
+    description: "Fiery chicken, peppers, and onions with lime yogurt.",
+    mealTypes: ["dinner"],
+    tastes: ["comfort", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["gain", "calorie_count"],
+    readyInMinutes: 25,
+    image:
+      "https://images.unsplash.com/photo-1478144592103-25e218a04891?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 590, protein: 48, carbs: 45, fat: 24 },
+    ingredients: [
+      { name: "Chicken thighs", amount: 320, unit: "g", category: "Protein" },
+      { name: "Bell peppers", amount: 180, unit: "g", category: "Produce" },
+      { name: "Red onion", amount: 70, unit: "g", category: "Produce" },
+      { name: "Tortillas", amount: 3, unit: "piece", category: "Bakery" },
+      { name: "Greek yogurt", amount: 60, unit: "g", category: "Dairy" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "thai-crunch-salad",
+    name: "Thai Crunch Salad",
+    description: "Shredded cabbage, herbs, and roasted shrimp with peanut dressing.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["plant-forward", "low-carb", "comfort"],
+    complexity: "adventurous",
+    goalFit: ["lose_weight", "recomp"],
+    readyInMinutes: 18,
+    image:
+      "https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 430, protein: 38, carbs: 24, fat: 22 },
+    ingredients: [
+      { name: "Shrimp", amount: 200, unit: "g", category: "Protein" },
+      { name: "Cabbage", amount: 150, unit: "g", category: "Produce" },
+      { name: "Carrots", amount: 80, unit: "g", category: "Produce" },
+      { name: "Peanut butter", amount: 30, unit: "g", category: "Pantry" },
+      { name: "Fresh herbs", amount: 20, unit: "g", category: "Produce" },
+    ],
+    proteinType: "seafood",
+  },
+  {
+    id: "dark-chocolate-bites",
+    name: "Dark Chocolate Walnut Bites",
+    description: "Two-bite energy balls with cacao, walnuts, and espresso salt.",
+    mealTypes: ["snack"],
+    tastes: ["comfort", "low-carb", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["save_time", "calorie_count"],
+    readyInMinutes: 10,
+    image:
+      "https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 190, protein: 6, carbs: 14, fat: 12 },
+    ingredients: [
+      { name: "Walnuts", amount: 80, unit: "g", category: "Pantry" },
+      { name: "Dark chocolate", amount: 90, unit: "g", category: "Pantry" },
+      { name: "Dates", amount: 70, unit: "g", category: "Produce" },
+      { name: "Espresso powder", amount: 4, unit: "g", category: "Pantry" },
+      { name: "Sea salt", amount: 2, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "plant",
+  },
+  {
+    id: "kimchi-fried-rice",
+    name: "Kimchi Cauli Fried Rice",
+    description: "Cauliflower rice with kimchi, edamame, and jammy eggs.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["low-carb", "quick-minimal", "plant-forward"],
+    complexity: "normal",
+    goalFit: ["lose_weight", "save_time"],
+    readyInMinutes: 17,
+    image:
+      "https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&w=600&q=60",
+    macros: { calories: 410, protein: 29, carbs: 32, fat: 18 },
+    ingredients: [
+      { name: "Cauliflower rice", amount: 220, unit: "g", category: "Produce" },
+      { name: "Kimchi", amount: 120, unit: "g", category: "Produce" },
+      { name: "Edamame", amount: 100, unit: "g", category: "Frozen" },
+      { name: "Eggs", amount: 2, unit: "large", category: "Dairy" },
+      { name: "Scallions", amount: 30, unit: "g", category: "Produce" },
+    ],
+    proteinType: "mixed",
+  },
+];
+
+const GOAL_MULTIPLIERS: Record<string, number> = {
+  lose_weight: 0.92,
+  lose: 0.92,
+  save_time: 1,
+  maintain: 1,
+  calorie_count: 1.05,
+  recomp: 1,
+  gain: 1.12,
+};
+
+const SLOT_WEIGHTS: Record<MealSlot, number> = {
+  breakfast: 0.9,
+  lunch: 1.05,
+  dinner: 1.15,
+  snack: 0.6,
+};
+
+const COMPLEXITY_MULTIPLIERS: Record<ComplexityKey, number> = {
+  simple: 0.95,
+  normal: 1,
+  adventurous: 1.08,
+};
+
+const MEAL_SLOTS: MealSlot[] = ["breakfast", "lunch", "dinner", "snack"];
+
+const randomId = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2);
+
+const sumMacros = (items: MacroBreakdown[]): MacroBreakdown =>
+  items.reduce(
+    (acc, macro) => ({
+      calories: acc.calories + macro.calories,
+      protein: acc.protein + macro.protein,
+      carbs: acc.carbs + macro.carbs,
+      fat: acc.fat + macro.fat,
+    }),
+    { calories: 0, protein: 0, carbs: 0, fat: 0 }
+  );
+
+const scaleMacros = (macros: MacroBreakdown, multiplier: number): MacroBreakdown => ({
+  calories: Math.round(macros.calories * multiplier),
+  protein: Math.round(macros.protein * multiplier),
+  carbs: Math.round(macros.carbs * multiplier),
+  fat: Math.round(macros.fat * multiplier),
+});
+
+const scaleIngredients = (ingredients: IngredientLine[], multiplier: number): IngredientLine[] =>
+  ingredients.map((ingredient) => ({
+    ...ingredient,
+    amount: Number((ingredient.amount * multiplier).toFixed(2)),
+  }));
+
+const normalizeProteinLabel = (value?: string | null): string | null => {
+  if (!value) return null;
+  const normalized = value.toLowerCase();
+  if (normalized === "seafood") return "fish";
+  return normalized;
+};
+
+const proteinLabelFromMeal = (meal: Pick<MealInstance, "proteinType" | "tags">): string | null => {
+  if (meal.proteinType) {
+    const normalized = normalizeProteinLabel(meal.proteinType);
+    if (normalized) return normalized;
+  }
+  const proteinTag =
+    meal.tags?.find((tag) => tag.toLowerCase().startsWith("protein:")) ?? null;
+  if (proteinTag) {
+    const [, value] = proteinTag.split(":");
+    return normalizeProteinLabel(value ?? null);
+  }
+  return null;
+};
+
+export type RotationHistoryEntry = {
+  date: string;
+  proteins: string[];
+};
+
+export const rotationHistoryFromPlan = (plan: WeeklyMealPlan | null): RotationHistoryEntry[] => {
+  if (!plan) return [];
+  return plan.days.map((day) => {
+    const proteins = Array.from(
+      new Set(
+        day.meals
+          .map((meal) => proteinLabelFromMeal(meal))
+          .filter((value): value is string => Boolean(value))
+      )
+    );
+    return {
+      date: day.date,
+      proteins,
+    };
+  });
+};
+
+const ensureBaseIngredients = (meal: MealInstance): IngredientLine[] => {
+  if (meal.baseIngredients && meal.baseIngredients.length) {
+    return meal.baseIngredients;
+  }
+  const multiplier = meal.portionMultiplier || 1;
+  const fallback =
+    meal.ingredients?.map((ingredient) => ({
+      ...ingredient,
+      amount: Number((ingredient.amount / multiplier).toFixed(2)),
+    })) ?? [];
+  meal.baseIngredients = fallback;
+  return fallback;
+};
+
+const clampPortion = (value: number) => Number(Math.min(1.6, Math.max(0.6, value)).toFixed(2));
+
+const applyPortionMultiplier = (meal: MealInstance, multiplier: number) => {
+  const nextMultiplier = clampPortion(multiplier);
+  const baseIngredients = ensureBaseIngredients(meal);
+  meal.portionMultiplier = nextMultiplier;
+  meal.macros = scaleMacros(meal.baseMacros, nextMultiplier);
+  meal.ingredients = scaleIngredients(baseIngredients, nextMultiplier);
+};
+
+const buildPreferenceSignature = (prefs: PreferencesInput) =>
+  JSON.stringify({
+    tastes: [...prefs.tastes].sort(),
+    goal: prefs.goal ?? null,
+    mealComplexity: prefs.mealComplexity ?? null,
+    macroTargets: prefs.macroTargets
+      ? {
+          calories: prefs.macroTargets.calories ?? null,
+          protein: prefs.macroTargets.protein ?? null,
+          carbs: prefs.macroTargets.carbs ?? null,
+          fat: prefs.macroTargets.fat ?? null,
+        }
+      : null,
+  });
+
+const getStartOfWeek = (date = new Date()) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(diff);
+  return d;
+};
+
+const addDays = (date: Date, amount: number) => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + amount);
+  return result;
+};
+
+const computeMultiplier = (prefs: PreferencesInput, slot: MealSlot) => {
+  const goalMultiplier = GOAL_MULTIPLIERS[prefs.goal ?? "maintain"] ?? 1;
+  const complexityMultiplier = prefs.mealComplexity
+    ? COMPLEXITY_MULTIPLIERS[prefs.mealComplexity] ?? 1
+    : 1;
+  return Number((goalMultiplier * complexityMultiplier * SLOT_WEIGHTS[slot]).toFixed(2));
+};
+
+const alignDayToTargets = (day: DayPlan, prefs: PreferencesInput) => {
+  const targetCalories = prefs.macroTargets?.calories;
+  if (!targetCalories || day.totals.calories <= 0) return;
+  const scale = targetCalories / day.totals.calories;
+  const boundedScale = Math.max(0.75, Math.min(1.25, scale));
+  day.meals.forEach((meal) => {
+    applyPortionMultiplier(meal, meal.portionMultiplier * boundedScale);
+  });
+  recalcDay(day);
+};
+
+const scoreMeal = (meal: BaseMeal, prefs: PreferencesInput) => {
+  let score = 1 + Math.random();
+  if (prefs.tastes.length && meal.tastes.some((taste) => prefs.tastes.includes(taste))) {
+    score += 2;
+  }
+  if (prefs.goal && meal.goalFit?.includes(prefs.goal)) {
+    score += 1.5;
+  }
+  if (prefs.mealComplexity && meal.complexity === prefs.mealComplexity) {
+    score += 1;
+  }
+  return score;
+};
+
+const selectBaseMeal = (slot: MealSlot, prefs: PreferencesInput) => {
+  const candidates = MEAL_LIBRARY.filter((meal) => meal.mealTypes.includes(slot));
+  const ranked = candidates
+    .map((meal) => ({ meal, score: scoreMeal(meal, prefs) }))
+    .sort((a, b) => b.score - a.score);
+  if (!ranked.length) {
+    return MEAL_LIBRARY[0];
+  }
+  const window = Math.min(5, ranked.length);
+  const index = Math.floor(Math.random() * window);
+  return ranked[index].meal;
+};
+
+const createMealInstance = (slot: MealSlot, prefs: PreferencesInput): MealInstance => {
+  const base = selectBaseMeal(slot, prefs);
+  const multiplier = clampPortion(computeMultiplier(prefs, slot));
+  const baseIngredients = (base.ingredients ?? []).map((ingredient) => ({ ...ingredient }));
+  const meal: MealInstance = {
+    instanceId: randomId(),
+    baseId: base.id,
+    mealSlot: slot,
+    title: base.name,
+    description: base.description,
+    tags: base.tastes,
+    image: base.image,
+    readyInMinutes: base.readyInMinutes,
+    portionMultiplier: multiplier,
+    baseMacros: { ...base.macros },
+    macros: scaleMacros(base.macros, multiplier),
+    baseIngredients,
+    ingredients: scaleIngredients(baseIngredients, multiplier),
+  };
+  return meal;
+};
+
+const recalcDay = (day: DayPlan) => {
+  day.totals = sumMacros(day.meals.map((meal) => meal.macros));
+};
+
+const recalcWeek = (plan: WeeklyMealPlan) => {
+  plan.weeklyTotals = sumMacros(plan.days.map((day) => day.totals));
+  plan.generatedAt = new Date().toISOString();
+};
+
+const clonePlan = (plan: WeeklyMealPlan): WeeklyMealPlan =>
+  JSON.parse(JSON.stringify(plan));
+
+export const generateFallbackMealPlan = (prefs: PreferencesInput): WeeklyMealPlan => {
+  const signature = buildPreferenceSignature(prefs);
+  const startOfWeek = getStartOfWeek();
+  const fullDays: DayPlan[] = Array.from({ length: 7 }).map((_, index) => {
+    const date = addDays(startOfWeek, index);
+    const meals = MEAL_SLOTS.map((slot) => createMealInstance(slot, prefs));
+    const day: DayPlan = {
+      id: randomId(),
+      label: date.toLocaleDateString("en-US", { weekday: "long" }),
+      date: date.toISOString(),
+      meals,
+      totals: sumMacros(meals.map((meal) => meal.macros)),
+    };
+    alignDayToTargets(day, prefs);
+    return day;
+  });
+
+  return {
+    id: randomId(),
+    userId: prefs.userId,
+    weekStart: startOfWeek.toISOString(),
+    generatedAt: new Date().toISOString(),
+    preferenceSignature: signature,
+    days: fullDays,
+    weeklyTotals: sumMacros(fullDays.map((day) => day.totals)),
+  };
+};
+
+export const swapMealInPlan = (
+  plan: WeeklyMealPlan,
+  dayIndex: number,
+  mealIndex: number,
+  prefs: PreferencesInput
+): WeeklyMealPlan => {
+  const next = clonePlan(plan);
+  const day = next.days[dayIndex];
+  if (!day) return plan;
+  const slot = day.meals[mealIndex]?.mealSlot ?? "lunch";
+  day.meals[mealIndex] = createMealInstance(slot, prefs);
+  recalcDay(day);
+  recalcWeek(next);
+  return next;
+};
+
+export const adjustMealPortion = (
+  plan: WeeklyMealPlan,
+  dayIndex: number,
+  mealIndex: number,
+  direction: "increase" | "decrease"
+): WeeklyMealPlan => {
+  const next = clonePlan(plan);
+  const day = next.days[dayIndex];
+  if (!day) return plan;
+  const meal = day.meals[mealIndex];
+  if (!meal) return plan;
+  const multiplier = direction === "increase" ? 1.12 : 0.88;
+  applyPortionMultiplier(meal, meal.portionMultiplier * multiplier);
+  recalcDay(day);
+  recalcWeek(next);
+  return next;
+};
+
+export const preferenceSignatureFor = buildPreferenceSignature;
+
+export type ShoppingListItem = {
+  name: string;
+  quantity: number;
+  unit: string;
+  category?: string;
+};
+
+export const buildShoppingList = (plan: WeeklyMealPlan): ShoppingListItem[] => {
+  const map = new Map<string, ShoppingListItem>();
+  plan.days.forEach((day) => {
+    day.meals.forEach((meal) => {
+      (meal.ingredients ?? []).forEach((ingredient) => {
+        const key = `${ingredient.name.toLowerCase()}|${ingredient.unit}|${
+          ingredient.category ?? ""
+        }`;
+        const existing = map.get(key);
+        const quantity = Number(ingredient.amount.toFixed(2));
+        if (existing) {
+          existing.quantity = Number((existing.quantity + quantity).toFixed(2));
+        } else {
+          map.set(key, {
+            name: ingredient.name,
+            unit: ingredient.unit,
+            category: ingredient.category,
+            quantity,
+          });
+        }
+      });
+    });
+  });
+
+  return Array.from(map.values()).sort((a, b) => {
+    const categoryA = a.category ?? "Pantry";
+    const categoryB = b.category ?? "Pantry";
+    if (categoryA !== categoryB) {
+      return categoryA.localeCompare(categoryB);
+    }
+    return a.name.localeCompare(b.name);
+  });
+};
+
+export const normalizeShoppingList = async (
+  items: ShoppingListItem[]
+): Promise<ShoppingListItem[]> => {
+  // Placeholder for future AI normalization. We currently return the items untouched,
+  // but this hook allows us to plug in an LLM or external service without refactoring.
+  return items;
+};

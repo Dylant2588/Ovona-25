@@ -4,7 +4,7 @@
 
 import NextLink from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SwapHorizRoundedIcon from "@mui/icons-material/SwapHorizRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
@@ -67,6 +67,7 @@ import type { ValueType, NameType } from "recharts/types/component/DefaultToolti
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabaseClient";
 import {
+  buildRecipeSteps,
   buildShoppingList,
   generateFallbackMealPlan,
   preferenceSignatureFor,
@@ -74,6 +75,7 @@ import {
   regenerateWeekInPlan,
   resolveMacroTargets,
   rotationHistoryFromPlan,
+  sanitizeRecipeSteps,
   swapMealInPlan,
   WORKDAY_COUNT,
   type MacroTargets,
@@ -93,6 +95,10 @@ import {
   type EnforcementInfo,
 } from "@/lib/macro-enforcement";
 import { priceBasket } from "@/lib/tesco-prices";
+import {
+  formatIngredientLineForDisplay,
+  formatShoppingLineForDisplay,
+} from "@/lib/ingredient-display";
 
 type RawPreferences = {
   taste_preferences: string[] | string | null;
@@ -132,6 +138,9 @@ type BasketPricingLine = {
   packSize: string;
   totalCost: number;
   matched: boolean;
+  amountNeeded?: number;
+  amountToBuy?: number;
+  unit?: string;
 };
 
 type BasketPricing = {
@@ -472,15 +481,11 @@ const runAsync = (fn: () => void) => {
 const toDateOnly = (value: string) => new Date(value).toISOString().split("T")[0];
 
 const formatIngredientLine = (item: IngredientLine) => {
-  const amount = Number.isFinite(item.amount) ? Number(item.amount) : null;
-  const unit = (item.unit ?? "").trim();
-  const compactUnit = ["g", "kg", "ml", "l"].includes(unit.toLowerCase());
-  const amountText =
-    amount !== null ? `${amount % 1 === 0 ? amount : amount.toFixed(1)}` : "";
-  const quantity = `${amountText}${
-    unit ? (compactUnit ? unit : ` ${unit}`) : ""
-  }`.trim();
-  return quantity ? `${quantity} ${item.name}` : item.name;
+  return formatIngredientLineForDisplay({
+    amount: item.amount,
+    unit: item.unit,
+    ingredientName: item.name,
+  });
 };
 
 const SHOPPING_CATEGORY_ORDER = [
@@ -510,17 +515,6 @@ const shoppingItemKey = (item: ShoppingListItem) =>
 
 const formatGbp = (value: number) => `£${value.toFixed(2)}`;
 
-const SHOPPING_COUNTABLE_UNITS = new Set(["large", "each", "piece", "slice", "unit"]);
-
-const singularize = (value: string) =>
-  value.toLowerCase().endsWith("s") ? value.slice(0, -1) : value;
-
-const pluralize = (value: string, count: number) => {
-  if (count === 1) return singularize(value);
-  const singular = singularize(value);
-  return singular.toLowerCase().endsWith("s") ? singular : `${singular}s`;
-};
-
 const sanitizeShoppingName = (value: string) =>
   value
     .replace(/^\d+\s*(x|×)?\s*\d*\s*(g|kg|ml|l)?\s*/i, "")
@@ -528,37 +522,12 @@ const sanitizeShoppingName = (value: string) =>
     .replace(/\s+/g, " ")
     .trim() || value.trim();
 
-const roundMetricShoppingValue = (value: number) => {
-  if (value < 100) return Math.round(value / 5) * 5;
-  if (value <= 1000) return Math.round(value / 10) * 10;
-  return Math.round(value / 50) * 50;
-};
-
 const shoppingDisplayLine = (item: ShoppingListItem) => {
-  const rawName = sanitizeShoppingName(item.name);
-  const unit = (item.unit ?? "").trim().toLowerCase();
-  const quantity = Math.max(0, Number(item.quantity ?? 0));
-  const whole = Number.isFinite(quantity) ? Math.ceil(quantity) : 0;
-  if ((unit === "large" || unit === "piece") && /egg/i.test(rawName)) {
-    return { amount: `${whole}`, name: whole === 1 ? "Egg" : "Eggs" };
-  }
-  if (SHOPPING_COUNTABLE_UNITS.has(unit)) {
-    return { amount: `${whole}`, name: pluralize(rawName, whole) };
-  }
-  if (unit === "g" || unit === "ml" || unit === "kg" || unit === "l") {
-    const metricQuantity =
-      unit === "g" || unit === "ml"
-        ? roundMetricShoppingValue(quantity)
-        : Number(quantity.toFixed(2));
-    const prettyQuantity =
-      Number.isInteger(metricQuantity)
-        ? metricQuantity.toString()
-        : metricQuantity.toFixed(1);
-    return { amount: `${prettyQuantity}${unit}`, name: rawName };
-  }
-  const prettyQuantity =
-    Number.isInteger(quantity) ? quantity.toString() : quantity.toFixed(1);
-  return { amount: `${prettyQuantity} ${unit}`.trim(), name: rawName };
+  return formatShoppingLineForDisplay({
+    quantity: item.quantity,
+    unit: item.unit,
+    ingredientName: sanitizeShoppingName(item.name),
+  });
 };
 
 const buildLocalBasketPricing = (items: ShoppingListItem[]): BasketPricing | null => {
@@ -576,6 +545,9 @@ const buildLocalBasketPricing = (items: ShoppingListItem[]): BasketPricing | nul
         packSize: item.packSize,
         totalCost: item.totalCost,
         matched: item.matched,
+        amountNeeded: item.amountNeeded,
+        amountToBuy: item.amountToBuy,
+        unit: item.unit,
       })),
     };
   } catch (error) {
@@ -619,11 +591,20 @@ const normalizeSteps = (value: unknown) =>
     : [];
 
 const resolveRecipeSteps = (meal: PlanMeal) => {
-  const steps = normalizeSteps((meal as PlanMeal & { steps?: string[] }).steps);
+  const steps = sanitizeRecipeSteps(
+    normalizeSteps((meal as PlanMeal & { steps?: string[] }).steps)
+  );
   if (steps.length) return steps;
-  const recipeSteps = normalizeSteps(meal.recipeSteps);
+  const recipeSteps = sanitizeRecipeSteps(normalizeSteps(meal.recipeSteps));
   if (recipeSteps.length) return recipeSteps;
-  return [];
+  const fallback = buildRecipeSteps({
+    mealSlot: meal.mealSlot,
+    title: meal.title,
+    description: meal.description,
+    readyInMinutes: meal.readyInMinutes,
+    ingredients: meal.ingredients ?? [],
+  });
+  return fallback.length ? fallback : ["Combine all ingredients and serve."];
 };
 
 const proteinTypeMeta = (proteinType?: PlanMeal["proteinType"]) => {
@@ -659,6 +640,10 @@ const LOADING_STEPS = [
   { id: "ingredients", label: "Gathering ingredients" },
 ] as const;
 const AI_CLIENT_TIMEOUT_MS = 12000;
+const API_MAX_RETRIES = 3;
+const API_RETRY_BASE_DELAY_MS = 400;
+const RETRYABLE_STATUSES = new Set([401, 408, 429, 500, 502, 503, 504]);
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export default function MealsPage() {
   const theme = useTheme();
@@ -765,6 +750,62 @@ export default function MealsPage() {
     }
   };
 
+  const authFetch = useCallback(async (input: RequestInfo | URL, init: RequestInit = {}) => {
+    const headers = new Headers(init.headers ?? {});
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+    } catch (sessionError) {
+      console.error("Failed to get auth session for API request", sessionError);
+    }
+    return fetch(input, {
+      ...init,
+      headers,
+      credentials: "same-origin",
+    });
+  }, []);
+
+  const authFetchWithRetry = useCallback(
+    async (
+      input: RequestInfo | URL,
+      init: RequestInit = {},
+      maxRetries = API_MAX_RETRIES
+    ) => {
+      let lastResponse: Response | null = null;
+      let lastError: unknown = null;
+      for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+        try {
+          const response = await authFetch(input, init);
+          if (
+            response.ok ||
+            !RETRYABLE_STATUSES.has(response.status) ||
+            attempt === maxRetries - 1
+          ) {
+            return response;
+          }
+          lastResponse = response;
+        } catch (error) {
+          lastError = error;
+          if (attempt === maxRetries - 1) {
+            throw error;
+          }
+        }
+        await wait(API_RETRY_BASE_DELAY_MS * 2 ** attempt);
+      }
+
+      if (lastResponse) {
+        return lastResponse;
+      }
+      throw lastError instanceof Error ? lastError : new Error("API request failed");
+    },
+    [authFetch]
+  );
+
   const retryShoppingList = () => {
     setShoppingListError(null);
     setShoppingReloadToken((prev) => prev + 1);
@@ -830,7 +871,7 @@ export default function MealsPage() {
     const controller = new AbortController();
     const timeoutId = window.setTimeout(() => controller.abort(), AI_CLIENT_TIMEOUT_MS);
     try {
-      const response = await fetch("/api/meal-plan/generate", {
+      const response = await authFetchWithRetry("/api/meal-plan/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -877,8 +918,8 @@ export default function MealsPage() {
     (async () => {
       try {
         const [
-          { data: prefData, error: prefError },
-          { data: profileData, error: profileError },
+          { data: prefRows, error: prefError },
+          { data: profileRows, error: profileError },
           { data: userAllergiesData, error: userAllergiesError },
         ] = await Promise.all([
             supabase
@@ -887,19 +928,21 @@ export default function MealsPage() {
                 "taste_preferences, goal, meal_complexity, lifestyle, cuisines, allergies, target_calories, target_protein, target_carbs, target_fat"
               )
               .eq("user_id", user.id)
-              .maybeSingle<RawPreferences>(),
+              .limit(1),
             supabase
               .from("profiles")
               .select(
                 "locale, timezone, body_weight_kg, body_fat_percent, height_cm, activity_level, training_schedule, allergies, dislikes, cuisines, pantry_staples, household, delivery_preferences, sleep_hours, stress_level, notes"
               )
               .eq("id", user.id)
-              .maybeSingle<ProfileRow>(),
+              .limit(1),
             supabase
               .from("user_allergies")
               .select("*")
               .eq("user_id", user.id),
           ]);
+        const prefData = (prefRows?.[0] as RawPreferences | undefined) ?? null;
+        const profileData = (profileRows?.[0] as ProfileRow | undefined) ?? null;
 
         if (prefError) {
           console.error(prefError);
@@ -1185,7 +1228,7 @@ export default function MealsPage() {
       planSignatureRef.current = signature;
     }
     try {
-      await fetch("/api/meal-plan/state", {
+      await authFetchWithRetry("/api/meal-plan/state", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1207,7 +1250,7 @@ export default function MealsPage() {
 
   const fetchStoredPlan = async (weekStart: string) => {
     try {
-      const response = await fetch(
+      const response = await authFetchWithRetry(
         `/api/meal-plan/state?weekStart=${weekStart}`
       );
       if (!response.ok) return null;
@@ -1362,7 +1405,7 @@ export default function MealsPage() {
     setRegeneratingDayIndex(dayIndex);
     setError(null);
     try {
-      const response = await fetch("/api/meal-plan/generate/day", {
+      const response = await authFetchWithRetry("/api/meal-plan/generate/day", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1422,7 +1465,7 @@ export default function MealsPage() {
     const mealId = plan.days[dayIndex]?.meals[mealIndex]?.instanceId ?? null;
     setSwappingMealId(mealId);
     try {
-      const response = await fetch("/api/meal-plan/generate/meal", {
+      const response = await authFetchWithRetry("/api/meal-plan/generate/meal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1488,49 +1531,6 @@ export default function MealsPage() {
     }));
   };
 
-  const saveAllergiesToTable = async (userId: string, allergies: string[]) => {
-    const { error: deleteError } = await supabase
-      .from("user_allergies")
-      .delete()
-      .eq("user_id", userId);
-    if (deleteError) {
-      throw deleteError;
-    }
-    if (!allergies.length) {
-      return;
-    }
-    const allergyRows = allergies.map((allergy) => ({
-      user_id: userId,
-      allergy: allergy.toLowerCase(),
-    }));
-    const { error: allergyError } = await supabase
-      .from("user_allergies")
-      .insert(allergyRows);
-    if (!allergyError) {
-      return;
-    }
-    const allergenRows = allergies.map((allergy) => ({
-      user_id: userId,
-      allergen: allergy.toLowerCase(),
-    }));
-    const { error: allergenError } = await supabase
-      .from("user_allergies")
-      .insert(allergenRows);
-    if (!allergenError) {
-      return;
-    }
-    const nameRows = allergies.map((allergy) => ({
-      user_id: userId,
-      name: allergy.toLowerCase(),
-    }));
-    const { error: nameError } = await supabase
-      .from("user_allergies")
-      .insert(nameRows);
-    if (nameError) {
-      throw nameError;
-    }
-  };
-
   const handleSavePreferencePanel = async () => {
     if (!user || !preferences) return;
     setPreferencesSaving(true);
@@ -1557,27 +1557,42 @@ export default function MealsPage() {
     const nextSignature = preferenceSignatureFor(nextPreferences);
 
     try {
-      const { error: prefSaveError } = await supabase.from("user_preferences").upsert({
-        user_id: user.id,
-        lifestyle: dietaryMode,
-        allergies: sanitizedAllergies.length ? sanitizedAllergies.join(", ") : null,
-        cuisines: sanitizedCuisines.length ? sanitizedCuisines.join(", ") : null,
+      const saveResponse = await authFetchWithRetry("/api/preferences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dietaryMode: preferencesPanelState.dietaryMode,
+          allergies: sanitizedAllergies,
+          dislikes: sanitizedDislikes,
+          cuisines: sanitizedCuisines,
+          tastePreferences: nextPreferences.tastes,
+          goal: nextPreferences.goal,
+          mealComplexity: nextPreferences.mealComplexity,
+          macroTargets: nextPreferences.macroTargets,
+        }),
       });
-      if (prefSaveError) {
-        throw prefSaveError;
+
+      const savePayload = (await saveResponse
+        .json()
+        .catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+        profileSaved?: boolean;
+        allergiesSynced?: boolean;
+      };
+
+      if (!saveResponse.ok || !savePayload.ok) {
+        throw new Error(savePayload.error ?? "Failed to save preferences");
       }
 
-      const { error: profileSaveError } = await supabase.from("profiles").upsert({
-        id: user.id,
-        allergies: sanitizedAllergies.length ? sanitizedAllergies : null,
-        dislikes: sanitizedDislikes.length ? sanitizedDislikes : null,
-        cuisines: sanitizedCuisines.length ? sanitizedCuisines : null,
-      });
-      if (profileSaveError) {
-        throw profileSaveError;
+      if (savePayload.profileSaved === false || savePayload.allergiesSynced === false) {
+        console.warn("Preferences saved but some profile/allergy sync operations failed", {
+          profileSaved: savePayload.profileSaved,
+          allergiesSynced: savePayload.allergiesSynced,
+        });
       }
-
-      await saveAllergiesToTable(user.id, sanitizedAllergies);
 
       setPreferencesPanelOpen(false);
       setPreferencesNotice("Preferences saved. Regenerating your meals...");
@@ -1695,6 +1710,7 @@ export default function MealsPage() {
       fat: day.totals.fat,
     }));
   }, [displayDays]);
+  const canRenderMacroChart = !!plan && chartData.length > 0;
 
   const weekRange = useMemo(() => {
     if (!plan) return "";
@@ -1735,16 +1751,22 @@ export default function MealsPage() {
       let hadFailure = false;
       // Try cached server list first
       try {
-        const cached = await fetch(`/api/shopping-list?weekStart=${weekStart}`, {
+        const cached = await authFetchWithRetry(
+          `/api/shopping-list?weekStart=${weekStart}`,
+          {
           method: "GET",
           cache: "no-store",
-        });
+          }
+        );
         if (cached.ok) {
           const data = (await cached.json()) as {
             items?: ShoppingListItem[];
             pricing?: BasketPricing;
           };
-          if (active && data.items?.length) {
+          const cacheHasNeededAmounts =
+            Array.isArray(data.items) &&
+            data.items.every((item) => typeof item.amountNeeded === "number");
+          if (active && data.items?.length && cacheHasNeededAmounts) {
             setNormalizedList(data.items);
             setBasketPricing(data.pricing ?? buildLocalBasketPricing(data.items));
             setNormalizingList(false);
@@ -1760,7 +1782,7 @@ export default function MealsPage() {
 
       // Regenerate and persist
       try {
-        const response = await fetch("/api/shopping-list", {
+        const response = await authFetchWithRetry("/api/shopping-list", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1816,7 +1838,15 @@ export default function MealsPage() {
     return () => {
       active = false;
     };
-  }, [authLoading, plan, profileLocale, shoppingList, shoppingReloadToken, user]);
+  }, [
+    authFetchWithRetry,
+    authLoading,
+    plan,
+    profileLocale,
+    shoppingList,
+    shoppingReloadToken,
+    user,
+  ]);
 
   const displayShoppingList = normalizedList?.length ? normalizedList : shoppingList;
 
@@ -2366,52 +2396,64 @@ export default function MealsPage() {
                   </Stack>
                 )}
                 <Box sx={{ flex: 1 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <XAxis dataKey="label" stroke="#94a3b8" />
-                      <YAxis yAxisId="macros" stroke="#94a3b8" />
-                      <YAxis yAxisId="calories" orientation="right" stroke="#94a3b8" />
-                      <RechartsTooltip content={<MacroTooltip />} />
-                      <Legend />
-                      {typeof macroTargets?.calories === "number" && (
-                        <ReferenceLine
-                          yAxisId="calories"
-                          y={macroTargets.calories}
-                          stroke={chartColors.calories}
-                          strokeDasharray="4 4"
-                          label={{ value: "Cal target", position: "insideTopRight", fill: chartColors.calories }}
-                        />
-                      )}
-                      {typeof macroTargets?.protein === "number" && (
-                        <ReferenceLine
-                          yAxisId="macros"
-                          y={macroTargets.protein}
-                          stroke={chartColors.protein}
-                          strokeDasharray="4 4"
-                        />
-                      )}
-                      {typeof macroTargets?.carbs === "number" && (
-                        <ReferenceLine
-                          yAxisId="macros"
-                          y={macroTargets.carbs}
-                          stroke={chartColors.carbs}
-                          strokeDasharray="4 4"
-                        />
-                      )}
-                      {typeof macroTargets?.fat === "number" && (
-                        <ReferenceLine
-                          yAxisId="macros"
-                          y={macroTargets.fat}
-                          stroke={chartColors.fat}
-                          strokeDasharray="4 4"
-                        />
-                      )}
-                      <Bar yAxisId="calories" dataKey="calories" fill={chartColors.calories} />
-                      <Bar yAxisId="macros" dataKey="protein" fill={chartColors.protein} />
-                      <Bar yAxisId="macros" dataKey="carbs" fill={chartColors.carbs} />
-                      <Bar yAxisId="macros" dataKey="fat" fill={chartColors.fat} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  {canRenderMacroChart ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData}>
+                        <XAxis dataKey="label" stroke="#94a3b8" />
+                        <YAxis yAxisId="macros" stroke="#94a3b8" />
+                        <YAxis yAxisId="calories" orientation="right" stroke="#94a3b8" />
+                        <RechartsTooltip content={<MacroTooltip />} />
+                        <Legend />
+                        {typeof macroTargets?.calories === "number" && (
+                          <ReferenceLine
+                            yAxisId="calories"
+                            y={macroTargets.calories}
+                            stroke={chartColors.calories}
+                            strokeDasharray="4 4"
+                            label={{ value: "Cal target", position: "insideTopRight", fill: chartColors.calories }}
+                          />
+                        )}
+                        {typeof macroTargets?.protein === "number" && (
+                          <ReferenceLine
+                            yAxisId="macros"
+                            y={macroTargets.protein}
+                            stroke={chartColors.protein}
+                            strokeDasharray="4 4"
+                          />
+                        )}
+                        {typeof macroTargets?.carbs === "number" && (
+                          <ReferenceLine
+                            yAxisId="macros"
+                            y={macroTargets.carbs}
+                            stroke={chartColors.carbs}
+                            strokeDasharray="4 4"
+                          />
+                        )}
+                        {typeof macroTargets?.fat === "number" && (
+                          <ReferenceLine
+                            yAxisId="macros"
+                            y={macroTargets.fat}
+                            stroke={chartColors.fat}
+                            strokeDasharray="4 4"
+                          />
+                        )}
+                        <Bar yAxisId="calories" dataKey="calories" fill={chartColors.calories} />
+                        <Bar yAxisId="macros" dataKey="protein" fill={chartColors.protein} />
+                        <Bar yAxisId="macros" dataKey="carbs" fill={chartColors.carbs} />
+                        <Bar yAxisId="macros" dataKey="fat" fill={chartColors.fat} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <Stack
+                      alignItems="center"
+                      justifyContent="center"
+                      sx={{ height: "100%", color: "text.secondary" }}
+                    >
+                      <Typography variant="body2">
+                        Macro chart will appear once your meal data is loaded.
+                      </Typography>
+                    </Stack>
+                  )}
                 </Box>
               </CardContent>
             </Card>

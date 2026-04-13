@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabaseServer";
 import {
   WORKDAY_COUNT,
   type MacroBreakdown,
   type WeeklyMealPlan,
 } from "@/lib/meal-generator";
 import type { EnforcementInfo } from "@/lib/macro-enforcement";
+import { resolveRequestAuth } from "@/lib/serverAuth";
 
 type StoredDay = {
   id: string;
@@ -17,8 +17,13 @@ type StoredDay = {
   enforcement?: EnforcementInfo | null;
 };
 
-const toISODate = (value: string) =>
-  new Date(value).toISOString().split("T")[0];
+const toISODate = (value: string) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error("invalid date");
+  }
+  return parsed.toISOString().split("T")[0];
+};
 
 const sumMacros = (items: MacroBreakdown[]): MacroBreakdown =>
   items.reduce(
@@ -40,14 +45,19 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const weekStart = toISODate(weekStartParam);
-  const supabase = await supabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let weekStart: string;
+  try {
+    weekStart = toISODate(weekStartParam);
+  } catch {
+    return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
+  }
+  const { supabase, session, user } = await resolveRequestAuth(request);
 
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (!session) {
+    console.warn("[meal-plan/state] using bearer fallback auth");
   }
 
   const { data, error } = await supabase
@@ -62,7 +72,7 @@ export async function GET(request: NextRequest) {
   }
 
   const dayRows = (data ?? [])
-    .filter((row) => row.day_id !== "shopping-list")
+    .filter((row) => row.day_id !== "shopping-list" && row.day_id !== "alternatives")
     .slice(0, WORKDAY_COUNT);
 
   if (!dayRows.length) {
@@ -132,16 +142,26 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const effectiveWeekStart = toISODate(
-    weekStart ?? plan.weekStart
-  );
-  const supabase = await supabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const rawWeekStart = weekStart ?? plan.weekStart;
+  if (!rawWeekStart) {
+    return NextResponse.json(
+      { error: "weekStart or plan.weekStart is required" },
+      { status: 400 }
+    );
+  }
+  let effectiveWeekStart: string;
+  try {
+    effectiveWeekStart = toISODate(rawWeekStart);
+  } catch {
+    return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
+  }
+  const { supabase, session, user } = await resolveRequestAuth(request);
 
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (!session) {
+    console.warn("[meal-plan/state] using bearer fallback auth");
   }
 
   const planId = plan.id ?? `plan-${effectiveWeekStart}`;
@@ -150,29 +170,45 @@ export async function POST(request: NextRequest) {
     persistedDays.map((day) => day.totals as MacroBreakdown)
   );
 
-  const rows = persistedDays.map((day) => ({
-    user_id: user.id,
-    plan_id: planId,
-    day_id: day.id,
-    date: toISODate(day.date),
-    week_start: effectiveWeekStart,
-    meals: {
-      id: day.id,
-      label: day.label,
-      date: day.date,
-      meals: day.meals,
-      totals: day.totals,
-      preferenceSignature: plan.preferenceSignature ?? null,
-      enforcement: enforcement ?? null,
-    },
-  }));
+  let rows: Array<{
+    user_id: string;
+    plan_id: string;
+    day_id: string;
+    date: string;
+    week_start: string;
+    meals: unknown;
+  }> = [];
+  try {
+    rows = persistedDays.map((day) => ({
+      user_id: user.id,
+      plan_id: planId,
+      day_id: day.id,
+      date: toISODate(day.date),
+      week_start: effectiveWeekStart,
+      meals: {
+        id: day.id,
+        label: day.label,
+        date: day.date,
+        meals: day.meals,
+        totals: day.totals,
+        preferenceSignature: plan.preferenceSignature ?? null,
+        enforcement: enforcement ?? null,
+      },
+    }));
+  } catch {
+    return NextResponse.json(
+      { error: "invalid day date in plan payload" },
+      { status: 400 }
+    );
+  }
 
   // replace existing rows for the week to keep latest swaps/portions
   await supabase
     .from("plan_history")
     .delete()
     .eq("user_id", user.id)
-    .eq("week_start", effectiveWeekStart);
+    .eq("week_start", effectiveWeekStart)
+    .neq("day_id", "alternatives");
 
   if (rows.length) {
     const { error } = await supabase

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabaseServer";
 import {
   buildShoppingList,
   WORKDAY_COUNT,
@@ -7,45 +6,14 @@ import {
   type WeeklyMealPlan,
 } from "@/lib/meal-generator";
 import { priceBasket } from "@/lib/tesco-prices";
+import { resolveRequestAuth } from "@/lib/serverAuth";
 
-const NORMALIZE_TIMEOUT_MS = 5000;
-
-const toISODate = (value: string) =>
-  new Date(value).toISOString().split("T")[0];
-
-const normalizeViaApi = async (
-  items: ShoppingListItem[],
-  locale: string,
-  origin: string
-): Promise<ShoppingListItem[]> => {
-  if (!items.length) return items;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), NORMALIZE_TIMEOUT_MS);
-  try {
-    const response = await fetch(
-      `${origin}/api/normalize-shopping-list`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, locale }),
-        cache: "no-store",
-        signal: controller.signal,
-      }
-    );
-    if (response.ok) {
-      const data = (await response.json()) as {
-        items?: ShoppingListItem[];
-      };
-      if (Array.isArray(data.items) && data.items.length) {
-        return data.items;
-      }
-    }
-  } catch (error) {
-    console.error("normalizeViaApi failed", error);
-  } finally {
-    clearTimeout(timeoutId);
+const toISODate = (value: string) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error("invalid date");
   }
-  return items;
+  return parsed.toISOString().split("T")[0];
 };
 
 const shoppingListResponse = (items: ShoppingListItem[]) => {
@@ -71,6 +39,9 @@ const shoppingListResponse = (items: ShoppingListItem[]) => {
         packSize: item.packSize,
         totalCost: item.totalCost,
         matched: item.matched,
+        amountNeeded: item.amountNeeded,
+        amountToBuy: item.amountToBuy,
+        unit: item.unit,
       })),
     },
   });
@@ -84,14 +55,19 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
-  const weekStart = toISODate(weekStartParam);
-  const supabase = await supabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let weekStart: string;
+  try {
+    weekStart = toISODate(weekStartParam);
+  } catch {
+    return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
+  }
+  const { supabase, session, user } = await resolveRequestAuth(request);
 
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (!session) {
+    console.warn("[shopping-list] using bearer fallback auth");
   }
 
   const { data, error } = await supabase
@@ -138,26 +114,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = await supabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { supabase, session, user } = await resolveRequestAuth(request);
 
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+  if (!session) {
+    console.warn("[shopping-list] using bearer fallback auth");
+  }
 
-  const effectiveWeekStart = toISODate(weekStart ?? plan.weekStart);
+  const rawWeekStart = weekStart ?? plan.weekStart;
+  if (!rawWeekStart) {
+    return NextResponse.json(
+      { error: "weekStart or plan.weekStart is required" },
+      { status: 400 }
+    );
+  }
+  let effectiveWeekStart: string;
+  try {
+    effectiveWeekStart = toISODate(rawWeekStart);
+  } catch {
+    return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
+  }
   const workweekPlan: WeeklyMealPlan = {
     ...plan,
     days: (plan.days ?? []).slice(0, WORKDAY_COUNT),
   };
-  const baseItems = buildShoppingList(workweekPlan);
-  const normalized = await normalizeViaApi(
-    baseItems,
-    locale,
-    request.nextUrl.origin
-  );
+  const normalized = buildShoppingList(workweekPlan);
 
   await supabase
     .from("plan_history")

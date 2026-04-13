@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { type ShoppingListItem } from "@/lib/meal-generator";
+import { resolveRequestAuth } from "@/lib/serverAuth";
 
 const client = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -27,6 +28,14 @@ type AiNormalizedItem = {
 };
 
 export async function POST(request: NextRequest) {
+  const { session, user } = await resolveRequestAuth(request);
+  if (!user) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  if (!session) {
+    console.warn("[normalize-shopping-list] using bearer fallback auth");
+  }
+
   let body: { items?: ShoppingListItem[]; locale?: string } = {};
   try {
     body = await request.json();

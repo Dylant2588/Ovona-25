@@ -445,24 +445,27 @@ export default function OnboardingPage() {
       mealsPerDay: chosenMealsPerDay,
     };
 
-    const preferencePayload = {
-      user_id: user.id,
-      goal: chosenGoal,
-      meal_complexity: cookingToComplexity(chosenCookingTime),
-      taste_preferences: cookingToTastePreferences(chosenCookingTime),
-      lifestyle: chosenDietaryMode === "mixed" ? null : chosenDietaryMode,
-      allergies: chosenAllergies.length ? chosenAllergies.join(", ") : null,
-      target_calories: chosenTargets.calories,
-      target_protein: chosenTargets.protein,
-      target_carbs: chosenTargets.carbs,
-      target_fat: chosenTargets.fat,
-    };
-
-    const { error: prefError } = await supabase
-      .from("user_preferences")
-      .upsert(preferencePayload);
-
-    if (prefError) {
+    const preferenceResponse = await fetch("/api/preferences", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dietaryMode: chosenDietaryMode,
+        allergies: chosenAllergies,
+        dislikes: chosenDislikes,
+        cuisines: [],
+        tastePreferences: cookingToTastePreferences(chosenCookingTime),
+        goal: chosenGoal,
+        mealComplexity: cookingToComplexity(chosenCookingTime),
+        macroTargets: chosenTargets,
+      }),
+    });
+    if (!preferenceResponse.ok) {
+      const preferencePayload = (await preferenceResponse
+        .json()
+        .catch(() => ({}))) as { error?: string };
+      console.error("onboarding preferences save failed", preferencePayload.error);
       setSaving(false);
       setError("Could not save your preferences. Please try again.");
       return;
