@@ -51,12 +51,15 @@ export async function GET(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
   }
-  const { supabase, session, user } = await resolveRequestAuth(request);
+  const { supabase, user, status, method } = await resolveRequestAuth(request);
 
-  if (!user) {
+  if (status === "transient") {
+    return NextResponse.json({ error: "auth unavailable" }, { status: 503 });
+  }
+  if (status === "unauthorized" || !user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  if (!session) {
+  if (method === "bearer") {
     console.warn("[meal-plan/state] using bearer fallback auth");
   }
 
@@ -155,12 +158,15 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
   }
-  const { supabase, session, user } = await resolveRequestAuth(request);
+  const { supabase, user, status, method } = await resolveRequestAuth(request);
 
-  if (!user) {
+  if (status === "transient") {
+    return NextResponse.json({ error: "auth unavailable" }, { status: 503 });
+  }
+  if (status === "unauthorized" || !user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  if (!session) {
+  if (method === "bearer") {
     console.warn("[meal-plan/state] using bearer fallback auth");
   }
 
