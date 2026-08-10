@@ -2475,7 +2475,7 @@ export default function MealsPage() {
                         <XAxis dataKey="label" stroke="#94a3b8" />
                         <YAxis yAxisId="macros" stroke="#94a3b8" />
                         <YAxis yAxisId="calories" orientation="right" stroke="#94a3b8" />
-                        <RechartsTooltip content={<MacroTooltip />} />
+                        <RechartsTooltip content={MacroTooltip} />
                         <Legend />
                         {typeof macroTargets?.calories === "number" && (
                           <ReferenceLine
