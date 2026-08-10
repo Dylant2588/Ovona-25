@@ -62,7 +62,7 @@ import {
   Legend,
   ReferenceLine,
 } from "recharts";
-import type { TooltipProps } from "recharts";
+import type { TooltipContentProps } from "recharts";
 import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabaseClient";
@@ -384,7 +384,7 @@ const dayEnforcementMeta = (
   return { color: "#22c55e", label: "On target" };
 };
 
-const MacroTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
+const MacroTooltip = ({ active, payload, label }: TooltipContentProps<ValueType, NameType>) => {
   if (!active || !payload?.length) return null;
   return (
     <Box
