@@ -2389,7 +2389,7 @@ export default function MealsPage() {
                       const average = workweekAverages[macro.key];
                       const unitLabel = macro.key === "calories" ? "kcal" : macro.unit;
                       return (
-                        <Grid item xs={6} key={macro.key}>
+                        <Grid size={6} key={macro.key}>
                           <Box
                             sx={{
                               borderRadius: 2,
@@ -3160,7 +3160,7 @@ export default function MealsPage() {
             <FormGroup>
               <Grid container spacing={0.5}>
                 {ALLERGY_OPTIONS.map((allergy) => (
-                  <Grid item xs={6} key={allergy}>
+                  <Grid size={6} key={allergy}>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -3213,7 +3213,7 @@ export default function MealsPage() {
             <FormGroup>
               <Grid container spacing={0.5}>
                 {CUISINE_OPTIONS.map((cuisine) => (
-                  <Grid item xs={6} key={cuisine}>
+                  <Grid size={6} key={cuisine}>
                     <FormControlLabel
                       control={
                         <Checkbox
