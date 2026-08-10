@@ -27,18 +27,6 @@ type AiNormalizedItem = {
   displayName?: string;
 };
 
-type ResponseText = {
-  text?: string;
-};
-
-type ResponseOutput = {
-  content?: ResponseText[];
-};
-
-type ResponseWithOutput = {
-  output?: ResponseOutput[];
-};
-
 export async function POST(request: NextRequest) {
   const { session, user } = await resolveRequestAuth(request);
   if (!user) {
@@ -170,13 +158,25 @@ const roundQuantity = (quantity: number, unit: string) => {
   return Math.round(quantity * 100) / 100;
 };
 
-const extractText = (res: ResponseWithOutput) =>
-  res.output
-    ?.map((block) =>
-      block.content?.map((entry) => entry.text ?? "").join("")
-    )
+const extractText = (response: unknown) => {
+  if (!response || typeof response !== "object") return "";
+  const output = (response as { output?: unknown }).output;
+  if (!Array.isArray(output)) return "";
+
+  return output
+    .flatMap((block) => {
+      if (!block || typeof block !== "object") return [];
+      const content = (block as { content?: unknown }).content;
+      if (!Array.isArray(content)) return [];
+      return content.flatMap((entry) => {
+        if (!entry || typeof entry !== "object") return [];
+        const text = (entry as { text?: unknown }).text;
+        return typeof text === "string" ? [text] : [];
+      });
+    })
     .join("\n")
-    ?.trim() ?? "";
+    .trim();
+};
 
 const extractJson = (text: string) => {
   const start = text.indexOf("[");
