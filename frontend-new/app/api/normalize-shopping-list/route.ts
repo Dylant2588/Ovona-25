@@ -27,6 +27,18 @@ type AiNormalizedItem = {
   displayName?: string;
 };
 
+type ResponseText = {
+  text?: string;
+};
+
+type ResponseOutput = {
+  content?: ResponseText[];
+};
+
+type ResponseWithOutput = {
+  output?: ResponseOutput[];
+};
+
 export async function POST(request: NextRequest) {
   const { session, user } = await resolveRequestAuth(request);
   if (!user) {
@@ -158,10 +170,10 @@ const roundQuantity = (quantity: number, unit: string) => {
   return Math.round(quantity * 100) / 100;
 };
 
-const extractText = (res: OpenAI.Beta.Responses.Response) =>
+const extractText = (res: ResponseWithOutput) =>
   res.output
     ?.map((block) =>
-      block.content?.map((entry) => ("text" in entry ? entry.text : "")).join("")
+      block.content?.map((entry) => entry.text ?? "").join("")
     )
     .join("\n")
     ?.trim() ?? "";
