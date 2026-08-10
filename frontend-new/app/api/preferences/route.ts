@@ -17,6 +17,13 @@ type SavePreferencesPayload = {
     carbs?: number | null;
     fat?: number | null;
   } | null;
+  profile?: {
+    email?: string | null;
+    bodyWeightKg?: number | null;
+    heightCm?: number | null;
+    activityLevel?: string | null;
+    notes?: string | null;
+  } | null;
 };
 
 const uniqueStrings = (values: unknown): string[] => {
@@ -59,6 +66,16 @@ const normalizeGoal = (value: SavePreferencesPayload["goal"]) => {
   if (normalized === "gain" || normalized === "build_muscle") return "gain";
   if (normalized === "maintain") return "maintain";
   if (normalized === "recomp" || normalized === "body_recomposition") return "recomp";
+  return null;
+};
+
+const normalizeActivityLevel = (value: unknown) => {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+  if (["sedentary", "light", "moderate", "intense"].includes(normalized)) {
+    return normalized;
+  }
   return null;
 };
 
@@ -111,6 +128,7 @@ const syncUserAllergies = async (
   }
 
   const attempts = [
+    normalizedAllergies.map((allergy) => ({ user_id: userId, allergy_name: allergy })),
     normalizedAllergies.map((allergy) => ({ user_id: userId, allergy })),
     normalizedAllergies.map((allergy) => ({ user_id: userId, allergen: allergy })),
     normalizedAllergies.map((allergy) => ({ user_id: userId, name: allergy })),
@@ -130,16 +148,55 @@ const upsertProfilesWithFallback = async (
   userId: string,
   allergies: string[],
   dislikes: string[],
-  cuisines: string[]
+  cuisines: string[],
+  profilePatch: {
+    email?: string | null;
+    bodyWeightKg?: number | null;
+    heightCm?: number | null;
+    activityLevel?: string | null;
+    notes?: string | null;
+  }
 ) => {
-  const base = {
+  const base: Record<string, unknown> = {
     id: userId,
     allergies: allergies.length ? allergies : null,
     dislikes: dislikes.length ? dislikes : null,
     cuisines: cuisines.length ? cuisines : null,
   };
+  if (profilePatch.email !== undefined) {
+    base.email = profilePatch.email;
+  }
+  if (profilePatch.bodyWeightKg !== undefined) {
+    base.body_weight_kg = profilePatch.bodyWeightKg;
+  }
+  if (profilePatch.heightCm !== undefined) {
+    base.height_cm = profilePatch.heightCm;
+  }
+  if (profilePatch.activityLevel !== undefined) {
+    base.activity_level = profilePatch.activityLevel;
+  }
+  if (profilePatch.notes !== undefined) {
+    base.notes = profilePatch.notes;
+  }
   const payloads = [
     base,
+    {
+      id: userId,
+      body_weight_kg: base.body_weight_kg,
+      height_cm: base.height_cm,
+      activity_level: base.activity_level,
+      notes: base.notes,
+      allergies: base.allergies,
+      dislikes: base.dislikes,
+      cuisines: base.cuisines,
+    },
+    {
+      id: userId,
+      body_weight_kg: base.body_weight_kg,
+      height_cm: base.height_cm,
+      activity_level: base.activity_level,
+      notes: base.notes,
+    },
     { id: userId, allergies: base.allergies, dislikes: base.dislikes },
     { id: userId, allergies: base.allergies, cuisines: base.cuisines },
     { id: userId, dislikes: base.dislikes, cuisines: base.cuisines },
@@ -170,11 +227,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
-    const { supabase: authClient, session, user } = await resolveRequestAuth(request);
-    if (!user?.id) {
+    const { supabase: authClient, user, status, method } = await resolveRequestAuth(request);
+    if (status === "transient") {
+      return NextResponse.json({ error: "auth unavailable" }, { status: 503 });
+    }
+    if (status === "unauthorized" || !user?.id) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
-    if (!session) {
+    if (method === "bearer") {
       console.warn("[preferences] using bearer fallback auth");
     }
     const { writeClient, usingServiceRole } = await createWriteClient(authClient);
@@ -192,6 +252,32 @@ export async function POST(request: NextRequest) {
     const tastePreferences = uniqueStrings(body.tastePreferences);
     const mealComplexity = normalizeMealComplexity(body.mealComplexity);
     const normalizedGoal = normalizeGoal(body.goal);
+    const profilePatch = {
+      email:
+        body.profile && "email" in body.profile
+          ? typeof body.profile.email === "string"
+            ? body.profile.email
+            : null
+          : undefined,
+      bodyWeightKg:
+        body.profile && "bodyWeightKg" in body.profile
+          ? parseNumberOrNull(body.profile.bodyWeightKg)
+          : undefined,
+      heightCm:
+        body.profile && "heightCm" in body.profile
+          ? parseNumberOrNull(body.profile.heightCm)
+          : undefined,
+      activityLevel:
+        body.profile && "activityLevel" in body.profile
+          ? normalizeActivityLevel(body.profile.activityLevel)
+          : undefined,
+      notes:
+        body.profile && "notes" in body.profile
+          ? typeof body.profile.notes === "string"
+            ? body.profile.notes
+            : null
+          : undefined,
+    };
 
     const userPreferencesPayload: Record<string, unknown> = {
       user_id: userId,
@@ -276,7 +362,8 @@ export async function POST(request: NextRequest) {
       userId,
       allergies,
       dislikes,
-      cuisines
+      cuisines,
+      profilePatch
     );
     const allergiesSynced = await syncUserAllergies(writeClient, userId, allergies);
 

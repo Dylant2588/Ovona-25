@@ -51,12 +51,14 @@ export async function GET(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
   }
-  const { supabase, user, status, method } = await resolveRequestAuth(request);
+  const { supabase, user, status, method, reason } = await resolveRequestAuth(request);
 
   if (status === "transient") {
+    console.warn("[meal-plan/state] auth unavailable", { method: "GET", reason });
     return NextResponse.json({ error: "auth unavailable" }, { status: 503 });
   }
   if (status === "unauthorized" || !user) {
+    console.warn("[meal-plan/state] unauthorized request", { method: "GET", authMethod: method });
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   if (method === "bearer") {
@@ -158,12 +160,14 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
   }
-  const { supabase, user, status, method } = await resolveRequestAuth(request);
+  const { supabase, user, status, method, reason } = await resolveRequestAuth(request);
 
   if (status === "transient") {
+    console.warn("[meal-plan/state] auth unavailable", { method: "POST", reason });
     return NextResponse.json({ error: "auth unavailable" }, { status: 503 });
   }
   if (status === "unauthorized" || !user) {
+    console.warn("[meal-plan/state] unauthorized request", { method: "POST", authMethod: method });
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
   if (method === "bearer") {

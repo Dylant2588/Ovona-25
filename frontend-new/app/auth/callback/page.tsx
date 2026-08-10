@@ -6,6 +6,34 @@ import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 
+const isExplicitUnauthorizedError = (error: unknown) => {
+  const authError = error as {
+    status?: number;
+    code?: string;
+    message?: string;
+    name?: string;
+  } | null;
+
+  if (!authError) return false;
+  if (authError.status === 401 || authError.status === 403) return true;
+
+  const details = `${authError.message ?? ""} ${authError.code ?? ""} ${authError.name ?? ""}`
+    .toLowerCase()
+    .trim();
+
+  if (!details) return false;
+
+  return [
+    "auth session missing",
+    "unauthorized",
+    "forbidden",
+    "invalid",
+    "expired",
+    "token",
+    "jwt",
+  ].some((hint) => details.includes(hint));
+};
+
 export default function AuthCallbackPage() {
   const router = useRouter();
 
@@ -16,7 +44,8 @@ export default function AuthCallbackPage() {
 
     async function handleAuthRedirect() {
       let user: User | null = null;
-      let userLookupFailed = false;
+      let authLookupTransient = false;
+      let authLookupUnauthorized = false;
 
       for (let attempt = 0; attempt < MAX_LOOKUP_ATTEMPTS; attempt += 1) {
         try {
@@ -26,14 +55,21 @@ export default function AuthCallbackPage() {
           } = await supabase.auth.getUser();
 
           if (error) {
-            userLookupFailed = true;
+            if (isExplicitUnauthorizedError(error)) {
+              authLookupUnauthorized = true;
+              break;
+            }
+            authLookupTransient = true;
           } else if (nextUser) {
             user = nextUser;
-            userLookupFailed = false;
+            authLookupTransient = false;
+            break;
+          } else {
+            authLookupUnauthorized = true;
             break;
           }
         } catch {
-          userLookupFailed = true;
+          authLookupTransient = true;
         }
 
         if (attempt < MAX_LOOKUP_ATTEMPTS - 1) {
@@ -46,10 +82,13 @@ export default function AuthCallbackPage() {
       }
 
       if (!user) {
-        if (userLookupFailed) {
-          console.warn("[auth/callback] session lookup remained unavailable; routing to login");
+        if (authLookupUnauthorized && !authLookupTransient) {
+          router.replace("/login");
+          return;
         }
-        router.replace("/login");
+
+        console.warn("[auth/callback] auth state remained uncertain; routing to meals");
+        router.replace("/meals");
         return;
       }
 

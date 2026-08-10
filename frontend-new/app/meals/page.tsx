@@ -167,13 +167,19 @@ type UserAllergyRow = {
 
 type PlanMeal = WeeklyMealPlan["days"][number]["meals"][number];
 
-type ToastSeverity = "success" | "error" | "info";
+type ToastSeverity = "success" | "error" | "info" | "warning";
 
 type ToastState = {
   open: boolean;
   message: string;
   severity: ToastSeverity;
   actionLabel?: string;
+};
+
+type PreferencesNoticeState = {
+  message: string;
+  severity: "success" | "warning" | "info";
+  retryable?: boolean;
 };
 
 const complexityFromInt = (value: number | null | undefined): PreferencesInput["mealComplexity"] => {
@@ -680,8 +686,10 @@ export default function MealsPage() {
   const [expandedDayId, setExpandedDayId] = useState<string | null>(null);
   const [preferencesPanelOpen, setPreferencesPanelOpen] = useState(false);
   const [preferencesSaving, setPreferencesSaving] = useState(false);
-  const [preferencesNotice, setPreferencesNotice] = useState<string | null>(null);
+  const [preferencesNotice, setPreferencesNotice] = useState<PreferencesNoticeState | null>(null);
   const [showCustomizePrompt, setShowCustomizePrompt] = useState(false);
+  const [hasCanonicalPreferences, setHasCanonicalPreferences] = useState<boolean | null>(null);
+  const [preferencesLoadUncertain, setPreferencesLoadUncertain] = useState(false);
   const [preferencesPanelState, setPreferencesPanelState] = useState<PreferencePanelState>({
     dietaryMode: "mixed",
     allergies: [],
@@ -695,6 +703,7 @@ export default function MealsPage() {
   const [regeneratingDayIndex, setRegeneratingDayIndex] = useState<number | null>(null);
   const [swappingMealId, setSwappingMealId] = useState<string | null>(null);
   const toastActionRef = useRef<(() => void) | null>(null);
+  const loginRedirectPendingRef = useRef(false);
   const [toast, setToast] = useState<ToastState>({
     open: false,
     message: "",
@@ -750,6 +759,20 @@ export default function MealsPage() {
     }
   };
 
+  const redirectToLoginOnce = useCallback(() => {
+    if (loginRedirectPendingRef.current) {
+      return;
+    }
+    loginRedirectPendingRef.current = true;
+    toastActionRef.current = null;
+    setToast({
+      open: true,
+      message: "Your session expired. Please sign in again.",
+      severity: "info",
+    });
+    router.replace("/login");
+  }, [router]);
+
   const authFetch = useCallback(async (input: RequestInfo | URL, init: RequestInit = {}) => {
     const headers = new Headers(init.headers ?? {});
     try {
@@ -786,6 +809,9 @@ export default function MealsPage() {
             !RETRYABLE_STATUSES.has(response.status) ||
             attempt === maxRetries - 1
           ) {
+            if (response.status === 401 || response.status === 403) {
+              redirectToLoginOnce();
+            }
             return response;
           }
           lastResponse = response;
@@ -803,7 +829,7 @@ export default function MealsPage() {
       }
       throw lastError instanceof Error ? lastError : new Error("API request failed");
     },
-    [authFetch]
+    [authFetch, redirectToLoginOnce]
   );
 
   const retryShoppingList = () => {
@@ -832,11 +858,17 @@ export default function MealsPage() {
     const skipKey = onboardingSkipKeyFor(user.id);
 
     if (onboardingState === "ready") {
-      setPreferencesNotice("Your meal plan is ready!");
+      setPreferencesNotice({
+        message: "Your meal plan is ready!",
+        severity: "success",
+      });
       setShowCustomizePrompt(false);
       window.localStorage.removeItem(skipKey);
     } else if (onboardingState === "skipped") {
-      setPreferencesNotice("Using starter defaults. Customise your plan anytime.");
+      setPreferencesNotice({
+        message: "Using starter defaults. Customise your plan anytime.",
+        severity: "info",
+      });
       setShowCustomizePrompt(true);
       window.localStorage.setItem(skipKey, "1");
     } else {
@@ -854,11 +886,12 @@ export default function MealsPage() {
   }, [router, searchParams, user]);
 
   useEffect(() => {
-    if (authLoading || prefLoading) return;
-    if (user && !preferences) {
+    if (authLoading || prefLoading || !user) return;
+    if (preferencesLoadUncertain) return;
+    if (hasCanonicalPreferences === false) {
       router.replace("/onboarding");
     }
-  }, [authLoading, prefLoading, preferences, router, user]);
+  }, [authLoading, hasCanonicalPreferences, prefLoading, preferencesLoadUncertain, router, user]);
 
   const fetchPlanFromAi = async (
     rotationHistory: RotationHistoryEntry[],
@@ -904,6 +937,8 @@ export default function MealsPage() {
       runAsync(() => {
         setPreferences(null);
         setPreferenceTastes([]);
+        setHasCanonicalPreferences(null);
+        setPreferencesLoadUncertain(false);
         setPrefLoading(false);
         setLoadingStepIndex(0);
       });
@@ -912,6 +947,8 @@ export default function MealsPage() {
 
     runAsync(() => {
       setPrefLoading(true);
+      setHasCanonicalPreferences(null);
+      setPreferencesLoadUncertain(false);
       setError(null);
     });
 
@@ -943,9 +980,11 @@ export default function MealsPage() {
           ]);
         const prefData = (prefRows?.[0] as RawPreferences | undefined) ?? null;
         const profileData = (profileRows?.[0] as ProfileRow | undefined) ?? null;
+        const canonicalPreferencesFound = Boolean(prefData);
 
         if (prefError) {
           console.error(prefError);
+          setPreferencesLoadUncertain(true);
           showToast("Using starter defaults while we load your preferences.", "info");
         }
         if (profileError) {
@@ -1007,6 +1046,7 @@ export default function MealsPage() {
             5,
         };
 
+        setHasCanonicalPreferences(canonicalPreferencesFound);
         setPreferences({
           userId: user.id,
           tastes,
@@ -1021,6 +1061,8 @@ export default function MealsPage() {
       } catch (loadError) {
         console.error("Failed loading preferences", loadError);
         setError(null);
+        setHasCanonicalPreferences(null);
+        setPreferencesLoadUncertain(true);
         showToast("Couldn't load saved preferences. Using defaults for now.", "info");
         setPreferences({
           userId: user.id,
@@ -1587,16 +1629,34 @@ export default function MealsPage() {
         throw new Error(savePayload.error ?? "Failed to save preferences");
       }
 
-      if (savePayload.profileSaved === false || savePayload.allergiesSynced === false) {
+      const hasSecondarySyncWarning =
+        savePayload.profileSaved === false || savePayload.allergiesSynced === false;
+
+      if (hasSecondarySyncWarning) {
         console.warn("Preferences saved but some profile/allergy sync operations failed", {
           profileSaved: savePayload.profileSaved,
           allergiesSynced: savePayload.allergiesSynced,
         });
+        setPreferencesNotice({
+          message:
+            "Preferences saved and meals are regenerating, but some profile/allergy details did not sync yet.",
+          severity: "warning",
+          retryable: true,
+        });
+        showToast("Preferences saved with a sync warning. You can retry now.", "warning", {
+          actionLabel: "Retry",
+          onAction: () => void handleSavePreferencePanel(),
+        });
       }
 
       setPreferencesPanelOpen(false);
-      setPreferencesNotice("Preferences saved. Regenerating your meals...");
-      showToast("Preferences saved. Regenerating your meals...", "info");
+      if (!hasSecondarySyncWarning) {
+        setPreferencesNotice({
+          message: "Preferences saved. Regenerating your meals...",
+          severity: "success",
+        });
+        showToast("Preferences saved. Regenerating your meals...", "info");
+      }
       setRegeneratingWeek(true);
       setPlanLoading(true);
       setLoadingStepIndex(0);
@@ -2135,7 +2195,20 @@ export default function MealsPage() {
       )}
 
       {error && <Alert severity="error">{error}</Alert>}
-      {preferencesNotice && <Alert severity="success">{preferencesNotice}</Alert>}
+      {preferencesNotice && (
+        <Alert
+          severity={preferencesNotice.severity}
+          action={
+            preferencesNotice.retryable ? (
+              <Button color="inherit" size="small" onClick={() => void handleSavePreferencePanel()}>
+                Retry sync
+              </Button>
+            ) : undefined
+          }
+        >
+          {preferencesNotice.message}
+        </Alert>
+      )}
       {showCustomizePrompt && preferences && (
         <Alert
           severity="info"

@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   title: "Ovona - Smart Nutrition Companion",
   description:
     "Plan meals, track nutrition, and onboard smoothly with Ovona's AI assistant.",
+  applicationName: "Ovona",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Ovona",
+  },
+  manifest: "/manifest.webmanifest",
+  themeColor: "#0c1020",
 };
 
 export default function RootLayout({

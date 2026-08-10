@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { supabase } from "@/lib/supabaseClient";
+import { getSiteUrl } from "@/lib/site-url";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,7 +46,7 @@ export default function LoginPage() {
       await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: "http://localhost:3000/auth/callback",
+          redirectTo: `${getSiteUrl()}/auth/callback`,
         },
       });
     } finally {

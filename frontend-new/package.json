@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:phase1:reliability": "powershell -ExecutionPolicy Bypass -File ./scripts/phase1-reliability-check.ps1 -Mode full"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

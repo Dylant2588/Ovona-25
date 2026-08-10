@@ -241,6 +241,9 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
+  const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
+  const [pendingPersistMode, setPendingPersistMode] = useState<boolean | null>(null);
 
   const [userId, setUserId] = useState<string | null>(null);
   const [profileNotes, setProfileNotes] = useState<string | null>(null);
@@ -368,45 +371,11 @@ export default function OnboardingPage() {
     setDislikes((prev) => prev.filter((item) => item !== tag));
   };
 
-  const saveAllergiesToTable = async (targetUserId: string, allergyValues: string[]) => {
-    const { error: deleteError } = await supabase
-      .from("user_allergies")
-      .delete()
-      .eq("user_id", targetUserId);
-    if (deleteError) {
-      throw deleteError;
-    }
-    if (!allergyValues.length) {
-      return;
-    }
-    const rows = allergyValues.map((allergy) => ({
-      user_id: targetUserId,
-      allergy: allergy.toLowerCase(),
-    }));
-    const { error: allergyError } = await supabase.from("user_allergies").insert(rows);
-    if (!allergyError) return;
-
-    const fallbackRows = allergyValues.map((allergy) => ({
-      user_id: targetUserId,
-      allergen: allergy.toLowerCase(),
-    }));
-    const { error: fallbackError } = await supabase
-      .from("user_allergies")
-      .insert(fallbackRows);
-    if (!fallbackError) return;
-
-    const nameRows = allergyValues.map((allergy) => ({
-      user_id: targetUserId,
-      name: allergy.toLowerCase(),
-    }));
-    const { error: nameError } = await supabase.from("user_allergies").insert(nameRows);
-    if (nameError) {
-      throw nameError;
-    }
-  };
-
   const persistOnboarding = async (useDefaults: boolean) => {
     setError(null);
+    setWarning(null);
+    setPendingRedirect(null);
+    setPendingPersistMode(null);
     setSaving(true);
 
     const {
@@ -444,6 +413,8 @@ export default function OnboardingPage() {
       cookingTime: chosenCookingTime,
       mealsPerDay: chosenMealsPerDay,
     };
+    const profileNotesValue = writeOnboardingMeta(profileNotes, profileMeta);
+    const nextRoute = useDefaults ? "/meals?onboarding=skipped" : "/meals?onboarding=ready";
 
     const preferenceResponse = await fetch("/api/preferences", {
       method: "POST",
@@ -459,70 +430,29 @@ export default function OnboardingPage() {
         goal: chosenGoal,
         mealComplexity: cookingToComplexity(chosenCookingTime),
         macroTargets: chosenTargets,
+        profile: {
+          email: user.email ?? null,
+          bodyWeightKg: profileWeight,
+          heightCm: profileHeight,
+          activityLevel: profileActivity,
+          notes: profileNotesValue,
+        },
       }),
     });
-    if (!preferenceResponse.ok) {
-      const preferencePayload = (await preferenceResponse
-        .json()
-        .catch(() => ({}))) as { error?: string };
+    const preferencePayload = (await preferenceResponse
+      .json()
+      .catch(() => ({}))) as {
+      ok?: boolean;
+      error?: string;
+      profileSaved?: boolean;
+      allergiesSynced?: boolean;
+    };
+
+    if (!preferenceResponse.ok || !preferencePayload.ok) {
       console.error("onboarding preferences save failed", preferencePayload.error);
       setSaving(false);
       setError("Could not save your preferences. Please try again.");
       return;
-    }
-
-    const profilePayload = {
-      id: user.id,
-      email: user.email ?? null,
-      body_weight_kg: profileWeight,
-      height_cm: profileHeight,
-      activity_level: profileActivity,
-      allergies: chosenAllergies.length ? chosenAllergies : null,
-      dislikes: chosenDislikes.length ? chosenDislikes : null,
-      notes: writeOnboardingMeta(profileNotes, profileMeta),
-    };
-
-    const profileFallbackPayload = {
-      id: user.id,
-      allergies: chosenAllergies.length ? chosenAllergies : null,
-      dislikes: chosenDislikes.length ? chosenDislikes : null,
-      notes: writeOnboardingMeta(profileNotes, profileMeta),
-    };
-
-    let profileError: Error | null = null;
-    const profilePayloadVariants = [
-      profilePayload,
-      {
-        ...profilePayload,
-        email: undefined,
-      },
-      profileFallbackPayload,
-    ];
-
-    for (const payloadVariant of profilePayloadVariants) {
-      const { error } = await supabase.from("profiles").upsert(payloadVariant, {
-        onConflict: "id",
-      });
-      if (!error) {
-        profileError = null;
-        break;
-      }
-      profileError = error;
-      console.error("profiles upsert failed during onboarding", {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-      });
-    }
-
-    if (profileError) {
-      console.warn("Proceeding without profile persistence during onboarding.");
-    }
-
-    try {
-      await saveAllergiesToTable(user.id, chosenAllergies);
-    } catch (allergyError) {
-      console.error("Failed to sync user_allergies", allergyError);
     }
 
     if (typeof window !== "undefined") {
@@ -536,8 +466,18 @@ export default function OnboardingPage() {
       window.localStorage.setItem(metaKey, JSON.stringify(profileMeta));
     }
 
+    if (preferencePayload.profileSaved === false || preferencePayload.allergiesSynced === false) {
+      setSaving(false);
+      setPendingRedirect(nextRoute);
+      setPendingPersistMode(useDefaults);
+      setWarning(
+        "Your core preferences were saved, but profile/allergy sync is incomplete. Retry sync or continue."
+      );
+      return;
+    }
+
     setSaving(false);
-    router.replace(useDefaults ? "/meals?onboarding=skipped" : "/meals?onboarding=ready");
+    router.replace(nextRoute);
   };
 
   const handleNext = () => {
@@ -862,6 +802,39 @@ export default function OnboardingPage() {
               </Stack>
             )}
 
+            {warning && (
+              <Alert
+                severity="warning"
+                action={
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={() =>
+                        void persistOnboarding(
+                          pendingPersistMode === null ? false : pendingPersistMode
+                        )
+                      }
+                      disabled={saving}
+                    >
+                      Retry
+                    </Button>
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={() => {
+                        if (!pendingRedirect) return;
+                        router.replace(pendingRedirect);
+                      }}
+                    >
+                      Continue
+                    </Button>
+                  </Stack>
+                }
+              >
+                {warning}
+              </Alert>
+            )}
             {error && <Alert severity="error">{error}</Alert>}
 
             <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
