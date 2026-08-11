@@ -71,6 +71,12 @@ None yet.
 
 - Existing repository has substantial in-flight changes outside `.planning/`; phase work should isolate scope carefully.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260811-o94 | Implement Ovona first product-redesign slice: Today/This week meal UX, lightweight I ate this capture with calm adaptation feedback, and responsive polish while preserving planner features. | 2026-08-11 | 837e7e7 | [260811-o94-implement-ovona-first-product-redesign-s](./quick/260811-o94-implement-ovona-first-product-redesign-s/) |
+
 ## Session Continuity
 
 Last session: 2026-04-15T13:59:36.913Z
