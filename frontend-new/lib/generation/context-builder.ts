@@ -1,4 +1,5 @@
 import { readOnboardingMeta } from "@/lib/onboarding-meta";
+import type { PreferencesInput } from "@/lib/meal-generator";
 import { supabaseServer } from "@/lib/supabaseServer";
 import type {
   GenerationContext,
@@ -301,6 +302,7 @@ const parseAllergyRows = (rows: unknown): string[] => {
       if (!row || typeof row !== "object") return "";
       const record = row as Record<string, unknown>;
       return (
+        parseString(record.allergy_name) ||
         parseString(record.allergy) ||
         parseString(record.allergen) ||
         parseString(record.name)
@@ -312,9 +314,10 @@ const parseAllergyRows = (rows: unknown): string[] => {
 
 export async function buildContext(
   userId: string,
-  options?: { supabase?: GenerationSupabase }
+  options?: { supabase?: GenerationSupabase; preferences?: PreferencesInput }
 ): Promise<GenerationContext> {
   const supabase = options?.supabase ?? (await supabaseServer());
+  const requestedPreferences = options?.preferences;
 
   const [prefRes, profileRes, allergyRes, history] = await Promise.all([
     supabase.from("user_preferences").select("*").eq("user_id", userId).limit(1),
@@ -336,9 +339,23 @@ export async function buildContext(
     console.warn("[context-builder] user_allergies query failed:", allergyRes.error.message);
   }
 
-  const targets = deriveCalculatedTargets(preferences, profile);
+  const requestedTargets = requestedPreferences?.macroTargets;
+  const targetSource: Record<string, unknown> = {
+    ...(preferences ?? {}),
+    goal: requestedPreferences?.goal ?? preferences?.goal,
+    target_calories: requestedTargets?.calories ?? preferences?.target_calories,
+    target_protein: requestedTargets?.protein ?? preferences?.target_protein,
+    target_carbs: requestedTargets?.carbs ?? preferences?.target_carbs,
+    target_fat: requestedTargets?.fat ?? preferences?.target_fat,
+  };
+  const targets = deriveCalculatedTargets(targetSource, profile);
+  const requestedProfile = requestedPreferences?.profile;
   const dietaryMode = normalizeDietaryMode(
-    preferences?.dietary_mode ?? preferences?.lifestyle ?? profile?.dietary_mode ?? null
+    requestedProfile?.dietaryMode ??
+      preferences?.dietary_mode ??
+      preferences?.lifestyle ??
+      profile?.dietary_mode ??
+      null
   );
   const healthConditions = deriveHealthConditions(preferences, profile);
   const microTargets = deriveMicroTargets(healthConditions);
@@ -353,21 +370,24 @@ export async function buildContext(
   const tableAllergies = parseAllergyRows(allergyRes.data ?? []);
   const allergies = Array.from(
     new Set(
-      [...preferencesAllergies, ...profileAllergies, ...tableAllergies].map((entry) =>
-        entry.toLowerCase()
+      [...(requestedProfile?.allergies ?? []), ...preferencesAllergies, ...profileAllergies, ...tableAllergies].map(
+        (entry) => entry.toLowerCase()
       )
     )
   );
 
   const dislikes = Array.from(
     new Set(
-      toStringArray(profile?.dislikes).map((entry) => entry.toLowerCase())
+      [...(requestedProfile?.dislikes ?? []), ...toStringArray(profile?.dislikes)].map((entry) =>
+        entry.toLowerCase()
+      )
     )
   );
 
   const cuisines = Array.from(
     new Set(
       [
+        ...(requestedProfile?.cuisines ?? []),
         ...toStringArray(preferences?.cuisine_preferences),
         ...toStringArray(preferences?.cuisines),
         ...toStringArray(profile?.cuisines),
@@ -375,7 +395,7 @@ export async function buildContext(
     )
   );
 
-  const mealsPerDay = resolveMealsPerDay(preferences, profile);
+  const mealsPerDay = requestedProfile?.mealsPerDay ?? resolveMealsPerDay(preferences, profile);
   const slotLabels = resolveSlotLabels(mealsPerDay);
   const slotBudgets = buildSlotBudgets(targets.calories, targets.protein, slotLabels);
 

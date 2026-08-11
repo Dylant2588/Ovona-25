@@ -3,6 +3,7 @@ import type {
   MacroBreakdown,
   MealInstance,
   MealSlot,
+  PreferencesInput,
   ProteinType,
   WeeklyMealPlan,
 } from "@/lib/meal-generator";
@@ -198,7 +199,23 @@ const mealConflictsWithAllergies = (
   context: GenerationContext
 ) => {
   const allergySet = new Set(context.allergies.map((entry) => entry.toLowerCase()));
-  return allergenFlags.some((flag) => allergySet.has(flag.toLowerCase()));
+  const dairyTerms = new Set([
+    "dairy",
+    "lactose",
+    "milk",
+    "yogurt",
+    "yoghurt",
+    "cheese",
+    "whey",
+    "casein",
+    "butter",
+    "cream",
+  ]);
+  const blocksDairy = [...allergySet].some((entry) => dairyTerms.has(entry));
+  return allergenFlags.some((flag) => {
+    const normalizedFlag = flag.toLowerCase();
+    return allergySet.has(normalizedFlag) || (blocksDairy && dairyTerms.has(normalizedFlag));
+  });
 };
 
 const chooseSlotBudget = (context: GenerationContext, slot: string) => {
@@ -296,6 +313,16 @@ const ensureSafety = async (
       }
     }
 
+    const selectedValidation = await validateMealIngredients(selected, supabase);
+    if (
+      selectedValidation.unknownIngredients.length > 0 ||
+      mealConflictsWithAllergies(selectedValidation.allergenFlags, context)
+    ) {
+      throw new Error(
+        `[generation] no verified allergy-safe replacement for ${meal.name}`
+      );
+    }
+
     safeMeals.push(selected);
   }
 
@@ -303,7 +330,8 @@ const ensureSafety = async (
 };
 
 export async function generateWeeklyPlanWithArtifacts(
-  userId: string
+  userId: string,
+  options?: { preferences?: PreferencesInput }
 ): Promise<GenerationArtifacts> {
   const supabase = await supabaseServer();
 
@@ -318,7 +346,10 @@ export async function generateWeeklyPlanWithArtifacts(
     console.warn("[generate-plan] meal_concepts seed check skipped:", error);
   }
 
-  const context = await buildContext(userId, { supabase });
+  const context = await buildContext(userId, {
+    supabase,
+    preferences: options?.preferences,
+  });
   let nutrition = await generateMeals(context, { supabase });
 
   if (!nutrition.meals.length) {
@@ -369,7 +400,10 @@ export async function generateWeeklyPlanWithArtifacts(
   };
 }
 
-export async function generateWeeklyPlan(userId: string): Promise<WeeklyMealPlan> {
-  const result = await generateWeeklyPlanWithArtifacts(userId);
+export async function generateWeeklyPlan(
+  userId: string,
+  options?: { preferences?: PreferencesInput }
+): Promise<WeeklyMealPlan> {
+  const result = await generateWeeklyPlanWithArtifacts(userId, options);
   return result.weeklyPlan;
 }

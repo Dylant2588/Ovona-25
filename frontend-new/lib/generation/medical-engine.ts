@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { resolveNutritionBaseline } from "@/lib/meal-generator";
 import type {
   GenerationContext,
   IngredientMacros,
@@ -257,6 +258,33 @@ const rowFromDb = (row: Record<string, unknown>, fallbackName: string): Ingredie
   per_100g_calcium_mg: toNumber(row.per_100g_calcium_mg),
 });
 
+const rowFromBaseline = (name: string): IngredientRecord | null => {
+  const baseline = resolveNutritionBaseline(name);
+  if (!baseline) return null;
+  return {
+    name: baseline.name,
+    category: "Other",
+    unit: baseline.unit,
+    per_100g_calories: baseline.per100g.calories,
+    per_100g_protein: baseline.per100g.protein,
+    per_100g_carbs: baseline.per100g.carbs,
+    per_100g_fat: baseline.per100g.fat,
+    per_100g_fibre: 0,
+    per_100g_iron_mg: 0,
+    per_100g_omega_3_g: 0,
+    per_100g_b12_mcg: 0,
+    per_100g_vitamin_d_mcg: 0,
+    per_100g_folate_mcg: 0,
+    per_100g_calcium_mg: 0,
+  };
+};
+
+const hasUsableMacros = (record: IngredientRecord) =>
+  record.per_100g_calories > 0 ||
+  record.per_100g_protein > 0 ||
+  record.per_100g_carbs > 0 ||
+  record.per_100g_fat > 0;
+
 const lookupIngredient = async (
   name: string,
   supabase: SupabaseClient
@@ -266,20 +294,35 @@ const lookupIngredient = async (
     return ingredientCache.get(key) ?? null;
   }
 
+  const { data: exactData, error: exactError } = await supabase
+    .from("ingredients")
+    .select("*")
+    .eq("name", name)
+    .limit(1);
+
+  if (!exactError && Array.isArray(exactData) && exactData.length) {
+    const exactRecord = rowFromDb(exactData[0] as Record<string, unknown>, name);
+    const resolved = hasUsableMacros(exactRecord) ? exactRecord : rowFromBaseline(name);
+    ingredientCache.set(key, resolved);
+    return resolved;
+  }
+
   const { data, error } = await supabase
     .from("ingredients")
     .select("*")
     .ilike("name", `%${name}%`)
     .limit(1);
 
-  if (error || !Array.isArray(data) || !data.length) {
-    ingredientCache.set(key, null);
-    return null;
+  if (!error && Array.isArray(data) && data.length) {
+    const record = rowFromDb(data[0] as Record<string, unknown>, name);
+    const resolved = hasUsableMacros(record) ? record : rowFromBaseline(name);
+    ingredientCache.set(key, resolved);
+    return resolved;
   }
 
-  const record = rowFromDb(data[0] as Record<string, unknown>, name);
-  ingredientCache.set(key, record);
-  return record;
+  const baseline = rowFromBaseline(name);
+  ingredientCache.set(key, baseline);
+  return baseline;
 };
 
 const clamp = (value: number, min: number, max: number) =>

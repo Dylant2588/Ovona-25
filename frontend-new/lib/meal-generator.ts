@@ -624,8 +624,8 @@ const NON_VEGAN_KEYWORDS = [
 const ALLERGY_EXPANSION_RULES: Array<{ needle: string; keywords: string[] }> = [
   { needle: "shellfish", keywords: ["shellfish", "shrimp", "prawn", "crab", "lobster"] },
   { needle: "fish", keywords: ["fish", "salmon", "cod", "tuna", "mackerel", "anchovy"] },
-  { needle: "dairy", keywords: ["dairy", "milk", "yogurt", "cheese", "whey", "butter", "cream"] },
-  { needle: "lactose", keywords: ["dairy", "milk", "yogurt", "cheese", "whey", "butter"] },
+  { needle: "dairy", keywords: ["dairy", "milk", "yogurt", "yoghurt", "cheese", "whey", "casein", "cottage", "butter", "cream"] },
+  { needle: "lactose", keywords: ["dairy", "milk", "yogurt", "yoghurt", "cheese", "whey", "casein", "cottage", "butter"] },
   { needle: "nut", keywords: ["nut", "nuts", "peanut", "almond", "walnut", "cashew"] },
   { needle: "peanut", keywords: ["peanut", "groundnut"] },
   { needle: "soy", keywords: ["soy", "tofu", "edamame", "miso"] },
@@ -808,6 +808,27 @@ const findNutritionEntry = (ingredientName: string): IndexedNutritionEntry | nul
       )
     ) ?? null
   );
+};
+
+/**
+ * Compatibility nutrition for the static meal library. The generation pipeline
+ * uses this only when the Supabase ingredient catalogue has no usable record.
+ */
+export const resolveNutritionBaseline = (ingredientName: string) => {
+  const entry = findNutritionEntry(ingredientName);
+  if (!entry) return null;
+
+  const scale = 100 / entry.servingSize;
+  return {
+    name: entry.aliases[0] ?? ingredientName,
+    unit: entry.unit,
+    per100g: {
+      calories: entry.macros.calories * scale,
+      protein: entry.macros.protein * scale,
+      carbs: entry.macros.carbs * scale,
+      fat: entry.macros.fat * scale,
+    },
+  };
 };
 
 const fallbackCategoryMacros = (ingredient: IngredientLine) =>
@@ -2080,10 +2101,9 @@ const selectBaseMeal = (
   const proteinConstrained = applyProteinSourceConstraint(filtered, selectionState);
   const pool = proteinConstrained.length ? proteinConstrained : filtered;
   if (!pool.length) {
-    console.warn(
-      `No preference-safe meals available for slot "${slot}". Falling back to default candidate.`
+    throw new Error(
+      `No preference-safe meals are available for slot "${slot}". Update preferences to continue.`
     );
-    return slotPool[0] ?? MEAL_LIBRARY[0];
   }
 
   if (!selectionState || selectionState.dayIndex === 0) {

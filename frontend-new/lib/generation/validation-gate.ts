@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { resolveNutritionBaseline } from "@/lib/meal-generator";
 import type { MealConcept, ValidationResult } from "@/lib/generation/types";
 
 const toStringArray = (value: unknown): string[] => {
@@ -26,7 +27,7 @@ const normalize = (value: string) =>
 const fallbackAllergenInference = (ingredientName: string): string[] => {
   const name = normalize(ingredientName);
   const hits: string[] = [];
-  if (/\bmilk|cheese|yogurt|cream|butter|whey|casein\b/.test(name)) hits.push("dairy");
+  if (/\bmilk|cheese|yogurt|yoghurt|cream|butter|whey|casein|cottage\b/.test(name)) hits.push("dairy");
   if (/\bwheat|bread|pasta|flour|barley|rye\b/.test(name)) hits.push("gluten");
   if (/\bpeanut|almond|cashew|walnut|hazelnut|nut\b/.test(name)) hits.push("nuts");
   if (/\bshrimp|prawn|crab|lobster|mussel|shellfish\b/.test(name)) hits.push("shellfish");
@@ -55,7 +56,11 @@ export async function validateMealIngredients(
       .limit(1);
 
     if (error) {
-      unknownIngredients.push(ingredientName);
+      if (resolveNutritionBaseline(ingredientName)) {
+        validIngredients.push(ingredientName);
+      } else {
+        unknownIngredients.push(ingredientName);
+      }
       fallbackAllergenInference(ingredientName).forEach((allergen) =>
         allergenFlags.add(allergen)
       );
@@ -75,7 +80,11 @@ export async function validateMealIngredients(
         fallbackAllergenInference(canonicalName).forEach((item) => allergenFlags.add(item));
       }
     } else {
-      unknownIngredients.push(ingredientName);
+      if (resolveNutritionBaseline(ingredientName)) {
+        validIngredients.push(ingredientName);
+      } else {
+        unknownIngredients.push(ingredientName);
+      }
       fallbackAllergenInference(ingredientName).forEach((allergen) =>
         allergenFlags.add(allergen)
       );

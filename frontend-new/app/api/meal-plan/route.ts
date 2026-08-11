@@ -17,6 +17,16 @@ type MealPlanPayload = {
   preferences?: PreferencesInput;
 };
 
+const hasCompleteNutrition = (plan: ReturnType<typeof generateFallbackMealPlan>) =>
+  plan.days.length > 0 &&
+  plan.days.every(
+    (day) =>
+      day.totals.calories > 0 &&
+      day.totals.protein > 0 &&
+      day.meals.length > 0 &&
+      day.meals.every((meal) => meal.macros.calories > 0 && meal.macros.protein > 0)
+  );
+
 const defaultPreferences: PreferencesInput = {
   tastes: [],
   goal: "maintain",
@@ -83,8 +93,11 @@ export async function POST(request: NextRequest) {
   const preferences = payload.preferences ?? defaultPreferences;
 
   try {
-    const artifacts = await generateWeeklyPlanWithArtifacts(user.id);
+    const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences });
     const plan = artifacts.weeklyPlan;
+    if (!hasCompleteNutrition(plan)) {
+      throw new Error("[meal-plan] generated plan was missing calorie or protein data");
+    }
 
     const targets = payload.preferences
       ? resolveMacroTargets(preferences)
