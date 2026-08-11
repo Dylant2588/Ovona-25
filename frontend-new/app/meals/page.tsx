@@ -820,15 +820,19 @@ function MealsPageContent() {
       init: RequestInit = {},
       maxRetries = API_MAX_RETRIES
     ) => {
+      // Retrying a write can duplicate an AI generation (and its token cost),
+      // so only retry idempotent reads. The UI exposes an explicit retry action
+      // for failed writes instead.
+      const attempts = init.method?.toUpperCase() === "GET" ? maxRetries : 1;
       let lastResponse: Response | null = null;
       let lastError: unknown = null;
-      for (let attempt = 0; attempt < maxRetries; attempt += 1) {
+      for (let attempt = 0; attempt < attempts; attempt += 1) {
         try {
           const response = await authFetch(input, init);
           if (
             response.ok ||
             !RETRYABLE_STATUSES.has(response.status) ||
-            attempt === maxRetries - 1
+            attempt === attempts - 1
           ) {
             if (response.status === 401 || response.status === 403) {
               redirectToLoginOnce();
@@ -838,7 +842,7 @@ function MealsPageContent() {
           lastResponse = response;
         } catch (error) {
           lastError = error;
-          if (attempt === maxRetries - 1) {
+          if (attempt === attempts - 1) {
             throw error;
           }
         }
@@ -1207,12 +1211,7 @@ function MealsPageContent() {
         }
       } catch (error) {
         console.error("Failed to load plan from server", error);
-        showToast("Couldn't load your saved plan. Trying a fresh generation...", "error", {
-          actionLabel: "Retry",
-          onAction: () => {
-            router.refresh();
-          },
-        });
+        showToast("Couldn't load your saved plan. Generate a new one when you're ready.", "error");
       }
 
       if (cachedPlan && cachedPlan.preferenceSignature === signature) {
@@ -1230,47 +1229,13 @@ function MealsPageContent() {
         return;
       }
 
-      setPlanLoading(true);
-      setLoadingStepIndex(0);
-      const rotationHistory = cachedPlan ? rotationHistoryFromPlan(cachedPlan) : [];
-
-      try {
-        setLoadingStepIndex(1);
-        const aiResponse = await fetchPlanFromAi(rotationHistory);
-        const aiPlan = aiResponse.plan;
-        if (canceled) return;
-        setPlan(aiPlan);
-        setEnforcement(aiResponse.enforcement);
-        await persistPlan(aiPlan, signature, aiResponse.enforcement ?? null);
-        setPlanLoading(false);
-        setLoadingStepIndex(LOADING_STEPS.length);
-        console.log("Meal plan load", {
-          source: "openai",
-          duration: Math.round(performance.now() - loadStart),
-        });
-        return;
-      } catch (error) {
-        console.error("AI meal plan request failed", error);
-        showToast("Couldn't generate from server. Using local fallback meals.", "error", {
-          actionLabel: "Retry",
-          onAction: () => {
-            void handleRegenerate();
-          },
-        });
-      }
-
       if (canceled) return;
-      const fallbackPlan = generateFallbackMealPlan(preferences);
-      const fallbackEnforced = enforcePlanMacros(fallbackPlan, preferences);
-      setPlan(fallbackEnforced.plan);
-      setEnforcement(fallbackEnforced.enforcement);
-      await persistPlan(fallbackEnforced.plan, signature, fallbackEnforced.enforcement);
+      // A missing plan is intentional empty state, not permission to spend on
+      // a fresh AI plan. Generation only happens from an explicit user action.
+      setPlan(null);
+      setEnforcement(null);
       setPlanLoading(false);
-      setLoadingStepIndex(LOADING_STEPS.length);
-      console.log("Meal plan load", {
-        source: "fallback",
-        duration: Math.round(performance.now() - loadStart),
-      });
+      setLoadingStepIndex(0);
     };
 
     loadPlan();
