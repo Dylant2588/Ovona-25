@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  Alert,
   Button,
   Card,
   CardActions,
@@ -20,6 +21,11 @@ export default function LoginPage() {
   const router = useRouter();
   const [checkingSession, setCheckingSession] = useState(true);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -42,15 +48,65 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
+    setAuthError(null);
     try {
-      await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: `${getSiteUrl()}/auth/callback`,
         },
       });
+      if (error) throw error;
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Unable to start Google sign-in.");
     } finally {
       setGoogleLoading(false);
+    }
+  };
+
+  const handleEmailAuth = async (mode: "signIn" | "signUp") => {
+    const normalizedEmail = email.trim();
+    setAuthError(null);
+    setAuthMessage(null);
+
+    if (!normalizedEmail || !password) {
+      setAuthError("Enter your email address and password.");
+      return;
+    }
+
+    setAuthLoading(true);
+    try {
+      if (mode === "signIn") {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: normalizedEmail,
+          password,
+        });
+        if (error) throw error;
+
+        if (data.session) {
+          router.replace("/meals");
+        }
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          emailRedirectTo: `${getSiteUrl()}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+
+      if (data.session) {
+        router.replace("/meals");
+      } else {
+        setAuthMessage("Check your email to confirm your account, then return here to sign in.");
+      }
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Unable to continue. Please try again.");
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -68,9 +124,7 @@ export default function LoginPage() {
           Sign in to your kitchen HQ
         </Typography>
         <Typography color="text.secondary" maxWidth={640}>
-          Placeholder experience for the upcoming authentication flow. Use the
-          form below to get a feel for the tone and spacing we will iterate on
-          later.
+          Sign in to view your meal plan, or create an account to start building one.
         </Typography>
       </Stack>
 
@@ -84,7 +138,14 @@ export default function LoginPage() {
         }}
       >
         <CardContent>
-          <Stack spacing={3}>
+          <Stack
+            component="form"
+            spacing={3}
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleEmailAuth("signIn");
+            }}
+          >
             <Stack spacing={1}>
               <Typography variant="subtitle2" color="text.secondary">
                 Email
@@ -93,8 +154,10 @@ export default function LoginPage() {
                 placeholder="chef@ovona.com"
                 type="email"
                 fullWidth
-                disabled
-                helperText="Interactive logic coming soon"
+                autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                disabled={authLoading || googleLoading}
               />
             </Stack>
             <Stack spacing={1}>
@@ -105,25 +168,42 @@ export default function LoginPage() {
                 placeholder="********"
                 type="password"
                 fullWidth
-                disabled
-                helperText="We will wire this up to Supabase next"
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                disabled={authLoading || googleLoading}
               />
             </Stack>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-              <Button fullWidth size="large" variant="contained" disabled>
-                Sign In
+              <Button
+                type="submit"
+                fullWidth
+                size="large"
+                variant="contained"
+                disabled={authLoading || googleLoading}
+              >
+                {authLoading ? "Working..." : "Sign In"}
               </Button>
-              <Button fullWidth size="large" color="secondary" disabled>
+              <Button
+                type="button"
+                fullWidth
+                size="large"
+                color="secondary"
+                onClick={() => void handleEmailAuth("signUp")}
+                disabled={authLoading || googleLoading}
+              >
                 Create Account
               </Button>
             </Stack>
+            {authError && <Alert severity="error">{authError}</Alert>}
+            {authMessage && <Alert severity="success">{authMessage}</Alert>}
             <Button
               onClick={handleGoogleLogin}
               size="large"
               variant="contained"
               color="secondary"
               fullWidth
-              disabled={googleLoading}
+              disabled={googleLoading || authLoading}
             >
               {googleLoading ? "Redirecting..." : "Continue with Google"}
             </Button>
