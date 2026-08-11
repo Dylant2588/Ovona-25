@@ -54,12 +54,11 @@ import {
 import { useTheme } from "@mui/material/styles";
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip as RechartsTooltip,
-  Legend,
   ReferenceLine,
 } from "recharts";
 import type { TooltipContentProps } from "recharts";
@@ -940,7 +939,10 @@ function MealsPageContent() {
         signal: controller.signal,
       });
       if (!response.ok) {
-        throw new Error("meal plan generation failed");
+        const errorBody = (await response.json().catch(() => null)) as
+          | { message?: string }
+          | null;
+        throw new Error(errorBody?.message ?? "meal plan generation failed");
       }
       const data = (await response.json()) as {
         plan: WeeklyMealPlan;
@@ -950,7 +952,8 @@ function MealsPageContent() {
         throw new Error("meal plan payload missing plan");
       }
       return { plan: data.plan, enforcement: data.enforcement ?? null };
-    } catch {
+    } catch (error) {
+      if (error instanceof Error) throw error;
       throw new Error("We couldn't generate your meal plan right now.");
     } finally {
       window.clearTimeout(timeoutId);
@@ -1404,6 +1407,14 @@ function MealsPageContent() {
       showToast("Week regenerated.", "success");
     } catch (error) {
       console.error("Unable to regenerate via AI, using fallback", error);
+      if (
+        error instanceof Error &&
+        error.message.includes("couldn't build a safe plan that meets")
+      ) {
+        setError(error.message);
+        showToast(error.message, "error");
+        return;
+      }
       const fallbackPlan = plan
         ? regenerateWeekInPlan(plan, preferences)
         : generateFallbackMealPlan(preferences);
@@ -1751,11 +1762,9 @@ function MealsPageContent() {
     return displayDays.map((day) => ({
       label: day.label.slice(0, 3),
       calories: day.totals.calories,
-      protein: day.totals.protein,
-      carbs: day.totals.carbs,
-      fat: day.totals.fat,
+      calorieTarget: macroTargets?.calories ?? null,
     }));
-  }, [displayDays]);
+  }, [displayDays, macroTargets?.calories]);
   const canRenderMacroChart = !!plan && chartData.length > 0;
 
   const weekRange = useMemo(() => {
@@ -2457,50 +2466,27 @@ function MealsPageContent() {
                 <Box sx={{ flex: 1 }}>
                   {canRenderMacroChart ? (
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}>
+                      <LineChart data={chartData} margin={{ top: 12, right: 18, left: 0, bottom: 8 }}>
                         <XAxis dataKey="label" stroke="#94a3b8" />
-                        <YAxis yAxisId="macros" stroke="#94a3b8" />
-                        <YAxis yAxisId="calories" orientation="right" stroke="#94a3b8" />
+                        <YAxis stroke="#94a3b8" unit=" kcal" />
                         <RechartsTooltip content={MacroTooltip} />
-                        <Legend />
                         {typeof macroTargets?.calories === "number" && (
                           <ReferenceLine
-                            yAxisId="calories"
                             y={macroTargets.calories}
                             stroke={chartColors.calories}
                             strokeDasharray="4 4"
                             label={{ value: "Cal target", position: "insideTopRight", fill: chartColors.calories }}
                           />
                         )}
-                        {typeof macroTargets?.protein === "number" && (
-                          <ReferenceLine
-                            yAxisId="macros"
-                            y={macroTargets.protein}
-                            stroke={chartColors.protein}
-                            strokeDasharray="4 4"
-                          />
-                        )}
-                        {typeof macroTargets?.carbs === "number" && (
-                          <ReferenceLine
-                            yAxisId="macros"
-                            y={macroTargets.carbs}
-                            stroke={chartColors.carbs}
-                            strokeDasharray="4 4"
-                          />
-                        )}
-                        {typeof macroTargets?.fat === "number" && (
-                          <ReferenceLine
-                            yAxisId="macros"
-                            y={macroTargets.fat}
-                            stroke={chartColors.fat}
-                            strokeDasharray="4 4"
-                          />
-                        )}
-                        <Bar yAxisId="calories" dataKey="calories" fill={chartColors.calories} />
-                        <Bar yAxisId="macros" dataKey="protein" fill={chartColors.protein} />
-                        <Bar yAxisId="macros" dataKey="carbs" fill={chartColors.carbs} />
-                        <Bar yAxisId="macros" dataKey="fat" fill={chartColors.fat} />
-                      </BarChart>
+                        <Line
+                          type="monotone"
+                          dataKey="calories"
+                          name="Calories"
+                          stroke={chartColors.calories}
+                          strokeWidth={3}
+                          dot={{ r: 5 }}
+                        />
+                      </LineChart>
                     </ResponsiveContainer>
                   ) : (
                     <Stack
@@ -2514,6 +2500,26 @@ function MealsPageContent() {
                     </Stack>
                   )}
                 </Box>
+                {hasMacroTargets && (
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {macroDisplay
+                      .filter((macro) => macro.key !== "calories")
+                      .map((macro) => {
+                        const target = macroTargets?.[macro.key as keyof MacroTargets];
+                        const average = workweekAverages[macro.key as keyof MacroBreakdown];
+                        if (typeof target !== "number" || typeof average !== "number") return null;
+                        return (
+                          <Chip
+                            key={`progress-${macro.key}`}
+                            size="small"
+                            variant="outlined"
+                            label={`${macro.label}: ${Math.round(average)}/${target} ${macro.unit}/day`}
+                            sx={{ borderColor: chartColors[macro.key as keyof typeof chartColors] }}
+                          />
+                        );
+                      })}
+                  </Stack>
+                )}
               </CardContent>
             </Card>
           </Stack>

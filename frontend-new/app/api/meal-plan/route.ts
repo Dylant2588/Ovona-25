@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       const result = enforceMacros(plan, targets);
       enforcement = toEnforcementInfo(result);
       if (!result.passed) {
-        console.warn("[meal-plan] macro enforcement partial:", enforcement.summary);
+        throw new Error(`[meal-plan] ${enforcement.summary}`);
       }
     }
 
@@ -142,7 +142,20 @@ export async function POST(request: NextRequest) {
       userId: user.id,
     });
     const targets = resolveMacroTargets(preferences);
-    const fallbackEnforcement = toEnforcementInfo(enforceMacros(fallbackPlan, targets));
+    const fallbackResult = enforceMacros(fallbackPlan, targets);
+    const fallbackEnforcement = toEnforcementInfo(fallbackResult);
+
+    if (!fallbackResult.passed) {
+      return NextResponse.json(
+        {
+          error: "incomplete_plan",
+          message:
+            "We couldn't build a safe plan that meets your daily calorie and protein targets yet.",
+          enforcement: fallbackEnforcement,
+        },
+        { status: 422 }
+      );
+    }
 
     return NextResponse.json({
       plan: fallbackPlan,

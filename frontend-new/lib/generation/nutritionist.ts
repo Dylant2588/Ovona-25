@@ -269,8 +269,8 @@ GUIDELINES:
 - Weekday meals only - quick, practical, minimal washing up
 - Use common UK supermarket ingredients
 - Breakfasts under 10 minutes, main meals under 15 minutes
-- Reuse ingredients across the week (if Monday uses chicken breast, use it again Wednesday)
-- Each day should feel different
+- Reuse pantry and produce ingredients where practical, but do not repeat the same named meal in this week
+- Each day should feel meaningfully different; rotate primary protein sources and do not use one source more than twice
 - Snacks should be genuinely quick (under 5 minutes or no-cook)
 - Include a mix of protein sources but maximum 3-4 different ones per week
 ${context.healthConditions.includes("anaemia") ? "- Include iron-rich foods (red meat, spinach, lentils) at least 3 times this week" : ""}
@@ -316,7 +316,7 @@ RULES FOR STEPS:
 - Never start with "Prep all ingredients"
 - Never end with "Serve and enjoy"
 
-Generate ${context.mealsPerDay * 5} meals and ${context.mealsPerDay * 5} alternatives.
+Generate exactly ${context.mealsPerDay * 5} meals and ${context.mealsPerDay * 5} alternatives. Prefer ingredients that are common, specific supermarket foods rather than invented branded products.
   `.trim();
 }
 
