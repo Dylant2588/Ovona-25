@@ -4,7 +4,7 @@
 
 import NextLink from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SwapHorizRoundedIcon from "@mui/icons-material/SwapHorizRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
 import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
@@ -652,6 +652,27 @@ const RETRYABLE_STATUSES = new Set([401, 408, 429, 500, 502, 503, 504]);
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 export default function MealsPage() {
+  return (
+    <Suspense
+      fallback={
+        <Box
+          sx={{
+            minHeight: "100vh",
+            display: "grid",
+            placeItems: "center",
+            bgcolor: "#0c1020",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      }
+    >
+      <MealsPageContent />
+    </Suspense>
+  );
+}
+
+function MealsPageContent() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
