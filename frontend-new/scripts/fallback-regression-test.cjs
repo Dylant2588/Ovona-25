@@ -150,4 +150,36 @@ if (!legacyPlan.days.length || !["verified", "adjusted", "failed"].includes(lega
   throw new Error("Client-normalized legacy preferences must complete fallback and enforcement.");
 }
 
+const affectedProductionPreferences = {
+  userId: "test-user",
+  tastes: ["quick-minimal"],
+  goal: "lose_weight",
+  mealComplexity: "simple",
+  macroTargets: { calories: 1830, protein: 216, carbs: 118, fat: 55 },
+  profile: {
+    dietaryMode: null,
+    allergies: ["Dairy", "Shellfish", "Nuts", "Fish", "Sesame"],
+    dislikes: [],
+    cuisines: ["Mediterranean", "Asian", "Mexican", "Indian", "British"],
+    mealsPerDay: 5,
+  },
+};
+
+const affectedProductionPlan = moduleUnderTest.exports.generateFallbackMealPlan(affectedProductionPreferences);
+const forbiddenProductionTerms = /dairy|milk|yogurt|whey|cheese|butter|cream|shellfish|shrimp|prawn|fish|salmon|nut|almond|sesame|tahini/i;
+
+if (
+  affectedProductionPlan.days.some((day) =>
+    day.meals.some((meal) =>
+      forbiddenProductionTerms.test(
+        [meal.title, meal.description, ...meal.ingredients.map((ingredient) => ingredient.name)].join(
+          " "
+        )
+      )
+    )
+  )
+) {
+  throw new Error("Production preference fallback must preserve every hard allergy exclusion.");
+}
+
 console.log("fallback regression probe: PASS");

@@ -142,7 +142,7 @@ const MEAL_LIBRARY: BaseMeal[] = [
     id: "blueberry-protein-oats",
     name: "Blueberry Protein Oats",
     description: "Overnight oats layered with chia, cinnamon, and fresh blueberries.",
-    mealTypes: ["breakfast"],
+    mealTypes: ["breakfast", "snack"],
     tastes: ["plant-forward", "quick-minimal", "meal-prep"],
     complexity: "simple",
     goalFit: ["lose_weight", "maintain", "calorie_count"],
@@ -153,7 +153,7 @@ const MEAL_LIBRARY: BaseMeal[] = [
     ingredients: [
       { name: "Rolled oats", amount: 80, unit: "g", category: "Pantry" },
       { name: "Chia seeds", amount: 20, unit: "g", category: "Pantry" },
-      { name: "Almond milk", amount: 240, unit: "ml", category: "Dairy" },
+      { name: "Water", amount: 240, unit: "ml", category: "Pantry" },
       { name: "Blueberries", amount: 75, unit: "g", category: "Produce" },
       { name: "Maple syrup", amount: 15, unit: "g", category: "Pantry" },
     ],
@@ -335,9 +335,9 @@ const MEAL_LIBRARY: BaseMeal[] = [
     proteinType: "poultry",
   },
   {
-    id: "mediterranean-snack-box",
-    name: "Mediterranean Snack Box",
-    description: "Hummus, veggies, olives, and whole-grain wrap wedges.",
+    id: "white-bean-snack-box",
+    name: "White Bean Snack Box",
+    description: "Mashed white beans, veggies, olives, and whole-grain wrap wedges.",
     mealTypes: ["snack", "lunch"],
     tastes: ["plant-forward", "quick-minimal", "comfort"],
     complexity: "simple",
@@ -347,7 +347,7 @@ const MEAL_LIBRARY: BaseMeal[] = [
       "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=60",
     macros: { calories: 320, protein: 12, carbs: 32, fat: 16 },
     ingredients: [
-      { name: "Hummus", amount: 120, unit: "g", category: "Pantry" },
+      { name: "Mashed white beans", amount: 120, unit: "g", category: "Pantry" },
       { name: "Cucumber", amount: 80, unit: "g", category: "Produce" },
       { name: "Cherry tomatoes", amount: 70, unit: "g", category: "Produce" },
       { name: "Olives", amount: 40, unit: "g", category: "Pantry" },
@@ -2104,7 +2104,12 @@ const selectBaseMeal = (
   const candidates = MEAL_LIBRARY.filter((meal) => meal.mealTypes.includes(slot));
   const uniqueCandidates = candidates.filter((meal) => !excludedIds.has(meal.id));
   const slotPool = uniqueCandidates.length ? uniqueCandidates : candidates;
-  const filtered = filterMealsByPreferences(slotPool, prefs);
+  const uniquePreferenceSafe = filterMealsByPreferences(slotPool, prefs);
+  // Prefer variety, but repeat a hard-safe meal when every remaining distinct
+  // choice violates an allergy or dietary constraint.
+  const filtered = uniquePreferenceSafe.length
+    ? uniquePreferenceSafe
+    : filterMealsByPreferences(candidates, prefs);
   const proteinConstrained = applyProteinSourceConstraint(filtered, selectionState);
   const pool = proteinConstrained.length ? proteinConstrained : filtered;
   if (!pool.length) {
