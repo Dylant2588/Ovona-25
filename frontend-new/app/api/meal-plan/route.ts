@@ -148,12 +148,14 @@ export async function POST(request: NextRequest) {
     if (!fallbackResult.passed) {
       return NextResponse.json(
         {
-          error: "incomplete_plan",
+          plan: fallbackPlan,
+          source: "fallback",
+          incomplete: true,
           message:
             "We couldn't build a safe plan that meets your daily calorie and protein targets yet.",
           enforcement: fallbackEnforcement,
         },
-        { status: 422 }
+        { status: 200 }
       );
     }
 
