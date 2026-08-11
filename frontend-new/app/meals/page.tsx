@@ -722,6 +722,10 @@ function MealsPageContent() {
   const [regeneratingWeek, setRegeneratingWeek] = useState(false);
   const [regeneratingDayIndex, setRegeneratingDayIndex] = useState<number | null>(null);
   const [swappingMealId, setSwappingMealId] = useState<string | null>(null);
+  const [mealLogs, setMealLogs] = useState<Record<string, "planned" | "eaten" | "skipped" | "swapped">>({});
+  const [loggingMealId, setLoggingMealId] = useState<string | null>(null);
+  const [foodNote, setFoodNote] = useState("");
+  const [loggingFood, setLoggingFood] = useState(false);
   const toastActionRef = useRef<(() => void) | null>(null);
   const loginRedirectPendingRef = useRef(false);
   const [toast, setToast] = useState<ToastState>({
@@ -769,6 +773,39 @@ function MealsPageContent() {
   const closeToast = () => {
     toastActionRef.current = null;
     setToast((prev) => ({ ...prev, open: false }));
+  };
+
+  const saveMealLog = async (mealInstanceId: string, date: string, notes?: string) => {
+    setLoggingMealId(mealInstanceId);
+    try {
+      const response = await authFetchWithRetry("/api/meal-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mealInstanceId, date: toDateOnly(date), status: "eaten", notes }),
+      });
+      if (!response.ok) throw new Error("meal log request failed");
+      setMealLogs((current) => ({ ...current, [mealInstanceId]: "eaten" }));
+      showToast("Logged. Future suggestions will reflect what you actually ate.", "success");
+      return true;
+    } catch (logError) {
+      console.error("Failed to save meal log", logError);
+      showToast("Couldn’t save that yet. Your meal is still actionable—please retry.", "error");
+      return false;
+    } finally {
+      setLoggingMealId(null);
+    }
+  };
+
+  const handleFoodCapture = async () => {
+    const notes = foodNote.trim();
+    if (!notes) return;
+    setLoggingFood(true);
+    const saved = await saveMealLog(`food-${Date.now()}`, new Date().toISOString(), notes);
+    if (saved) {
+      setFoodNote("");
+      showToast("Noted. Your plan stays as written; future suggestions can take this into account.", "success");
+    }
+    setLoggingFood(false);
   };
 
   const runToastAction = () => {
@@ -1323,6 +1360,7 @@ function MealsPageContent() {
   useEffect(() => {
     if (!user) {
       setMealHistorySummary(null);
+      setMealLogs({});
       return;
     }
     let active = true;
@@ -1339,7 +1377,7 @@ function MealsPageContent() {
             .gte("week_start", fromISO),
           supabase
             .from("meal_logs")
-            .select("date, status")
+            .select("meal_instance_id, date, status")
             .eq("user_id", user.id)
             .gte("date", fromISO),
         ]);
@@ -1350,6 +1388,12 @@ function MealsPageContent() {
       }
       if (logsError) {
         console.error("Failed to load meal logs", logsError);
+      } else {
+        setMealLogs(
+          Object.fromEntries(
+            (logRows ?? []).map((log) => [log.meal_instance_id, log.status])
+          ) as Record<string, "planned" | "eaten" | "skipped" | "swapped">
+        );
       }
       const weekMap = new Map<
         string,
@@ -2351,6 +2395,82 @@ function MealsPageContent() {
 
       {plan && !planLoading && clientReady && (
         <>
+          <Card
+            variant="outlined"
+            sx={{
+              borderColor: "rgba(125,211,252,0.28)",
+              bgcolor: "rgba(10,14,26,0.86)",
+              overflow: "hidden",
+            }}
+          >
+            <CardContent sx={{ pb: "16px !important" }}>
+              <Stack spacing={2}>
+                <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={1}>
+                  <Box>
+                    <Typography variant="overline" color="secondary">{displayDays.some((day) => toDateOnly(day.date) === toDateOnly(new Date().toISOString())) ? "Today" : "Your next planned day"}</Typography>
+                    <Typography variant="h5" fontWeight={700}>
+                      {displayDays.find((day) => day.id === expandedDayId)?.label ?? "Your meals"}
+                    </Typography>
+                    <Typography color="text.secondary" variant="body2">
+                      Start with the next meal, then make any change you need.
+                    </Typography>
+                  </Box>
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                    {displayDays.find((day) => day.id === expandedDayId) && (
+                      <Chip
+                        color="secondary"
+                        variant="outlined"
+                        label={`${displayDays.find((day) => day.id === expandedDayId)?.totals.calories.toLocaleString()} kcal • ${displayDays.find((day) => day.id === expandedDayId)?.totals.protein.toLocaleString()}g protein`}
+                      />
+                    )}
+                  </Stack>
+                </Stack>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>This week</Typography>
+                  <Stack direction="row" spacing={1} sx={{ overflowX: "auto", pb: 0.5 }}>
+                    {displayDays.map((day) => (
+                      <Button
+                        key={day.id}
+                        size="small"
+                        variant={expandedDayId === day.id ? "contained" : "outlined"}
+                        color={expandedDayId === day.id ? "secondary" : "primary"}
+                        onClick={() => setExpandedDayId(day.id)}
+                        aria-pressed={expandedDayId === day.id}
+                        sx={{ flexShrink: 0, minHeight: 40 }}
+                      >
+                        {day.label} · {formatDate(day.date)}
+                      </Button>
+                    ))}
+                  </Stack>
+                </Box>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "stretch", sm: "center" }}>
+                  <TextField
+                    size="small"
+                    value={foodNote}
+                    onChange={(event) => setFoodNote(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") void handleFoodCapture();
+                    }}
+                    placeholder="Something else you ate (e.g. chocolate)"
+                    inputProps={{ "aria-label": "Something else you ate" }}
+                    sx={{ flex: 1, minWidth: 0 }}
+                  />
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => void handleFoodCapture()}
+                    disabled={!foodNote.trim() || loggingFood}
+                    sx={{ minHeight: 40, flexShrink: 0 }}
+                  >
+                    {loggingFood ? "Saving..." : "I ate this"}
+                  </Button>
+                </Stack>
+                <Typography variant="caption" color="text.secondary">
+                  A quick note helps future suggestions; your current plan stays as written.
+                </Typography>
+              </Stack>
+            </CardContent>
+          </Card>
           <Stack
             spacing={3}
             direction={{ xs: "column", md: "row" }}
@@ -2714,7 +2834,8 @@ function MealsPageContent() {
           )}
 
           <Stack spacing={2}>
-            {displayDays.map((day, dayIndex) => {
+            {displayDays.filter((day) => day.id === expandedDayId).map((day) => {
+              const dayIndex = displayDays.findIndex((candidate) => candidate.id === day.id);
               const calorieStatus = calorieStatusMeta(
                 day.totals.calories,
                 macroTargets?.calories
@@ -2744,7 +2865,9 @@ function MealsPageContent() {
                 key={day.id}
                 disableGutters
                 expanded={expandedDayId === day.id}
-                onChange={(_, expanded) => setExpandedDayId(expanded ? day.id : null)}
+                onChange={(_, expanded) => {
+                  if (expanded) setExpandedDayId(day.id);
+                }}
                 sx={{
                   borderRadius: 3,
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -2937,7 +3060,24 @@ function MealsPageContent() {
                             >
                               {mealMacroLine(meal)}
                             </Typography>
-                            <Stack direction="row" spacing={1} sx={{ mt: "auto" }}>
+                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: "auto" }}>
+                              <Button
+                                size="small"
+                                variant={mealLogs[meal.instanceId] === "eaten" ? "contained" : "outlined"}
+                                color={mealLogs[meal.instanceId] === "eaten" ? "success" : "secondary"}
+                                startIcon={
+                                  loggingMealId === meal.instanceId ? (
+                                    <CircularProgress size={14} color="inherit" />
+                                  ) : (
+                                    <CheckCircleOutlineRoundedIcon fontSize="small" />
+                                  )
+                                }
+                                onClick={() => void saveMealLog(meal.instanceId, day.date)}
+                                disabled={loggingMealId === meal.instanceId || mealLogs[meal.instanceId] === "eaten"}
+                                sx={{ minHeight: 36 }}
+                              >
+                                {mealLogs[meal.instanceId] === "eaten" ? "Eaten" : loggingMealId === meal.instanceId ? "Saving..." : "I ate this"}
+                              </Button>
                               <Button
                                 size="small"
                                 color="secondary"
@@ -2951,6 +3091,7 @@ function MealsPageContent() {
                                 }
                                 onClick={() => void handleSwapMeal(dayIndex, mealIndex)}
                                 disabled={Boolean(swappingMealId)}
+                                sx={{ minHeight: 36 }}
                               >
                                 {swapping ? "Swapping..." : "Swap meal"}
                               </Button>
@@ -2967,6 +3108,7 @@ function MealsPageContent() {
                                   />
                                 }
                                 onClick={() => setExpandedMealId(expanded ? null : meal.instanceId)}
+                                sx={{ minHeight: 36 }}
                               >
                                 {expanded ? "Hide recipe" : "View recipe"}
                               </Button>
