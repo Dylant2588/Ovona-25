@@ -1197,6 +1197,16 @@ function MealsPageContent() {
                 enforcement: storedPayload.enforcement,
               }
             : enforcePlanMacros(storedPayload.plan, preferences);
+          if (storedEnforced.enforcement?.passed === false) {
+            setPlan(null);
+            setEnforcement(storedEnforced.enforcement);
+            setError(
+              "Your saved plan no longer meets your targets. Generate a fresh plan after checking your preferences."
+            );
+            setPlanLoading(false);
+            setLoadingStepIndex(0);
+            return;
+          }
           setPlan(storedEnforced.plan);
           setEnforcement(storedEnforced.enforcement);
           await persistPlan(
@@ -1219,6 +1229,16 @@ function MealsPageContent() {
 
       if (cachedPlan && cachedPlan.preferenceSignature === signature) {
         const cachedEnforced = enforcePlanMacros(cachedPlan, preferences);
+        if (!cachedEnforced.enforcement.passed) {
+          setPlan(null);
+          setEnforcement(cachedEnforced.enforcement);
+          setError(
+            "Your cached plan no longer meets your targets. Generate a fresh plan after checking your preferences."
+          );
+          setPlanLoading(false);
+          setLoadingStepIndex(0);
+          return;
+        }
         setPlan(cachedEnforced.plan);
         setEnforcement(cachedEnforced.enforcement);
         planSignatureRef.current = signature;
@@ -1751,12 +1771,13 @@ function MealsPageContent() {
       setExpandedDayId(null);
       return;
     }
-    const hasExpanded = expandedDayId && displayDays.some((day) => day.id === expandedDayId);
-    if (hasExpanded) return;
-    const today = toDateOnly(new Date().toISOString());
-    const todayDay = displayDays.find((day) => toDateOnly(day.date) === today);
-    setExpandedDayId(todayDay?.id ?? displayDays[0].id);
-  }, [displayDays, expandedDayId]);
+    setExpandedDayId((current) => {
+      if (current && displayDays.some((day) => day.id === current)) return current;
+      const today = toDateOnly(new Date().toISOString());
+      const todayDay = displayDays.find((day) => toDateOnly(day.date) === today);
+      return todayDay?.id ?? displayDays[0].id;
+    });
+  }, [plan?.id, displayDays.length]);
 
   const chartData = useMemo(() => {
     return displayDays.map((day) => ({
