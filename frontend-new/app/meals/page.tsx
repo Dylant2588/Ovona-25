@@ -677,6 +677,7 @@ function MealsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
+  const userId = user?.id ?? null;
   const [preferences, setPreferences] = useState<PreferencesInput | null>(null);
   const [preferenceTastes, setPreferenceTastes] = useState<string[]>([]);
   const [plan, setPlan] = useState<WeeklyMealPlan | null>(null);
@@ -914,9 +915,9 @@ function MealsPageContent() {
   }, [preferences]);
 
   useEffect(() => {
-    if (!user || typeof window === "undefined") return;
+    if (!userId || typeof window === "undefined") return;
     const onboardingState = searchParams.get("onboarding");
-    const skipKey = onboardingSkipKeyFor(user.id);
+    const skipKey = onboardingSkipKeyFor(userId);
 
     if (onboardingState === "ready") {
       setPreferencesNotice({
@@ -944,15 +945,15 @@ function MealsPageContent() {
         : "/meals";
       router.replace(nextUrl);
     }
-  }, [router, searchParams, user]);
+  }, [router, searchParams, userId]);
 
   useEffect(() => {
-    if (authLoading || prefLoading || !user) return;
+    if (authLoading || prefLoading || !userId) return;
     if (preferencesLoadUncertain) return;
     if (hasCanonicalPreferences === false) {
       router.replace("/onboarding");
     }
-  }, [authLoading, hasCanonicalPreferences, prefLoading, preferencesLoadUncertain, router, user]);
+  }, [authLoading, hasCanonicalPreferences, prefLoading, preferencesLoadUncertain, router, userId]);
 
   const fetchPlanFromAi = async (
     rotationHistory: RotationHistoryEntry[],
@@ -998,7 +999,7 @@ function MealsPageContent() {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       runAsync(() => {
         setPreferences(null);
         setPreferenceTastes([]);
@@ -1029,19 +1030,19 @@ function MealsPageContent() {
               .select(
                 "taste_preferences, goal, meal_complexity, lifestyle, cuisines, allergies, target_calories, target_protein, target_carbs, target_fat"
               )
-              .eq("user_id", user.id)
+              .eq("user_id", userId)
               .limit(1),
             supabase
               .from("profiles")
               .select(
                 "locale, timezone, body_weight_kg, body_fat_percent, height_cm, activity_level, training_schedule, allergies, dislikes, cuisines, pantry_staples, household, delivery_preferences, sleep_hours, stress_level, notes"
               )
-              .eq("id", user.id)
+              .eq("id", userId)
               .limit(1),
             supabase
               .from("user_allergies")
               .select("*")
-              .eq("user_id", user.id),
+              .eq("user_id", userId),
           ]);
         const prefData = (prefRows?.[0] as RawPreferences | undefined) ?? null;
         const profileData = (profileRows?.[0] as ProfileRow | undefined) ?? null;
@@ -1082,7 +1083,7 @@ function MealsPageContent() {
           : null;
         const hasMacroTargets = macroTargets && hasAnyTarget(macroTargets);
         const onboardingMeta = readOnboardingMeta(profileData?.notes ?? null);
-        const localOnboardingMeta = readOnboardingMetaFromStorage(user.id);
+        const localOnboardingMeta = readOnboardingMetaFromStorage(userId);
 
         const profileInfo = {
           locale: profileData?.locale ?? "UK",
@@ -1113,7 +1114,7 @@ function MealsPageContent() {
 
         setHasCanonicalPreferences(canonicalPreferencesFound);
         setPreferences({
-          userId: user.id,
+          userId,
           tastes,
           goal: prefData?.goal ?? null,
           mealComplexity:
@@ -1130,7 +1131,7 @@ function MealsPageContent() {
         setPreferencesLoadUncertain(true);
         showToast("Couldn't load saved preferences. Using defaults for now.", "info");
         setPreferences({
-          userId: user.id,
+          userId,
           tastes: [],
           goal: "maintain",
           mealComplexity: "normal",
@@ -1153,14 +1154,14 @@ function MealsPageContent() {
             sleepHours: null,
             stressLevel: null,
             notes: null,
-            mealsPerDay: readOnboardingMetaFromStorage(user.id)?.mealsPerDay ?? 5,
+            mealsPerDay: readOnboardingMetaFromStorage(userId)?.mealsPerDay ?? 5,
           },
         });
       } finally {
         setPrefLoading(false);
       }
     })();
-  }, [router, user]);
+  }, [router, userId]);
 
   useEffect(() => {
     setClientReady(true);
@@ -1186,7 +1187,7 @@ function MealsPageContent() {
   }, [planLoading]);
 
   useEffect(() => {
-    if (!user || !preferences || !preferenceSignature) {
+    if (!userId || !preferences || !preferenceSignature) {
       runAsync(() => {
         setPlan(null);
         setEnforcement(null);
@@ -1198,7 +1199,7 @@ function MealsPageContent() {
     if (typeof window === "undefined") return;
 
     const signature = preferenceSignature;
-    const key = storageKeyFor(user.id);
+    const key = storageKeyFor(userId);
     const cachedRaw = window.localStorage.getItem(key);
     let cachedPlan: WeeklyMealPlan | null = null;
     if (cachedRaw) {
@@ -1303,7 +1304,7 @@ function MealsPageContent() {
     return () => {
       canceled = true;
     };
-  }, [preferences, preferenceSignature, user]);
+  }, [preferences, preferenceSignature, userId]);
 
   const persistPlan = async (
     nextPlan: WeeklyMealPlan,
@@ -1358,7 +1359,7 @@ function MealsPageContent() {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       setMealHistorySummary(null);
       setMealLogs({});
       return;
@@ -1373,12 +1374,12 @@ function MealsPageContent() {
           supabase
             .from("plan_history")
             .select("plan_id, week_start, date, meals")
-            .eq("user_id", user.id)
+            .eq("user_id", userId)
             .gte("week_start", fromISO),
           supabase
             .from("meal_logs")
             .select("meal_instance_id, date, status")
-            .eq("user_id", user.id)
+            .eq("user_id", userId)
             .gte("date", fromISO),
         ]);
       if (!active) return;
@@ -1455,7 +1456,7 @@ function MealsPageContent() {
     return () => {
       active = false;
     };
-  }, [supabase, user, plan?.id]);
+  }, [supabase, userId, plan?.id]);
 
   const handleRegenerate = async () => {
     if (!preferences || !preferenceSignature) return;
@@ -1868,7 +1869,7 @@ function MealsPageContent() {
       setShoppingListError(null);
       return;
     }
-    if (authLoading || !user) {
+    if (authLoading || !userId) {
       setNormalizedList(shoppingList);
       setBasketPricing(buildLocalBasketPricing(shoppingList));
       setNormalizingList(false);
@@ -1977,7 +1978,7 @@ function MealsPageContent() {
     profileLocale,
     shoppingList,
     shoppingReloadToken,
-    user,
+    userId,
   ]);
 
   const displayShoppingList = normalizedList?.length ? normalizedList : shoppingList;
