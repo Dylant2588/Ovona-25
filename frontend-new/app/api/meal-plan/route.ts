@@ -159,16 +159,21 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logRouteFailure("generation pipeline failed", error);
 
+    let fallbackStage = "plan_creation";
     try {
       const fallbackPlan = generateFallbackMealPlan({
         ...preferences,
         userId: user.id,
       });
+      fallbackStage = "target_resolution";
       const targets = resolveMacroTargets(preferences);
+      fallbackStage = "macro_enforcement";
       const fallbackResult = enforceMacros(fallbackPlan, targets);
+      fallbackStage = "enforcement_serialization";
       const fallbackEnforcement = toEnforcementInfo(fallbackResult);
 
       if (!fallbackResult.passed) {
+        fallbackStage = "partial_response";
         return NextResponse.json(
           {
             plan: fallbackPlan,
@@ -182,16 +187,18 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      fallbackStage = "success_response";
       return NextResponse.json({
         plan: fallbackPlan,
         source: "fallback",
         enforcement: fallbackEnforcement,
       });
     } catch (fallbackError) {
-      logRouteFailure("fallback generation failed", fallbackError);
+      logRouteFailure(`fallback failed at ${fallbackStage}`, fallbackError);
       return NextResponse.json(
         {
           error: "fallback_unavailable",
+          stage: fallbackStage,
           message: "We couldn't build a meal plan right now. Please try again.",
         },
         { status: 500 }
