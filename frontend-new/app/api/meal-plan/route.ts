@@ -42,6 +42,14 @@ const defaultPreferences: PreferencesInput = {
   },
 };
 
+const logRouteFailure = (category: string, error: unknown) => {
+  const details =
+    error instanceof Error
+      ? { name: error.name, message: error.message }
+      : { type: typeof error };
+  console.error(`[meal-plan] ${category}`, details);
+};
+
 const persistAlternatives = async (
   userId: string,
   weekStart: string,
@@ -82,7 +90,21 @@ export async function POST(request: NextRequest) {
     payload = {};
   }
 
-  const { supabase, session, user } = await resolveRequestAuth(request);
+  let auth: Awaited<ReturnType<typeof resolveRequestAuth>>;
+  try {
+    auth = await resolveRequestAuth(request);
+  } catch (error) {
+    logRouteFailure("auth resolution failed", error);
+    return NextResponse.json(
+      {
+        error: "auth_unavailable",
+        message: "We couldn't verify your session right now. Please try again.",
+      },
+      { status: 503 }
+    );
+  }
+
+  const { supabase, session, user } = auth;
   if (!user) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
@@ -135,34 +157,45 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[meal-plan] generation pipeline failed", error);
+    logRouteFailure("generation pipeline failed", error);
 
-    const fallbackPlan = generateFallbackMealPlan({
-      ...preferences,
-      userId: user.id,
-    });
-    const targets = resolveMacroTargets(preferences);
-    const fallbackResult = enforceMacros(fallbackPlan, targets);
-    const fallbackEnforcement = toEnforcementInfo(fallbackResult);
+    try {
+      const fallbackPlan = generateFallbackMealPlan({
+        ...preferences,
+        userId: user.id,
+      });
+      const targets = resolveMacroTargets(preferences);
+      const fallbackResult = enforceMacros(fallbackPlan, targets);
+      const fallbackEnforcement = toEnforcementInfo(fallbackResult);
 
-    if (!fallbackResult.passed) {
+      if (!fallbackResult.passed) {
+        return NextResponse.json(
+          {
+            plan: fallbackPlan,
+            source: "fallback",
+            incomplete: true,
+            message:
+              "We couldn't build a safe plan that meets your daily calorie and protein targets yet.",
+            enforcement: fallbackEnforcement,
+          },
+          { status: 200 }
+        );
+      }
+
+      return NextResponse.json({
+        plan: fallbackPlan,
+        source: "fallback",
+        enforcement: fallbackEnforcement,
+      });
+    } catch (fallbackError) {
+      logRouteFailure("fallback generation failed", fallbackError);
       return NextResponse.json(
         {
-          plan: fallbackPlan,
-          source: "fallback",
-          incomplete: true,
-          message:
-            "We couldn't build a safe plan that meets your daily calorie and protein targets yet.",
-          enforcement: fallbackEnforcement,
+          error: "fallback_unavailable",
+          message: "We couldn't build a meal plan right now. Please try again.",
         },
-        { status: 200 }
+        { status: 500 }
       );
     }
-
-    return NextResponse.json({
-      plan: fallbackPlan,
-      source: "fallback",
-      enforcement: fallbackEnforcement,
-    });
   }
 }
