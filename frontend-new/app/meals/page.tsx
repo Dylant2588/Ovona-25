@@ -1431,6 +1431,9 @@ function MealsPageContent() {
         const weekKey = weekStartISO(log.date);
         const entry = weekMap.get(weekKey);
         if (!entry) return;
+        // A free-text food note is useful context, but it is not a planned
+        // meal completion and should not inflate the meal-history signal.
+        if (log.meal_instance_id.startsWith("food-")) return;
         if (log.status === "eaten") entry.eatenMeals += 1;
         if (log.status === "skipped") entry.skippedMeals += 1;
       });
@@ -1822,6 +1825,15 @@ function MealsPageContent() {
       return todayDay?.id ?? displayDays[0].id;
     });
   }, [plan?.id, displayDays.length]);
+
+  const selectedDay = useMemo(
+    () => displayDays.find((day) => day.id === expandedDayId) ?? displayDays[0] ?? null,
+    [displayDays, expandedDayId]
+  );
+  const selectedDayIsToday = Boolean(
+    selectedDay && toDateOnly(selectedDay.date) === toDateOnly(new Date().toISOString())
+  );
+  const nextMeal = selectedDay?.meals.find((meal) => mealLogs[meal.instanceId] !== "eaten") ?? null;
 
   const chartData = useMemo(() => {
     return displayDays.map((day) => ({
@@ -2407,20 +2419,22 @@ function MealsPageContent() {
               <Stack spacing={2}>
                 <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={1}>
                   <Box>
-                    <Typography variant="overline" color="secondary">{displayDays.some((day) => toDateOnly(day.date) === toDateOnly(new Date().toISOString())) ? "Today" : "Your next planned day"}</Typography>
+                    <Typography variant="overline" color="secondary">
+                      {selectedDayIsToday ? "Today" : "Your next planned day"}
+                    </Typography>
                     <Typography variant="h5" fontWeight={700}>
-                      {displayDays.find((day) => day.id === expandedDayId)?.label ?? "Your meals"}
+                      {selectedDay?.label ?? "Your meals"}
                     </Typography>
                     <Typography color="text.secondary" variant="body2">
                       Start with the next meal, then make any change you need.
                     </Typography>
                   </Box>
                   <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-                    {displayDays.find((day) => day.id === expandedDayId) && (
+                    {selectedDay && (
                       <Chip
                         color="secondary"
                         variant="outlined"
-                        label={`${displayDays.find((day) => day.id === expandedDayId)?.totals.calories.toLocaleString()} kcal • ${displayDays.find((day) => day.id === expandedDayId)?.totals.protein.toLocaleString()}g protein`}
+                        label={`${selectedDay.totals.calories.toLocaleString()} kcal • ${selectedDay.totals.protein.toLocaleString()}g protein`}
                       />
                     )}
                   </Stack>
@@ -2443,6 +2457,22 @@ function MealsPageContent() {
                     ))}
                   </Stack>
                 </Box>
+                {nextMeal && (
+                  <Box
+                    sx={{
+                      borderLeft: "3px solid",
+                      borderColor: "secondary.main",
+                      pl: 1.5,
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      Next up
+                    </Typography>
+                    <Typography fontWeight={700}>
+                      {nextMeal.title} · {nextMeal.readyInMinutes} min
+                    </Typography>
+                  </Box>
+                )}
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "stretch", sm: "center" }}>
                   <TextField
                     size="small"
