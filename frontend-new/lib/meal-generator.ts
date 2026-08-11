@@ -1100,32 +1100,39 @@ const mealMatchesSensitiveTerms = (meal: BaseMeal, terms: string[]) =>
     expandsSensitiveTerm(term).some((keyword) => containsKeyword(meal, keyword))
   );
 
+// Allergies and dietary modes are safety constraints. They must never be
+// relaxed when the static library cannot satisfy a softer preference.
+const filterMealsByHardConstraints = (
+  candidates: BaseMeal[],
+  prefs: PreferencesInput
+): BaseMeal[] => {
+  const filters = buildMealFilterContext(prefs);
+  const allergySafe = filters.allergies.length
+    ? candidates.filter((meal) => !mealMatchesSensitiveTerms(meal, filters.allergies))
+    : candidates;
+
+  return filters.dietaryMode
+    ? allergySafe.filter((meal) =>
+        isMealCompatibleWithDietaryMode(meal, filters.dietaryMode!)
+      )
+    : allergySafe;
+};
+
 const filterMealsByPreferences = (
   candidates: BaseMeal[],
   prefs: PreferencesInput
 ): BaseMeal[] => {
-  const budgetFiltered = applyBudgetTierFilter(candidates, prefs);
   const filters = buildMealFilterContext(prefs);
-  if (!filters.allergies.length && !filters.dislikes.length && !filters.dietaryMode) {
-    return budgetFiltered;
-  }
-
-  const allergySafe = filters.allergies.length
-    ? budgetFiltered.filter((meal) => !mealMatchesSensitiveTerms(meal, filters.allergies))
-    : budgetFiltered;
-
-  const dietaryMode = filters.dietaryMode;
-  const dietarySafe = dietaryMode
-    ? allergySafe.filter((meal) =>
-        isMealCompatibleWithDietaryMode(meal, dietaryMode)
-      )
-    : allergySafe;
-
+  const hardSafe = filterMealsByHardConstraints(candidates, prefs);
+  const budgetPreferred = applyBudgetTierFilter(hardSafe, prefs);
   const dislikeSafe = filters.dislikes.length
-    ? dietarySafe.filter((meal) => !mealMatchesSensitiveTerms(meal, filters.dislikes))
-    : dietarySafe;
+    ? budgetPreferred.filter((meal) => !mealMatchesSensitiveTerms(meal, filters.dislikes))
+    : budgetPreferred;
 
-  return dislikeSafe;
+  // A fallback plan is still useful when every option conflicts with a
+  // non-safety preference. Fall back only to the hard-safe pool, never to the
+  // unfiltered library.
+  return dislikeSafe.length ? dislikeSafe : budgetPreferred;
 };
 
 const PROTEIN_STEP_KEYWORDS = [
