@@ -1007,8 +1007,8 @@ const expandsSensitiveTerm = (term: string): string[] => {
   return Array.from(expanded);
 };
 
-const normalizePreferenceTerms = (values?: string[] | null): string[] =>
-  (values ?? [])
+const normalizePreferenceTerms = (values?: string[] | string | null): string[] =>
+  (Array.isArray(values) ? values : typeof values === "string" ? [values] : [])
     .flatMap((value) => value.split(/[,;/]/))
     .map((value) => normalizeLookupText(value))
     .filter(Boolean);
@@ -1875,7 +1875,7 @@ const findLowerFatAlternative = (
       !usedBaseIds.has(meal.id)
   );
   const preferenceFiltered = filterMealsByPreferences(slotCandidates, prefs);
-  const pool = preferenceFiltered.length ? preferenceFiltered : slotCandidates;
+  const pool = preferenceFiltered;
   const ranked = pool
     .map((meal) => {
       const macros = mealMacrosFromIngredients(meal);
@@ -2445,9 +2445,7 @@ const optimizePlanCost = (
         !usedBaseIds.has(meal.id)
     );
     const preferenceFiltered = filterMealsByPreferences(baseCandidates, prefs);
-    const candidatePool = preferenceFiltered.length
-      ? preferenceFiltered
-      : baseCandidates;
+    const candidatePool = preferenceFiltered;
     if (!candidatePool.length) continue;
 
     const proteinSources = collectProteinSourcesFromPlan(plan, {
