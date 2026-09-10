@@ -63,6 +63,10 @@ Recent decisions affecting current work:
 - Initialization: Prioritize protein/calorie reliability over advanced family/micro features
 - Initialization: Keep shopping/pricing in v1 core loop for execution utility
 
+### Roadmap Evolution
+
+- Phase 7 added: Build deterministic personal meal orchestration engine
+
 ### Pending Todos
 
 None yet.

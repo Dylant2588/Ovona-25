@@ -122,3 +122,13 @@ Plans:
 | 4. Shopping List + Pricing Stability | 0/2 | Not started | - |
 | 5. Logging + API Resilience | 0/2 | Not started | - |
 | 6. Release Readiness | 0/2 | Not started | - |
+
+### Phase 7: Build deterministic personal meal orchestration engine
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 6
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 7 to break down)
