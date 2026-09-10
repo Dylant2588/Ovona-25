@@ -288,21 +288,13 @@ function replaceMeal(result: OrchestrationResult, target: SlotKey, candidates: C
 | A4 | Node built-in tests with Node 24 type stripping can cover the new pure TypeScript modules without a new dependency. | Validation Architecture | Imports/path aliases may require a small test entry-point adjustment. |
 | A5 | Household scaling should occur after per-serving portion adjustment and before shopping aggregation. | Pitfalls | Incorrect order would distort quantities and macros. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **What exact calorie/protein tolerance and repair limits should be locked?**
-   - What we know: existing macro enforcement uses calorie `0.95–1.08` and protein `0.98–1.10` factors. [VERIFIED: `frontend-new/lib/macro-enforcement.ts`]
-   - What's unclear: whether these bands and allowed portion bounds are suitable for the new seven-day candidate pool. [ASSUMED]
-   - Recommendation: centralize a Phase 7 `PlannerPolicy`, initially preserve those values, and lock them with boundary tests before tuning. [ASSUMED]
+1. **Policy limits are locked for Phase 7.** `DEFAULT_PLANNER_POLICY` uses the current calorie tolerance of `0.95–1.08` and protein tolerance of `0.98–1.10`, with all bounds, score weights, maximum portion adjustment, repair attempts, and repetition/leftover allowance centralized as immutable exported values. Boundary tests must cover both inclusive and exclusive edges. These defaults are configurable only through the policy argument; no route or candidate source may loosen them. [VERIFIED: existing calorie/protein factors in `frontend-new/lib/macro-enforcement.ts`; DECIDED: Phase 7 policy]
 
-2. **Where will the verified deterministic candidate catalogue come from?**
-   - What we know: `meal_concepts` stores ingredients, steps, slots, dietary flags, allergens, source, and verification state; the migration has no stored macro/cost fields. [VERIFIED: `20260217_generation_pipeline.sql`]
-   - What's unclear: whether enough verified concepts and canonical nutrition rows exist for a complete seven-day plan. [VERIFIED: migration/schema inspection; ASSUMED: operational data completeness]
-   - Recommendation: make candidate hydration/materialization an explicit early plan task and fail clearly when a hard-safe eligible pool is insufficient. [ASSUMED]
+2. **Verified-catalogue provenance and insufficiency policy are locked.** `meal_concepts` alone cannot establish a safe candidate because the current migration lacks macro and cost facts. [VERIFIED: `20260217_generation_pipeline.sql`] Phase 7 therefore adds a server-only, reviewed, versioned `lib/orchestration/verified-catalogue.ts` containing explicit per-serving nutrition, ingredient quantities/units, allergens, diet metadata, prep time, cost, `verified: true`, and source/version provenance for curated existing recipe IDs. Stored concepts may supplement it only after the same facts and provenance are materialized; LLM/heuristic/bare-flag records remain untrusted. Before scheduling, `assertCompleteWeeklyAvailability` must verify the hard-eligible catalogue can satisfy the exact seven-day slots under the locked repetition/batch rules; test fixtures prove a complete pool yields a valid plan. If facts or capacity are insufficient, the adapter returns reason-coded `INSUFFICIENT_VERIFIED_CATALOGUE` (HTTP 422) and never uses an LLM or random fallback. [DECIDED: Phase 7 candidate authority]
 
-3. **How is household size represented today?**
-   - What we know: existing `UserProfileInput.household` is a string array rather than a numeric household-size contract. [VERIFIED: `frontend-new/lib/meal-generator.ts`]
-   - Recommendation: normalize it at the boundary into an integer `householdSize >= 1`; no multi-person preference solving. [ASSUMED]
+3. **Household representation is locked.** Normalize the legacy household array/profile data at the server boundary to `householdSize: integer >= 1`; reject invalid/non-finite values rather than silently converting them. It multiplies shopping quantities after recipe portion scaling and exactly once. It does not add member-level preferences or multi-person optimisation. [VERIFIED: legacy `UserProfileInput.household` shape in `frontend-new/lib/meal-generator.ts`; DECIDED: D-03 implementation]
 
 ## Environment Availability
 
