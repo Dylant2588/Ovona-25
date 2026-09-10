@@ -57,9 +57,17 @@ test("rejects excess identical or similar meals but permits an explicitly linked
   assert.equal(noRepeat.ok, false);
 
   const leftovers = [
-    candidate("dinner-source", "dinner", { similarityKey: "stew" }),
-    candidate("lunch-leftover", "lunch", { similarityKey: "stew", isLeftover: true, leftoverFromCandidateId: "dinner-source" }),
+    candidate("a-breakfast-source", "breakfast", { similarityKey: "stew", prepMinutes: 0 }),
+    candidate("a-lunch-leftover", "lunch", { similarityKey: "stew", isLeftover: true, leftoverFromCandidateId: "a-breakfast-source" }),
   ];
-  const permitted = orchestrateWeek(profile(), [...completeCandidates().filter((item) => !["dinner-01", "lunch-02"].includes(item.id)), ...leftovers], []);
+  const practicalWeek = [
+    ...Array.from({ length: 6 }, (_, index) => candidate(`z-breakfast-${index}`, "breakfast")),
+    ...Array.from({ length: 7 }, (_, index) => candidate(`z-snack-${index}`, "snack")),
+    ...Array.from({ length: 6 }, (_, index) => candidate(`z-lunch-${index}`, "lunch")),
+    ...Array.from({ length: 7 }, (_, index) => candidate(`z-dinner-${index}`, "dinner")),
+    ...leftovers,
+  ];
+  const permitted = orchestrateWeek(profile(), practicalWeek, []);
   assert.equal(permitted.ok, true);
+  if (permitted.ok) assert.equal(permitted.value.days[0]!.meals.some((meal) => meal.candidateId === "a-lunch-leftover"), true);
 });

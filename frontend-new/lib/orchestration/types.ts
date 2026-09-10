@@ -59,7 +59,61 @@ export type VerifiedCandidateMeal = {
   servings: number;
   isLeftover?: boolean;
   leftoverFromCandidateId?: string;
+  /** Explicitly verified similarity group; absence means the candidate ID is its group. */
+  similarityKey?: string;
 };
+
+export type SelectedMealServing = {
+  recipeServings: number;
+  nutritionPortionMultiplier: number;
+  householdPortionMultiplier: number;
+  servings: number;
+};
+
+export type ScoreComponents = Readonly<{
+  nutrition: number;
+  preference: number;
+  reuse: number;
+  prep: number;
+  cost: number;
+  repetition: number;
+}>;
+
+export type CandidateScore = Readonly<{
+  candidate: VerifiedCandidateMeal;
+  components: ScoreComponents;
+  total: number;
+  facts: readonly string[];
+}>;
+
+export type SelectedMeal = Readonly<{
+  candidateId: string;
+  slot: PlannerMealSlot;
+  title: string;
+  similarityKey: string;
+  ingredients: readonly VerifiedIngredient[];
+  nutrition: Readonly<{ calories: number; protein: number; carbs: number; fat: number }>;
+  cost: number;
+  prepMinutes: number;
+  isLeftover: boolean;
+  leftoverFromCandidateId?: string;
+  score: CandidateScore;
+  explanation: string;
+} & SelectedMealServing>;
+
+export type ScheduledDay = Readonly<{
+  day: number;
+  meals: readonly SelectedMeal[];
+}>;
+
+export type ScheduleViolation = Readonly<{
+  day: number;
+  code: "missing_slot" | "calories_out_of_band" | "protein_out_of_band" | "hard_constraint_violation" | "repair_exhausted" | "insufficient_candidates";
+  message: string;
+}>;
+
+export type WeekSchedule = Readonly<{ days: readonly ScheduledDay[] }>;
+export type WeekScheduleResult = { ok: true; value: WeekSchedule } | { ok: false; error: Readonly<{ code: string; violations: readonly ScheduleViolation[] }> };
 
 export type CandidateExclusion = { candidateId: string; reason: string };
 export type OrchestrationResult<T> = { ok: true; value: T } | { ok: false; error: PlannerInputError };
