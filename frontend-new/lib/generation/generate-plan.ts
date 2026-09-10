@@ -367,11 +367,17 @@ export async function generateWeeklyPlanWithArtifacts(
   };
   weeklyPlan.weeklyTotals = sumMacros(weeklyPlan.days.map((day) => day.totals));
   const shopping = buildOrchestrationShoppingList(schedule.value);
+  const adjustedPlan: PortionedMeal[] = schedule.value.days.flatMap((day) => day.meals.map((meal) => ({
+    concept: { name: meal.title, ingredients: meal.ingredients.map((ingredient) => ingredient.name), steps: [], cuisine: "curated", protein_type: "plant", slot: meal.slot, prep_minutes: meal.prepMinutes, day: day.day },
+    ingredients: meal.ingredients.map((ingredient) => ({ name: ingredient.name, amount: ingredient.quantity * meal.servings, unit: ingredient.unit, category: ingredient.pantry ? "Pantry" : "Produce", macros: { calories: 0, protein: 0, carbs: 0, fat: 0 }, micros: { iron_mg: 0, omega_3_g: 0, b12_mcg: 0, vitamin_d_mcg: 0, folate_mcg: 0, calcium_mg: 0, fibre_g: 0 } })),
+    totalMacros: { ...meal.nutrition }, totalMicros: { iron_mg: 0, omega_3_g: 0, b12_mcg: 0, vitamin_d_mcg: 0, folate_mcg: 0, calcium_mg: 0, fibre_g: 0 }, slot: meal.slot, day: day.day,
+  })));
   const shoppingList = shopping.buyItems.map((item) => {
     const amount = item.amountToBuy ?? item.quantity;
     return { name: item.name, amountNeeded: item.amountNeeded ?? amount, amountToBuy: amount, unit: item.unit, category: "Produce", pricePerPack: 0, packSize: amount, packsNeeded: 1, totalPrice: 0 };
   });
-  return { context, practical: { adjustedPlan: [], shoppingList, weeklyTotal: 0, substitutionsMade: [] }, alternatives: [], source: "db", weeklyPlan };
+  const weeklyTotal = Number(schedule.value.days.flatMap((day) => day.meals).reduce((total, meal) => total + meal.cost * meal.servings, 0).toFixed(2));
+  return { context, practical: { adjustedPlan, shoppingList, weeklyTotal, substitutionsMade: [] }, alternatives: [], source: "db", weeklyPlan };
 }
 
 export async function generateWeeklyPlan(
