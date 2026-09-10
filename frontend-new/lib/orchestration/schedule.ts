@@ -1,5 +1,6 @@
 import { filterEligibleCandidates } from "./eligibility.ts";
 import { rankCandidates } from "./score.ts";
+import { validateAndRepairWeek } from "./validate.ts";
 import type { PlannerProfile, SelectedMeal, VerifiedCandidateMeal, WeekScheduleResult } from "./types.ts";
 
 export type CandidateHistory = Readonly<{ recentCandidateIds?: readonly string[] }>;
@@ -66,5 +67,5 @@ export const orchestrateWeek = (
     }
     days.push({ day, meals });
   }
-  return { ok: true, value: { days } };
+  return validateAndRepairWeek(profile, { days });
 };
