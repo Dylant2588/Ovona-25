@@ -125,10 +125,14 @@ Plans:
 
 ### Phase 7: Build deterministic personal meal orchestration engine
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** An authenticated individual can get, validate, swap, persist, and shop from a deterministic, safe seven-day meal plan with minimal input.
+**Requirements**: [D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12]
 **Depends on:** Phase 6
-**Plans:** 0 plans
+**Plans:** 5 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 7 to break down)
+- [ ] 07-01-PLAN.md — Establish test harness, canonical profile contracts, and verified candidate admission
+- [ ] 07-02-PLAN.md — Build deterministic seven-day scoring, scheduling, validation, and repair
+- [ ] 07-03-PLAN.md — Add immutable single-meal replacement and scaled shopping aggregation
+- [ ] 07-04-PLAN.md — Adapt legacy generation/fallback paths to the deterministic seven-day core
+- [ ] 07-05-PLAN.md — Wire authenticated routes, persistence, shopping, and existing planner presentation
