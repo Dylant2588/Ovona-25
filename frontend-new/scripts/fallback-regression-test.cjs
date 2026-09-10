@@ -56,7 +56,7 @@ const softConflictPlan = moduleUnderTest.exports.generateFallbackMealPlan({
 });
 
 if (
-  softConflictPlan.days.length !== 5 ||
+  softConflictPlan.days.length !== moduleUnderTest.exports.WORKDAY_COUNT ||
   !softConflictPlan.days.every((day) =>
     day.meals.some((meal) => meal.mealSlot === "breakfast")
   )

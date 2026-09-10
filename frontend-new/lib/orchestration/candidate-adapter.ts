@@ -6,6 +6,7 @@ import { assertCompleteWeeklyAvailability, materializeVerifiedCatalogue, type Cu
 import type { PlannerProfile } from "./types.ts";
 
 export type DeterministicPlanningInput = Readonly<{
+  context: GenerationContext;
   profile: PlannerProfile;
   candidates: readonly CuratedVerifiedCandidateMeal[];
   history: Readonly<{ recentCandidateIds: readonly string[] }>;
@@ -23,7 +24,7 @@ export const buildDeterministicPlanningInput = async (
   options: { supabase?: GenerationSupabase; preferences?: PreferencesInput; context?: GenerationContext } = {},
 ): Promise<DeterministicPlanningInputResult> => {
   // Dynamic loading keeps the pure test boundary free of Next's runtime-only alias loader.
-  const context = options.context ?? await import("../generation/context-builder").then(({ buildContext }) => buildContext(userId, options));
+  const context: GenerationContext = options.context ?? await import("../generation/context-builder").then(({ buildContext }) => buildContext(userId, options));
   const profile = normalizePlannerProfile({
     calorieTarget: context.calorieTarget,
     proteinTarget: context.proteinTarget,
@@ -31,7 +32,7 @@ export const buildDeterministicPlanningInput = async (
     dislikes: context.dislikes,
     dietaryRules: context.dietaryMode === "mixed" ? [] : [context.dietaryMode],
     maxPrepMinutes: context.maxPrepMinutes,
-    householdSize: options.preferences?.profile?.householdSize ?? 1,
+    householdSize: Math.max(1, options.preferences?.profile?.household?.length ?? 1),
     preferredMealTypes: context.cuisinePreferences,
     requiredSlots: [...new Set(context.slotLabels.map(slotName))],
   });
@@ -42,6 +43,7 @@ export const buildDeterministicPlanningInput = async (
   return {
     ok: true,
     value: Object.freeze({
+      context,
       profile,
       candidates: availability.value,
       history: Object.freeze({ recentCandidateIds: Object.freeze([]) }),

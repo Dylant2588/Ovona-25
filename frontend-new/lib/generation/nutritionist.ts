@@ -132,7 +132,7 @@ const pickWeekMeals = (
   const slotLabels = context.slotLabels.map((slot) => normalizeSlot(slot));
   const weeklyUses = new Map<string, number>();
 
-  for (let day = 1; day <= 5; day += 1) {
+  for (let day = 1; day <= 7; day += 1) {
     const usedToday = new Set<string>();
     slotLabels.forEach((slot) => {
       const candidates = pool
@@ -316,7 +316,7 @@ RULES FOR STEPS:
 - Never start with "Prep all ingredients"
 - Never end with "Serve and enjoy"
 
-Generate exactly ${context.mealsPerDay * 5} meals and ${context.mealsPerDay * 5} alternatives. Prefer ingredients that are common, specific supermarket foods rather than invented branded products.
+Generate exactly ${context.mealsPerDay * 7} meals and ${context.mealsPerDay * 7} alternatives. Prefer ingredients that are common, specific supermarket foods rather than invented branded products.
   `.trim();
 }
 
@@ -390,7 +390,7 @@ export async function generateMeals(
   options?: { supabase?: GenerationSupabase }
 ): Promise<NutritionistOutput> {
   const supabase = options?.supabase ?? (await supabaseServer());
-  const required = context.mealsPerDay * 5;
+  const required = context.mealsPerDay * 7;
   const requiredTotal = required * 2;
 
   const dbPool = await fetchDbPool(context, supabase);

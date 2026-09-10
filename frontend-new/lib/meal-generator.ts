@@ -493,7 +493,7 @@ const COMPLEXITY_MULTIPLIERS: Record<ComplexityKey, number> = {
   adventurous: 1.08,
 };
 
-export const WORKDAY_COUNT = 5;
+export const WORKDAY_COUNT = 7;
 export const WORKDAY_MEAL_SLOTS: MealSlot[] = [
   "breakfast",
   "snack",

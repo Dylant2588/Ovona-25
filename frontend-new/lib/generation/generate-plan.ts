@@ -25,6 +25,9 @@ import type {
   PortionedMeal,
 } from "@/lib/generation/types";
 import { validateMealIngredients } from "@/lib/generation/validation-gate";
+import { buildDeterministicPlanningInput } from "@/lib/orchestration/candidate-adapter";
+import { orchestrateWeek } from "@/lib/orchestration/schedule";
+import { buildOrchestrationShoppingList } from "@/lib/orchestration/shopping";
 
 const normalize = (value: string) =>
   value
@@ -132,7 +135,7 @@ const distributeAcrossWeek = (
   concepts: MealConcept[],
   context: GenerationContext
 ) => {
-  const required = context.mealsPerDay * 5;
+  const required = context.mealsPerDay * 7;
   const slots = context.slotLabels.map(slotLabelToSlot);
   const prepared = concepts.map((concept, index) => ({
     ...concept,
@@ -152,7 +155,7 @@ const distributeAcrossWeek = (
   });
 
   const ordered: MealConcept[] = [];
-  for (let day = 1; day <= 5; day += 1) {
+  for (let day = 1; day <= 7; day += 1) {
     slots.forEach((slot, slotIndex) => {
       const key = `${day}-${slot}`;
       const existing = byDaySlot.get(key);
@@ -178,7 +181,7 @@ const fillFromFallback = (
   current: MealConcept[],
   context: GenerationContext
 ): MealConcept[] => {
-  const required = context.mealsPerDay * 5;
+  const required = context.mealsPerDay * 7;
   if (current.length >= required) return current.slice(0, required);
   const fallback = distributeAcrossWeek(fallbackToStaticLibrary(context).meals, context);
   const merged = [...current];
@@ -234,7 +237,7 @@ const buildPlanFromPortionedMeals = (
   const weekStart = getWeekStart();
   const days: WeeklyMealPlan["days"] = [];
 
-  for (let day = 1; day <= 5; day += 1) {
+  for (let day = 1; day <= 7; day += 1) {
     const date = addDays(weekStart, day - 1);
     const dayMeals = meals
       .filter((meal) => meal.day === day)
@@ -333,71 +336,42 @@ export async function generateWeeklyPlanWithArtifacts(
   userId: string,
   options?: { preferences?: PreferencesInput }
 ): Promise<GenerationArtifacts> {
-  const supabase = await supabaseServer();
-
-  try {
-    const { count, error } = await supabase
-      .from("meal_concepts")
-      .select("id", { count: "exact", head: true });
-    if (!error && (count ?? 0) === 0) {
-      await seedMealConceptsFromStaticLibrary(supabase);
-    }
-  } catch (error) {
-    console.warn("[generate-plan] meal_concepts seed check skipped:", error);
+  const hydrated = await buildDeterministicPlanningInput(userId, { preferences: options?.preferences });
+  if (!hydrated.ok) throw Object.assign(new Error(hydrated.error.reasons.join("; ")), hydrated.error);
+  const schedule = orchestrateWeek(hydrated.value.profile, hydrated.value.candidates, hydrated.value.history);
+  if (!schedule.ok) {
+    throw Object.assign(new Error(schedule.error.violations.map((violation) => violation.message).join("; ")), {
+      statusCode: 422, code: "INSUFFICIENT_VERIFIED_CATALOGUE", reasons: schedule.error.violations.map((violation) => violation.message),
+    });
   }
-
-  const context = await buildContext(userId, {
-    supabase,
-    preferences: options?.preferences,
-  });
-  let nutrition = await generateMeals(context, { supabase });
-
-  if (!nutrition.meals.length) {
-    nutrition = fallbackToStaticLibrary(context);
-  }
-
-  let distributedMeals = distributeAcrossWeek(nutrition.meals, context);
-  distributedMeals = fillFromFallback(distributedMeals, context);
-  const safeMeals = await ensureSafety(
-    distributedMeals,
-    nutrition.alternatives,
-    context,
-    supabase
-  );
-
-  const portioned = await Promise.all(
-    safeMeals.map((meal) =>
-      calculatePortions(meal, chooseSlotBudget(context, meal.slot), supabase)
-    )
-  );
-  const healthAdjusted = await applyHealthAdjustments(portioned, context);
-  const practical = await optimiseAndPrice(healthAdjusted, context.weeklyBudget, supabase);
-
-  let finalPortioned = practical.adjustedPlan;
-  if (practical.substitutionsMade.length > 0) {
-    finalPortioned = await applyHealthAdjustments(finalPortioned, context);
-  }
-
-  const weeklyPlan = buildPlanFromPortionedMeals(finalPortioned, context, userId);
-
-  await storeMealConcepts(nutrition.meals, supabase, {
-    source: nutrition.source === "fallback" ? "seed" : "llm",
-    verified: nutrition.source === "fallback",
-  });
-  await storeMealConcepts(nutrition.alternatives, supabase, {
-    source: nutrition.source === "fallback" ? "seed" : "llm",
-    verified: nutrition.source === "fallback",
-  });
-
-  await recordMealHistory(userId, finalPortioned, toDateOnly(getWeekStart()), supabase);
-
-  return {
-    context,
-    practical,
-    alternatives: nutrition.alternatives,
-    source: nutrition.source,
-    weeklyPlan,
+  const context = hydrated.value.context;
+  const weekStart = getWeekStart();
+  const weeklyPlan: WeeklyMealPlan = {
+    id: randomUUID(), userId, weekStart: weekStart.toISOString(), generatedAt: new Date().toISOString(),
+    preferenceSignature: JSON.stringify({ calories: context.calorieTarget, protein: context.proteinTarget, dietaryMode: context.dietaryMode, allergies: context.allergies }),
+    days: schedule.value.days.map((day) => {
+      const date = addDays(weekStart, day.day - 1);
+      const meals = day.meals.map((meal): MealInstance => ({
+        instanceId: randomUUID(), baseId: meal.candidateId, mealSlot: meal.slot, title: meal.title, description: meal.explanation,
+        steps: [], recipeSteps: [], tags: ["verified", "deterministic", ...meal.score.facts], image: "", readyInMinutes: meal.prepMinutes, portionMultiplier: meal.nutritionPortionMultiplier,
+        baseMacros: { ...meal.nutrition }, macros: {
+          calories: Math.round(meal.nutrition.calories * meal.nutritionPortionMultiplier), protein: Math.round(meal.nutrition.protein * meal.nutritionPortionMultiplier),
+          carbs: Math.round(meal.nutrition.carbs * meal.nutritionPortionMultiplier), fat: Math.round(meal.nutrition.fat * meal.nutritionPortionMultiplier),
+        },
+        baseIngredients: meal.ingredients.map((ingredient) => ({ name: ingredient.name, amount: ingredient.quantity, unit: ingredient.unit, category: ingredient.pantry ? "Pantry" : "Produce" })),
+        ingredients: meal.ingredients.map((ingredient) => ({ name: ingredient.name, amount: ingredient.quantity * meal.servings, unit: ingredient.unit, category: ingredient.pantry ? "Pantry" : "Produce" })), proteinType: "plant",
+      }));
+      return { id: randomUUID(), label: date.toLocaleDateString("en-US", { weekday: "long" }), date: date.toISOString(), meals, totals: sumMacros(meals.map((meal) => meal.macros)) };
+    }),
+    weeklyTotals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
   };
+  weeklyPlan.weeklyTotals = sumMacros(weeklyPlan.days.map((day) => day.totals));
+  const shopping = buildOrchestrationShoppingList(schedule.value);
+  const shoppingList = shopping.buyItems.map((item) => {
+    const amount = item.amountToBuy ?? item.quantity;
+    return { name: item.name, amountNeeded: item.amountNeeded ?? amount, amountToBuy: amount, unit: item.unit, category: "Produce", pricePerPack: 0, packSize: amount, packsNeeded: 1, totalPrice: 0 };
+  });
+  return { context, practical: { adjustedPlan: [], shoppingList, weeklyTotal: 0, substitutionsMade: [] }, alternatives: [], source: "db", weeklyPlan };
 }
 
 export async function generateWeeklyPlan(

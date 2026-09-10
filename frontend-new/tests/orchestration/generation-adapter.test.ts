@@ -51,7 +51,7 @@ test("the adapter excludes untrusted stored concepts and returns truthful verifi
       slotLabels: ["Breakfast", "Snack", "Lunch", "Snack", "Dinner"], weeklyBudget: 55,
       recentMealNames: ["Unknown concept"], recentProteinTypes: [], slotBudgets: [],
     },
-    preferences: { profile: { mealsPerDay: 5 } },
+    preferences: { tastes: [], profile: { mealsPerDay: 5 } },
   });
   assert.equal(result.ok, true);
   if (result.ok) {
