@@ -461,6 +461,105 @@ const MEAL_LIBRARY: BaseMeal[] = [
     ],
     proteinType: "mixed",
   },
+  {
+    id: "turkey-rice-breakfast-bowl",
+    name: "Turkey Rice Breakfast Bowl",
+    description: "Lean turkey slices with brown rice, spinach, and tomatoes.",
+    mealTypes: ["breakfast"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 8,
+    image: "",
+    macros: { calories: 307, protein: 46, carbs: 23, fat: 4 },
+    ingredients: [
+      { name: "Roast turkey slices", amount: 180, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Spinach", amount: 30, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 60, unit: "g", category: "Produce" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "turkey-oat-snack-pot",
+    name: "Turkey Oat Snack Pot",
+    description: "Lean turkey, oats, cucumber, and olive oil for a compact protein snack.",
+    mealTypes: ["snack"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 6,
+    image: "",
+    macros: { calories: 330, protein: 42, carbs: 19, fat: 8 },
+    ingredients: [
+      { name: "Roast turkey slices", amount: 160, unit: "g", category: "Protein" },
+      { name: "Rolled oats", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Cucumber", amount: 100, unit: "g", category: "Produce" },
+      { name: "Olive oil", amount: 5, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "turkey-tomato-snack-box",
+    name: "Turkey Tomato Snack Box",
+    description: "Lean turkey with tomatoes, cucumber, oats, and olive oil.",
+    mealTypes: ["snack"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 6,
+    image: "",
+    macros: { calories: 330, protein: 42, carbs: 19, fat: 8 },
+    ingredients: [
+      { name: "Roast turkey slices", amount: 160, unit: "g", category: "Protein" },
+      { name: "Rolled oats", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Cucumber", amount: 100, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 80, unit: "g", category: "Produce" },
+      { name: "Olive oil", amount: 5, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "herbed-chicken-rice-plate",
+    name: "Herbed Chicken Rice Plate",
+    description: "Chicken breast, brown rice, spinach, and tomatoes with herbs.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 20,
+    image: "",
+    macros: { calories: 403, protein: 45, carbs: 35, fat: 7 },
+    ingredients: [
+      { name: "Chicken breast", amount: 130, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 35, unit: "g", category: "Pantry" },
+      { name: "Spinach", amount: 60, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 100, unit: "g", category: "Produce" },
+      { name: "Olive oil", amount: 5, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "lemon-chicken-rice-skillet",
+    name: "Lemon Chicken Rice Skillet",
+    description: "Chicken breast, brown rice, spinach, and tomatoes with lemon.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 20,
+    image: "",
+    macros: { calories: 403, protein: 45, carbs: 35, fat: 7 },
+    ingredients: [
+      { name: "Chicken breast", amount: 130, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 35, unit: "g", category: "Pantry" },
+      { name: "Spinach", amount: 60, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 100, unit: "g", category: "Produce" },
+      { name: "Lime", amount: 1, unit: "each", category: "Produce" },
+      { name: "Olive oil", amount: 5, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
 ];
 
 const GOAL_MULTIPLIERS: Record<string, number> = {
@@ -2118,15 +2217,23 @@ const selectBaseMeal = (
     );
   }
 
-  if (!selectionState || selectionState.dayIndex === 0) {
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    return pool[randomIndex] ?? slotPool[0] ?? MEAL_LIBRARY[0];
+  // When a protein target is supplied, do not sacrifice macro feasibility for
+  // variety. A meal that cannot supply its per-slot protein share even at the
+  // safe maximum portion will only force every later meal to be oversized.
+  const proteinTarget = targets?.protein ? targets.protein / (selectionState?.slots.length ?? 1) : 0;
+  const proteinViable = proteinTarget
+    ? pool.filter((meal) => mealMacrosFromIngredients(meal).protein * MAX_PORTION >= proteinTarget)
+    : [];
+  const macroViablePool = proteinViable.length ? proteinViable : pool;
+
+  if (!selectionState) {
+    return macroViablePool[0] ?? slotPool[0] ?? MEAL_LIBRARY[0];
   }
 
-  const strictPool = pool.filter((meal) =>
+  const strictPool = macroViablePool.filter((meal) =>
     isCandidateStrictlyVaried(meal, selectionState)
   );
-  const cappedPool = pool.filter((meal) => {
+  const cappedPool = macroViablePool.filter((meal) => {
     const { timesUsed } = mealUsageStats(meal, selectionState);
     return timesUsed < MAX_MEAL_USES_PER_WEEK;
   });
@@ -2134,7 +2241,7 @@ const selectBaseMeal = (
     ? strictPool
     : cappedPool.length
     ? cappedPool
-    : pool;
+    : macroViablePool;
 
   const ranked = effectivePool
     .map((meal) => ({
@@ -2143,13 +2250,10 @@ const selectBaseMeal = (
     }))
     .sort((a, b) => b.score - a.score);
 
-  const topWindow = ranked.slice(0, Math.min(3, ranked.length));
-  const randomTop = topWindow[Math.floor(Math.random() * topWindow.length)];
   return (
-    randomTop?.meal ??
     ranked[0]?.meal ??
     effectivePool[0] ??
-    pool[0] ??
+    macroViablePool[0] ??
     slotPool[0] ??
     MEAL_LIBRARY[0]
   );
@@ -2450,7 +2554,16 @@ const optimizePlanCost = (
         !usedBaseIds.has(meal.id)
     );
     const preferenceFiltered = filterMealsByPreferences(baseCandidates, prefs);
-    const candidatePool = preferenceFiltered;
+    const proteinTarget = macroTargets?.protein
+      ? macroTargets.protein / slots.length
+      : 0;
+    const proteinViable = proteinTarget
+      ? preferenceFiltered.filter(
+          (candidate) =>
+            mealMacrosFromIngredients(candidate).protein * MAX_PORTION >= proteinTarget
+        )
+      : [];
+    const candidatePool = proteinViable.length ? proteinViable : preferenceFiltered;
     if (!candidatePool.length) continue;
 
     const proteinSources = collectProteinSourcesFromPlan(plan, {

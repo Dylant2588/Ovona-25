@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+process.env.NODE_ENV = "production";
 const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
@@ -166,6 +167,13 @@ const affectedProductionPreferences = {
 };
 
 const affectedProductionPlan = moduleUnderTest.exports.generateFallbackMealPlan(affectedProductionPreferences);
+const affectedProductionTargets = moduleUnderTest.exports.resolveMacroTargets(
+  affectedProductionPreferences
+);
+const affectedProductionEnforcement = enforcementModule.exports.enforceMacros(
+  affectedProductionPlan,
+  affectedProductionTargets
+);
 const forbiddenProductionTerms = /dairy|milk|yogurt|whey|cheese|butter|cream|shellfish|shrimp|prawn|fish|salmon|nut|almond|sesame|tahini/i;
 
 if (
@@ -180,6 +188,51 @@ if (
   )
 ) {
   throw new Error("Production preference fallback must preserve every hard allergy exclusion.");
+}
+
+if (!affectedProductionEnforcement.passed) {
+  throw new Error(
+    `The production allergy profile must receive a feasible calorie/protein fallback plan: ${JSON.stringify(
+      affectedProductionPlan.days.map((day) => ({ totals: day.totals, meals: day.meals.map((meal) => meal.baseId) }))
+    )}`
+  );
+}
+
+if (
+  affectedProductionPlan.days.some(
+    (day) =>
+      day.totals.calories < affectedProductionTargets.calories * 0.95 ||
+      day.totals.calories > affectedProductionTargets.calories * 1.08 ||
+      day.totals.protein < affectedProductionTargets.protein * 0.98 ||
+      day.totals.protein > affectedProductionTargets.protein * 1.1
+  )
+) {
+  throw new Error("A passing production fallback must actually meet its calorie and protein bounds.");
+}
+
+const infeasiblePlan = JSON.parse(JSON.stringify(affectedProductionPlan));
+infeasiblePlan.days.forEach((day) => {
+  day.meals.forEach((meal) => {
+    meal.portionMultiplier = 1;
+    meal.baseMacros = { calories: 100, protein: 5, carbs: 10, fat: 2 };
+    meal.macros = { ...meal.baseMacros };
+  });
+  day.totals = { calories: 500, protein: 25, carbs: 50, fat: 10 };
+});
+const infeasibleEnforcement = enforcementModule.exports.enforceMacros(
+  infeasiblePlan,
+  affectedProductionTargets
+);
+if (
+  infeasibleEnforcement.passed ||
+  infeasiblePlan.days.some(
+    (day) =>
+      day.totals.calories !== 500 ||
+      day.totals.protein !== 25 ||
+      day.meals.some((meal) => meal.portionMultiplier !== 1)
+  )
+) {
+  throw new Error("Failed enforcement must preserve its original, transparent infeasible plan.");
 }
 
 console.log("fallback regression probe: PASS");
