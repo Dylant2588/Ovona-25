@@ -576,14 +576,6 @@ const mealSlotDisplayLabel = (
   return `Snack ${snackNumber}`;
 };
 
-const mealSlotColor = (slot: string) => {
-  if (slot === "breakfast") return "#60a5fa";
-  if (slot === "snack") return "#4ade80";
-  if (slot === "lunch") return "#fb923c";
-  if (slot === "dinner") return "#c084fc";
-  return "#94a3b8";
-};
-
 const mealMacroLine = (meal: PlanMeal) =>
   `${meal.macros.calories} kcal • ${meal.macros.protein}g protein`;
 
@@ -2178,7 +2170,12 @@ function MealsPageContent() {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => setShoppingExpanded((prev) => !prev)}
+            onClick={() => {
+              setShoppingExpanded((prev) => !prev);
+              if (!shoppingExpanded) {
+                document.getElementById("weekly-shopping")?.scrollIntoView({ block: "start" });
+              }
+            }}
             disabled={!displayShoppingList.length}
           >
             {shoppingExpanded ? "Hide shopping list" : "Shopping list"}
@@ -2507,7 +2504,7 @@ function MealsPageContent() {
                       <Typography variant="subtitle1" fontWeight={600}>
                         {day.label} | {formatDate(day.date)}
                       </Typography>
-                      <Stack direction="row" spacing={1} alignItems="center">
+                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
                         <Box
                           sx={{
                             width: 10,
@@ -2614,8 +2611,7 @@ function MealsPageContent() {
                               ? "rgba(125, 211, 252, 0.45)"
                               : "rgba(255,255,255,0.08)",
                             bgcolor: "rgba(5,7,15,0.88)",
-                            backgroundImage:
-                              "linear-gradient(180deg, rgba(125,211,252,0.08), rgba(5,7,15,0.88) 22%)",
+                            borderRadius: 2.5,
                             boxShadow: expanded
                               ? "0 0 0 1px rgba(125,211,252,0.22)"
                               : "none",
@@ -2643,7 +2639,7 @@ function MealsPageContent() {
                             </Box>
                           )}
                           <CardContent
-                            sx={{ display: "flex", flexDirection: "column", gap: 1.5, flexGrow: 1 }}
+                            sx={{ display: "flex", flexDirection: "column", gap: 2, flexGrow: 1, p: { xs: 2.5, md: 3 } }}
                           >
                             <Typography
                               variant="caption"
@@ -2651,63 +2647,25 @@ function MealsPageContent() {
                                 letterSpacing: 0.8,
                                 textTransform: "uppercase",
                                 fontWeight: 700,
-                                color: mealSlotColor(meal.mealSlot),
+                                color: "text.secondary",
                               }}
                             >
                               {mealSlotDisplayLabel(meal.mealSlot, mealIndex, day.meals)}
                             </Typography>
-                            <Typography variant="h6" sx={{ lineHeight: 1.2 }}>
+                            <Typography variant="h6" component="h2" sx={{ fontSize: { xs: "1.3rem", md: "1.45rem" }, fontWeight: 600, letterSpacing: "-0.025em", lineHeight: 1.3, overflowWrap: "anywhere" }}>
                               {meal.title}
                             </Typography>
-                            <Stack direction="row" spacing={1} alignItems="center" useFlexGap>
-                              <Chip label={`${meal.readyInMinutes} min`} size="small" variant="outlined" />
-                              {meal.portionMultiplier !== 1 && (
-                                <Chip label={`Portion x${meal.portionMultiplier}`} size="small" />
-                              )}
-                            </Stack>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                            >
-                              {mealMacroLine(meal)}
+                            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                              {meal.readyInMinutes > 0 ? `${meal.readyInMinutes} min · ` : ""}{mealMacroLine(meal)}
+                              {meal.portionMultiplier !== 1 ? ` · Portion ×${meal.portionMultiplier}` : ""}
                             </Typography>
-                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: "auto" }}>
+                            <Stack spacing={1} sx={{ mt: "auto", pt: 1 }}>
                               <Button
-                                size="small"
-                                variant={mealLogs[meal.instanceId] === "eaten" ? "contained" : "outlined"}
-                                color={mealLogs[meal.instanceId] === "eaten" ? "success" : "secondary"}
-                                startIcon={
-                                  loggingMealId === meal.instanceId ? (
-                                    <CircularProgress size={14} color="inherit" />
-                                  ) : (
-                                    <CheckCircleOutlineRoundedIcon fontSize="small" />
-                                  )
-                                }
-                                onClick={() => void saveMealLog(meal.instanceId, day.date)}
-                                disabled={loggingMealId === meal.instanceId || mealLogs[meal.instanceId] === "eaten"}
-                                sx={{ minHeight: 36 }}
-                              >
-                                {mealLogs[meal.instanceId] === "eaten" ? "Eaten" : loggingMealId === meal.instanceId ? "Saving..." : "I ate this"}
-                              </Button>
-                              <Button
-                                size="small"
-                                color="secondary"
-                                variant="outlined"
-                                startIcon={
-                                  swapping ? (
-                                    <CircularProgress size={14} color="inherit" />
-                                  ) : (
-                                    <SwapHorizRoundedIcon fontSize="small" />
-                                  )
-                                }
-                                onClick={() => void handleSwapMeal(dayIndex, mealIndex)}
-                                disabled={Boolean(swappingMealId)}
-                                sx={{ minHeight: 36 }}
-                              >
-                                {swapping ? "Swapping..." : "Swap meal"}
-                              </Button>
-                              <Button
-                                size="small"
+                                variant="contained"
+                                fullWidth
+                                aria-expanded={expanded}
+                                aria-controls={`recipe-${day.id}`}
+                                aria-label={`${expanded ? "Hide" : "View"} recipe for ${meal.title}`}
                                 color="secondary"
                                 startIcon={<MenuBookRoundedIcon fontSize="small" />}
                                 endIcon={
@@ -2719,17 +2677,53 @@ function MealsPageContent() {
                                   />
                                 }
                                 onClick={() => setExpandedMealId(expanded ? null : meal.instanceId)}
-                                sx={{ minHeight: 36 }}
+                                sx={{ minHeight: 44 }}
                               >
                                 {expanded ? "Hide recipe" : "View recipe"}
                               </Button>
+                              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                <Button
+                                  size="small"
+                                  variant="text"
+                                  color={mealLogs[meal.instanceId] === "eaten" ? "success" : "secondary"}
+                                  startIcon={
+                                    loggingMealId === meal.instanceId ? (
+                                      <CircularProgress size={14} color="inherit" />
+                                    ) : (
+                                      <CheckCircleOutlineRoundedIcon fontSize="small" />
+                                    )
+                                  }
+                                  onClick={() => void saveMealLog(meal.instanceId, day.date)}
+                                  disabled={loggingMealId === meal.instanceId || mealLogs[meal.instanceId] === "eaten"}
+                                  sx={{ minHeight: 44 }}
+                                >
+                                  {mealLogs[meal.instanceId] === "eaten" ? "Eaten" : loggingMealId === meal.instanceId ? "Saving..." : "I ate this"}
+                                </Button>
+                                <Button
+                                  size="small"
+                                  color="secondary"
+                                  variant="text"
+                                  startIcon={
+                                    swapping ? (
+                                      <CircularProgress size={14} color="inherit" />
+                                    ) : (
+                                      <SwapHorizRoundedIcon fontSize="small" />
+                                    )
+                                  }
+                                  onClick={() => void handleSwapMeal(dayIndex, mealIndex)}
+                                  disabled={Boolean(swappingMealId)}
+                                  sx={{ minHeight: 44 }}
+                                >
+                                  {swapping ? "Swapping..." : "Swap meal"}
+                                </Button>
+                              </Stack>
                             </Stack>
                           </CardContent>
                         </Card>
                       );
                     })}
                   </Box>
-                  <Collapse in={Boolean(expandedMealForDay)} timeout="auto" unmountOnExit>
+                  <Collapse id={`recipe-${day.id}`} in={Boolean(expandedMealForDay)} timeout="auto" unmountOnExit>
                     {expandedMealForDay && expandedProteinMeta && (
                       <Box
                         sx={{
@@ -2771,6 +2765,7 @@ function MealsPageContent() {
                             <Chip
                               size="small"
                               variant="outlined"
+                              sx={{ maxWidth: "100%", height: "auto", "& .MuiChip-label": { whiteSpace: "normal", py: 0.75 } }}
                               label={`${expandedMealForDay.macros.calories} kcal • ${expandedMealForDay.macros.protein}g protein • ${expandedMealForDay.macros.carbs}g carbs • ${expandedMealForDay.macros.fat}g fat`}
                             />
                           </Stack>
@@ -3060,6 +3055,7 @@ function MealsPageContent() {
 
             </AccordionDetails>
           </Accordion>
+          {historyInsights && (
           <Accordion disableGutters sx={{ border: "1px solid rgba(255,255,255,0.08)", bgcolor: "rgba(10,14,26,0.7)", borderRadius: 3, "&:before": { display: "none" } }}>
             <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: { xs: 2, md: 3 }, minHeight: 64 }}>
               <Typography fontWeight={600}>Your meal history</Typography>
@@ -3133,8 +3129,10 @@ function MealsPageContent() {
 
             </AccordionDetails>
           </Accordion>
+          )}
           {displayShoppingList.length > 0 ? (
             <Accordion
+              id="weekly-shopping"
               expanded={shoppingExpanded}
               onChange={(_, expanded) => setShoppingExpanded(expanded)}
               disableGutters
