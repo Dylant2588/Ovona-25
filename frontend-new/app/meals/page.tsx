@@ -2584,10 +2584,7 @@ function MealsPageContent() {
                       display: "grid",
                       gap: 2,
                       alignItems: "stretch",
-                      gridTemplateColumns: {
-                        xs: "1fr",
-                        md: `repeat(${Math.max(day.meals.length, 1)}, minmax(0, 1fr))`,
-                      },
+                      gridTemplateColumns: "1fr",
                     }}
                   >
                     {day.meals.map((meal, mealIndex) => {
@@ -2639,8 +2636,9 @@ function MealsPageContent() {
                             </Box>
                           )}
                           <CardContent
-                            sx={{ display: "flex", flexDirection: "column", gap: 2, flexGrow: 1, p: { xs: 2.5, md: 3 } }}
+                            sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { md: "center" }, gap: { xs: 1, md: 2 }, p: 2, "&:last-child": { pb: 2 } }}
                           >
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Typography
                               variant="caption"
                               sx={{
@@ -2652,17 +2650,16 @@ function MealsPageContent() {
                             >
                               {mealSlotDisplayLabel(meal.mealSlot, mealIndex, day.meals)}
                             </Typography>
-                            <Typography variant="h6" component="h2" sx={{ fontSize: { xs: "1.3rem", md: "1.45rem" }, fontWeight: 600, letterSpacing: "-0.025em", lineHeight: 1.3, overflowWrap: "anywhere" }}>
+                            <Typography variant="h6" component="h2" sx={{ fontSize: { xs: "1.15rem", md: "1.25rem" }, fontWeight: 600, letterSpacing: "-0.025em", lineHeight: 1.35, my: 0.5, overflowWrap: "break-word" }}>
                               {meal.title}
                             </Typography>
                             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
                               {meal.readyInMinutes > 0 ? `${meal.readyInMinutes} min · ` : ""}{mealMacroLine(meal)}
-                              {meal.portionMultiplier !== 1 ? ` · Portion ×${meal.portionMultiplier}` : ""}
                             </Typography>
-                            <Stack spacing={1} sx={{ mt: "auto", pt: 1 }}>
+                            </Box>
+                            <Stack direction={{ xs: "column", sm: "row" }} spacing={0.5} sx={{ flexShrink: 0 }}>
                               <Button
-                                variant="contained"
-                                fullWidth
+                                variant="text"
                                 aria-expanded={expanded}
                                 aria-controls={`recipe-${day.id}`}
                                 aria-label={`${expanded ? "Hide" : "View"} recipe for ${meal.title}`}
@@ -2685,7 +2682,7 @@ function MealsPageContent() {
                                 <Button
                                   size="small"
                                   variant="text"
-                                  color={mealLogs[meal.instanceId] === "eaten" ? "success" : "secondary"}
+                                  color={mealLogs[meal.instanceId] === "eaten" ? "success" : "inherit"}
                                   startIcon={
                                     loggingMealId === meal.instanceId ? (
                                       <CircularProgress size={14} color="inherit" />
@@ -2701,7 +2698,7 @@ function MealsPageContent() {
                                 </Button>
                                 <Button
                                   size="small"
-                                  color="secondary"
+                                  color="inherit"
                                   variant="text"
                                   startIcon={
                                     swapping ? (
@@ -2744,6 +2741,9 @@ function MealsPageContent() {
                           sx={{ mb: 2 }}
                         >
                           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                            {expandedMealForDay.portionMultiplier !== 1 && (
+                              <Chip size="small" variant="outlined" label={`Portion ×${expandedMealForDay.portionMultiplier}`} />
+                            )}
                             <Chip
                               size="small"
                               variant="outlined"
