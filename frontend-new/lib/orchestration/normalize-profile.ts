@@ -48,7 +48,9 @@ export const normalizePlannerProfile = (raw: unknown, policy: PlannerPolicy = DE
   const proteinTarget = requiredNumber(input.proteinTarget ?? targets.protein, "proteinTarget", policy.proteinTargetRange.min, policy.proteinTargetRange.max);
   const maxPrepMinutes = requiredNumber(input.maxPrepMinutes ?? legacyProfile.maxPrepMinutes ?? policy.maxPrepMinutes, "maxPrepMinutes", 0, policy.maxPrepMinutes, true);
   const householdSize = requiredNumber(input.householdSize ?? legacyProfile.householdSize ?? 1, "householdSize", 1, policy.maxHouseholdSize, true);
-  const requiredSlots = normalizedStrings(input.requiredSlots ?? legacyProfile.requiredSlots).filter((slot): slot is PlannerMealSlot => SLOT_NAMES.includes(slot as PlannerMealSlot));
+  const rawSlots = input.requiredSlots ?? legacyProfile.requiredSlots;
+  const slotValues = Array.isArray(rawSlots) ? rawSlots : typeof rawSlots === "string" ? rawSlots.split(",") : [];
+  const requiredSlots = slotValues.filter((slot): slot is string => typeof slot === "string").map((slot) => slot.trim().toLowerCase()).filter((slot): slot is PlannerMealSlot => SLOT_NAMES.includes(slot as PlannerMealSlot));
   const resolvedSlots = requiredSlots.length ? requiredSlots : [...SLOT_NAMES];
   const budget = input.budgetSensitivity;
   const budgetSensitivity = budget === "low" || budget === "high" || budget === "medium" ? budget : "medium";

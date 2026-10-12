@@ -30,7 +30,7 @@ const weekCandidates = (): VerifiedCandidateMeal[] =>
   );
 
 const scheduledWeek = () => {
-  const result = orchestrateWeek(profile(), weekCandidates(), []);
+  const result = orchestrateWeek(profile(), weekCandidates(), {});
   assert.equal(result.ok, true);
   if (!result.ok) throw new Error("fixture week must be valid");
   return result.value;
@@ -42,7 +42,7 @@ test("replaces exactly one target slot immutably with a score-derived explanatio
   const oldMeal = original.days[0]!.meals.find((meal) => meal.slot === target.slot)!;
   const replacement = candidate("breakfast-replacement", "breakfast", { title: "Quick replacement" });
 
-  const outcome = replaceMeal(original, target, [...weekCandidates(), replacement], profile(), [], profile().policy);
+  const outcome = replaceMeal(original, target, [...weekCandidates(), replacement], profile(), {}, profile().policy);
 
   assert.equal(outcome.ok, true);
   if (!outcome.ok) return;
@@ -65,7 +65,7 @@ test("rejects unsafe, repeated, or malformed replacement candidates without rela
   const repeated = candidate("already-used", "breakfast", { similarityKey: original.days[1]!.meals.find((meal) => meal.slot === target.slot)!.similarityKey });
   const unsafe = candidate("unsafe", "breakfast", { allergens: ["peanut"] });
 
-  const outcome = replaceMeal(original, target, [oldMeal as unknown as VerifiedCandidateMeal, repeated, unsafe], profile(), [], profile().policy);
+  const outcome = replaceMeal(original, target, [oldMeal as unknown as VerifiedCandidateMeal, repeated, unsafe], profile(), {}, profile().policy);
 
   assert.equal(outcome.ok, false);
   if (!outcome.ok) assert.equal(outcome.error.code, "insufficient_replacement_candidates");

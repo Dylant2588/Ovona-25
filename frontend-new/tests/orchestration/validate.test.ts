@@ -25,7 +25,7 @@ const candidates = (calories: number, protein: number, options: { allergens?: re
   );
 
 test("accepts inclusive calorie and protein tolerance boundaries for every one of seven days", () => {
-  const result = orchestrateWeek(profile(), candidates(475, 29.4), []);
+  const result = orchestrateWeek(profile(), candidates(475, 29.4), {});
   assert.equal(result.ok, true);
   if (!result.ok) return;
   assert.equal(result.value.days.length, 7);
@@ -33,7 +33,7 @@ test("accepts inclusive calorie and protein tolerance boundaries for every one o
 });
 
 test("repairs individual nutrition portions deterministically and materializes household servings exactly once", () => {
-  const result = orchestrateWeek(profile(3), candidates(450, 28), []);
+  const result = orchestrateWeek(profile(3), candidates(450, 28), {});
   assert.equal(result.ok, true);
   if (!result.ok) return;
   const meal = result.value.days[0]!.meals[0]!;
@@ -44,11 +44,11 @@ test("repairs individual nutrition portions deterministically and materializes h
 });
 
 test("returns reason-coded invalidity when bounded repair cannot meet daily bands or use an unsafe candidate", () => {
-  const impossible = orchestrateWeek(profile(), candidates(100, 5), []);
+  const impossible = orchestrateWeek(profile(), candidates(100, 5), {});
   assert.equal(impossible.ok, false);
   if (!impossible.ok) assert.ok(impossible.error.violations.some((violation) => violation.code === "calories_out_of_band" || violation.code === "repair_exhausted"));
 
-  const unsafe = orchestrateWeek(profile(), candidates(450, 28, { allergens: ["peanut"] }), []);
+  const unsafe = orchestrateWeek(profile(), candidates(450, 28, { allergens: ["peanut"] }), {});
   assert.equal(unsafe.ok, false);
   if (!unsafe.ok) assert.equal(unsafe.error.code, "insufficient_candidates");
 });

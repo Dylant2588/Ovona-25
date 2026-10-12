@@ -4,6 +4,7 @@ import test from "node:test";
 import { normalizePlannerProfile } from "../../lib/orchestration/normalize-profile.ts";
 import { orchestrateWeek } from "../../lib/orchestration/schedule.ts";
 import { rankCandidates } from "../../lib/orchestration/score.ts";
+import { validateAndRepairWeek } from "../../lib/orchestration/validate.ts";
 import type { VerifiedCandidateMeal } from "../../lib/orchestration/types.ts";
 import { validRawProfile } from "./fixtures.ts";
 
@@ -30,8 +31,8 @@ const completeCandidates = (): VerifiedCandidateMeal[] =>
   );
 
 test("schedules byte-equivalent seven-day required slots with factual explanations", () => {
-  const first = orchestrateWeek(profile(), completeCandidates(), []);
-  const second = orchestrateWeek(profile(), completeCandidates(), []);
+  const first = orchestrateWeek(profile(), completeCandidates(), {});
+  const second = orchestrateWeek(profile(), completeCandidates(), {});
 
   assert.equal(first.ok, true);
   assert.deepEqual(first, second);
@@ -51,9 +52,26 @@ test("breaks equal score ties by candidate ID", () => {
   assert.deepEqual(ranked.map((entry) => entry.candidate.id), ["alpha", "zeta"]);
 });
 
+test("five-meal profiles retain two distinct snacks and reject a missing snack", () => {
+  const fiveMealProfile = normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2500, proteinTarget: 150,
+    requiredSlots: ["breakfast", "snack", "lunch", "snack", "dinner"] });
+  const candidates = [...completeCandidates(), ...Array.from({ length: 7 }, (_, day) => candidate(`extra-snack-${day}`, "snack"))];
+  const result = orchestrateWeek(fiveMealProfile, candidates);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  for (const day of result.value.days) {
+    const snacks = day.meals.filter((meal) => meal.slot === "snack");
+    assert.equal(day.meals.length, 5);
+    assert.equal(snacks.length, 2);
+    assert.notEqual(snacks[0].candidateId, snacks[1].candidateId);
+  }
+  const incomplete = { days: result.value.days.map((day, index) => index === 0 ? { ...day, meals: day.meals.filter((_, mealIndex) => mealIndex !== 1) } : day) };
+  assert.equal(validateAndRepairWeek(fiveMealProfile, incomplete).ok, false);
+});
+
 test("rejects excess identical or similar meals but permits an explicitly linked leftover", () => {
   const repeated = Array.from({ length: 7 }, (_, index) => candidate(`same-${index}`, "breakfast", { similarityKey: "same" }));
-  const noRepeat = orchestrateWeek(profile(), [...completeCandidates().filter((item) => item.slot !== "breakfast"), ...repeated], []);
+  const noRepeat = orchestrateWeek(profile(), [...completeCandidates().filter((item) => item.slot !== "breakfast"), ...repeated], {});
   assert.equal(noRepeat.ok, false);
 
   const leftovers = [
@@ -67,7 +85,7 @@ test("rejects excess identical or similar meals but permits an explicitly linked
     ...Array.from({ length: 7 }, (_, index) => candidate(`z-dinner-${index}`, "dinner")),
     ...leftovers,
   ];
-  const permitted = orchestrateWeek(profile(), practicalWeek, []);
+  const permitted = orchestrateWeek(profile(), practicalWeek, {});
   assert.equal(permitted.ok, true);
   if (permitted.ok) assert.equal(permitted.value.days[0]!.meals.some((meal) => meal.candidateId === "a-lunch-leftover"), true);
 });

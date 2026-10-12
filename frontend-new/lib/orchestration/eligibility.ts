@@ -17,7 +17,7 @@ export const isVerifiedCandidate = (candidate: unknown): candidate is VerifiedCa
   }
 
   const nutrition = candidate.nutrition;
-  if (![nutrition.calories, nutrition.protein, nutrition.carbs, nutrition.fat].every(isFiniteNonNegative) || nutrition.calories <= 0) {
+  if (![nutrition.calories, nutrition.protein, nutrition.carbs, nutrition.fat].every(isFiniteNonNegative) || !isFiniteNonNegative(nutrition.calories) || nutrition.calories <= 0) {
     return false;
   }
 

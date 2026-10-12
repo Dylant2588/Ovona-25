@@ -49,9 +49,10 @@ export const validateAndRepairWeek = (profile: PlannerProfile, schedule: WeekSch
     violations.push({ day: 0, code: "missing_slot", message: "A weekly schedule must contain exactly seven days." });
   }
   const repairedDays = schedule.days.map((day) => {
-    const bySlot = new Set(day.meals.map((meal) => meal.slot));
-    for (const slot of profile.hardConstraints.requiredSlots) {
-      if (!bySlot.has(slot)) violations.push({ day: day.day, code: "missing_slot", message: `Missing required ${slot} slot.` });
+    for (const slot of new Set(profile.hardConstraints.requiredSlots)) {
+      const requiredCount = profile.hardConstraints.requiredSlots.filter((required) => required === slot).length;
+      const actualCount = day.meals.filter((meal) => meal.slot === slot).length;
+      if (actualCount !== requiredCount) violations.push({ day: day.day, code: "missing_slot", message: `Expected ${requiredCount} ${slot} slot(s), found ${actualCount}.` });
     }
     for (const meal of day.meals) {
       if (meal.recipeServings <= 0 || meal.nutritionPortionMultiplier <= 0 || meal.householdPortionMultiplier !== profile.householdSize || meal.servings !== meal.recipeServings * meal.nutritionPortionMultiplier * meal.householdPortionMultiplier) {

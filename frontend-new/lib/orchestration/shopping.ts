@@ -12,7 +12,7 @@ export type OrchestrationShoppingList = Readonly<{
   pantryItems: readonly OrchestrationShoppingLine[];
 }>;
 
-type MutableLine = Omit<OrchestrationShoppingLine, "sourceMealIds"> & { sourceMealIds: string[] };
+type MutableLine = { -readonly [Key in keyof Omit<OrchestrationShoppingLine, "sourceMealIds">]: OrchestrationShoppingLine[Key] } & { sourceMealIds: string[] };
 
 const normalized = (value: string) => value.trim().toLowerCase().replace(/\s+/g, " ");
 const finitePositive = (value: number) => Number.isFinite(value) && value > 0;
