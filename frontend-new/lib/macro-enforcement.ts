@@ -163,6 +163,33 @@ const enforceDay = (day: DayPlan, targets: DailyTarget): DailyEnforcementResult 
     };
   }
 
+  day.meals.forEach((meal) => {
+    if (!Number.isFinite(meal.portionMultiplier) ||
+        meal.portionMultiplier < MIN_PORTION || meal.portionMultiplier > MAX_PORTION) {
+      applyMultiplier(meal, Number.isFinite(meal.portionMultiplier) ? meal.portionMultiplier : 1);
+      corrected = true;
+    }
+  });
+  const currentTotals = sumMacros(day.meals.map((meal) => meal.macros));
+  const portionsAreSafe = day.meals.every(
+    (meal) => Number.isFinite(meal.portionMultiplier) &&
+      meal.portionMultiplier >= MIN_PORTION && meal.portionMultiplier <= MAX_PORTION
+  );
+  // Preserve a feasible day rather than forcing each meal toward an equal
+  // protein share and potentially making the complete day infeasible.
+  if (portionsAreSafe && passForDay(currentTotals, targets)) {
+    day.totals = currentTotals;
+    return {
+      label: day.label,
+      passed: true,
+      corrected,
+      status: corrected ? "adjusted" : "verified",
+      before,
+      after: { ...currentTotals },
+      target: targets,
+    };
+  }
+
   for (let pass = 0; pass < 2; pass += 1) {
     const { values, total } = weightForSlots(day);
     day.meals.forEach((meal, index) => {
