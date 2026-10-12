@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import { imageForMeal } from "@/lib/meal-images";
 import type {
   MacroBreakdown,
   MealInstance,
@@ -120,7 +121,7 @@ const toMealInstance = (meal: PortionedMeal): MealInstance => {
       `protein:${meal.concept.protein_type}`,
       "generated",
     ],
-    image: "",
+    image: imageForMeal({ title: meal.concept.name, mealSlot: slot, ingredients }),
     readyInMinutes: meal.concept.prep_minutes,
     portionMultiplier: 1,
     baseMacros: macros,
@@ -353,7 +354,7 @@ export async function generateWeeklyPlanWithArtifacts(
       const date = addDays(weekStart, day.day - 1);
       const meals = day.meals.map((meal): MealInstance => ({
         instanceId: randomUUID(), baseId: meal.candidateId, mealSlot: meal.slot, title: meal.title, description: meal.explanation,
-        steps: [], recipeSteps: [], tags: ["verified", "deterministic", ...meal.score.facts], image: "", readyInMinutes: meal.prepMinutes, portionMultiplier: meal.nutritionPortionMultiplier,
+        steps: [], recipeSteps: [], tags: ["verified", "deterministic", ...meal.score.facts], image: imageForMeal({ title: meal.title, mealSlot: meal.slot, ingredients: meal.ingredients }), readyInMinutes: meal.prepMinutes, portionMultiplier: meal.nutritionPortionMultiplier,
         baseMacros: { ...meal.nutrition }, macros: {
           calories: Math.round(meal.nutrition.calories * meal.nutritionPortionMultiplier), protein: Math.round(meal.nutrition.protein * meal.nutritionPortionMultiplier),
           carbs: Math.round(meal.nutrition.carbs * meal.nutritionPortionMultiplier), fat: Math.round(meal.nutrition.fat * meal.nutritionPortionMultiplier),

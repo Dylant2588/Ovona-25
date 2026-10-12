@@ -1,4 +1,6 @@
 import { priceBasket } from "@/lib/tesco-prices";
+import { VARIED_MEALS } from "./varied-meal-catalogue";
+import { imageForMeal } from "./meal-images";
 
 export type MealSlot = "breakfast" | "lunch" | "dinner" | "snack";
 export type ComplexityKey = "simple" | "normal" | "adventurous";
@@ -138,6 +140,7 @@ export type IngredientLine = {
 };
 
 const MEAL_LIBRARY: BaseMeal[] = [
+  ...VARIED_MEALS,
   {
     id: "blueberry-protein-oats",
     name: "Blueberry Protein Oats",
@@ -655,6 +658,9 @@ const DEFAULT_MACROS_BY_CATEGORY: Record<string, MacroBreakdown> = {
 };
 
 const NUTRITION_DB: NutritionEntry[] = [
+  { aliases: ["egg whites"], unit: "g", servingSize: 100, macros: { calories: 52, protein: 10.9, carbs: 0.7, fat: 0.2 } },
+  { aliases: ["banana"], unit: "g", servingSize: 100, macros: { calories: 89, protein: 1.1, carbs: 22.8, fat: 0.3 } },
+  { aliases: ["wholewheat pasta"], unit: "g", servingSize: 100, macros: { calories: 350, protein: 13, carbs: 67, fat: 2.5 } },
   { aliases: ["rolled oats", "oats"], unit: "g", servingSize: 100, macros: { calories: 389, protein: 16.9, carbs: 66.3, fat: 6.9 } },
   { aliases: ["chia seeds", "chia"], unit: "g", servingSize: 100, macros: { calories: 486, protein: 16.5, carbs: 42.1, fat: 30.7 } },
   { aliases: ["almond milk"], unit: "ml", servingSize: 100, macros: { calories: 13, protein: 0.4, carbs: 0.3, fat: 1.1 } },
@@ -2190,7 +2196,7 @@ const createMealInstanceFromBase = (
     steps: recipeSteps,
     recipeSteps,
     tags: base.tastes,
-    image: base.image,
+    image: imageForMeal({ title: base.name, mealSlot: slot, ingredients: baseIngredients, image: base.image }),
     readyInMinutes: base.readyInMinutes,
     portionMultiplier: multiplier,
     baseMacros: { ...computedBaseMacros },
@@ -2645,7 +2651,6 @@ export const swapMealInPlan = (
   });
   const usedBaseIds = new Set(
     day.meals
-      .filter((_, index) => index !== mealIndex)
       .map((meal) => meal.baseId)
   );
   day.meals[mealIndex] = createMealInstance(slot, prefs, macroTargets, {

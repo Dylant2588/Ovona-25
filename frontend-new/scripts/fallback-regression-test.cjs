@@ -17,9 +17,20 @@ const output = ts.transpileModule(source, {
   },
 }).outputText;
 const moduleUnderTest = { exports: {} };
+const loadLocalModule = (id) => {
+  if (id === "./varied-meal-catalogue" || id === "./meal-images") {
+    const local = { exports: {} };
+    const code = ts.transpileModule(fs.readFileSync(path.join(__dirname, "..", "lib", `${id.slice(2)}.ts`), "utf8"), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2017 },
+    }).outputText;
+    new Function("exports", "require", "module", code)(local.exports, require, local);
+    return local.exports;
+  }
+  return require(id);
+};
 new Function("exports", "require", "module", output)(
   moduleUnderTest.exports,
-  require,
+  loadLocalModule,
   moduleUnderTest
 );
 
@@ -181,5 +192,58 @@ if (
 ) {
   throw new Error("Production preference fallback must preserve every hard allergy exclusion.");
 }
+
+const affectedProductionTargets = moduleUnderTest.exports.resolveMacroTargets(affectedProductionPreferences);
+enforcementModule.exports.enforceMacros(affectedProductionPlan, affectedProductionTargets);
+const safeSnapshot = JSON.stringify(affectedProductionPlan.days.map(day => day.meals));
+if (!enforcementModule.exports.enforceMacros(affectedProductionPlan, affectedProductionTargets).passed ||
+    JSON.stringify(affectedProductionPlan.days.map(day => day.meals)) !== safeSnapshot) {
+  throw new Error("Enforcement must preserve already passing safe meal portions.");
+}
+const staleTotalsPlan = JSON.parse(JSON.stringify(affectedProductionPlan));
+staleTotalsPlan.days.forEach(day => day.meals.forEach(meal => {
+  meal.baseMacros = { calories: 100, protein: 5, carbs: 10, fat: 2 };
+  meal.macros = { ...meal.baseMacros };
+}));
+if (enforcementModule.exports.enforceMacros(staleTotalsPlan, affectedProductionTargets).passed) {
+  throw new Error("Cached passing totals must not bypass checks of actual meal nutrition.");
+}
+const unsafePortionPlan = JSON.parse(JSON.stringify(affectedProductionPlan));
+unsafePortionPlan.days[0].meals[0].portionMultiplier = 2;
+const unsafePortionResult = enforcementModule.exports.enforceMacros(unsafePortionPlan, affectedProductionTargets);
+if (
+    (unsafePortionResult.passed && unsafePortionPlan.days[0].meals[0].portionMultiplier > 1.5)) {
+  throw new Error("Passing totals must not bypass safe portion bounds.");
+}
+
+const originalRandom = Math.random;
+try {
+  for (const seed of [0, 0.25, 0.5, 0.75, 0.999]) {
+    Math.random = () => seed;
+    const plan = moduleUnderTest.exports.generateFallbackMealPlan(affectedProductionPreferences);
+    if (!enforcementModule.exports.enforceMacros(plan, affectedProductionTargets).passed) throw new Error('Restricted variety must retain target fit.');
+    const swapped = moduleUnderTest.exports.swapMealInPlan(plan, 0, 0, affectedProductionPreferences);
+    if (swapped.days[0].meals[0].baseId === plan.days[0].meals[0].baseId) throw new Error("Swapping must exclude the current recipe when viable alternatives exist.");
+    if (!enforcementModule.exports.enforceMacros(swapped, affectedProductionTargets).passed) throw new Error("Swapping must retain target fit.");
+    if (swapped.days.flatMap(day => day.meals).some(meal => forbiddenProductionTerms.test(meal.ingredients.map(item => item.name).join(" ")))) throw new Error("Swapping must retain hard allergy exclusions.");
+    const distinctRecipes = (slot) => new Set(plan.days.flatMap(day => day.meals.filter(meal => meal.mealSlot === slot).map(meal =>
+      JSON.stringify([meal.baseIngredients.map(item => item.name).sort(), meal.recipeSteps])
+    ))).size;
+    if (distinctRecipes("breakfast") < 3 || distinctRecipes("snack") < 3 ||
+        new Set(plan.days.flatMap(day => day.meals.filter(meal => ["lunch", "dinner"].includes(meal.mealSlot)).map(meal =>
+          JSON.stringify([meal.baseIngredients.map(item => item.name).sort(), meal.recipeSteps])
+        ))).size < 4) {
+      throw new Error("Restricted weeks need materially different breakfast, snack and main recipes.");
+    }
+
+    for (const day of plan.days) {
+      const mains = day.meals.filter(meal => ['lunch', 'dinner'].includes(meal.mealSlot));
+      if (mains[0].baseId === mains[1].baseId) throw new Error('Daily mains must differ.');
+      const snacks = day.meals.filter(meal => meal.mealSlot === 'snack');
+      if (snacks.length !== 2 || snacks[0].baseId === snacks[1].baseId) throw new Error('Daily snacks must differ.');
+      if (day.meals.some(meal => !meal.image.startsWith('/images/meals/'))) throw new Error('Generated artwork must persist.');
+    }
+  }
+} finally { Math.random = originalRandom; }
 
 console.log("fallback regression probe: PASS");

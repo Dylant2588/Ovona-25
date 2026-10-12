@@ -5,7 +5,7 @@ milestone_name: milestone
 status: executing
 stopped_at: Phase 07 context gathered
 last_updated: "2026-09-10T09:56:29.177Z"
-last_activity: 2026-10-12 -- Completed quick task 261012-pdp: planner reliability and compact meals
+last_activity: 2026-10-12 -- Completed quick task 261012-pus: illustrated meals and recipe variety
 progress:
   total_phases: 7
   completed_phases: 1
@@ -84,6 +84,8 @@ None yet.
 | 261012-o3c | Polish planner hierarchy and meal presentation for a premium feel | 2026-10-12 | af09634 | [261012-o3c-polish-planner-with-premium-hierarchy-an](./quick/261012-o3c-polish-planner-with-premium-hierarchy-an/) |
 
 | 261012-pdp | Fix stale-plan diagnosis, snack recipes and compact meal rows | 2026-10-12 | fc064c0 | [261012-pdp-fix-planner-target-reliability-and-repet](./quick/261012-pdp-fix-planner-target-reliability-and-repet/) |
+
+| 261012-pus | Illustrated meal thumbnails and constrained recipe variety | 2026-10-12 | acd6de0 | [261012-pus-add-meal-placeholder-images-and-improve-](./quick/261012-pus-add-meal-placeholder-images-and-improve-/) |
 
 ## Session Continuity
 
