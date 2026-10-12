@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SwapHorizRoundedIcon from "@mui/icons-material/SwapHorizRounded";
 import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
-import AutorenewRoundedIcon from "@mui/icons-material/AutorenewRounded";
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import RestaurantMenuRoundedIcon from "@mui/icons-material/RestaurantMenuRounded";
 import TimelineRoundedIcon from "@mui/icons-material/TimelineRounded";
@@ -369,19 +368,7 @@ const macroStatusMeta = (enforcement: EnforcementInfo) => {
   };
 };
 
-const dayEnforcementMeta = (
-  day: EnforcementInfo["days"][number] | null
-) => {
-  if (!day) return null;
-  const status = day.status ?? (!day.passed ? "partial" : day.corrected ? "adjusted" : "verified");
-  if (status === "partial") {
-    return { color: "#ef4444", label: "Needs different meals" };
-  }
-  if (status === "adjusted") {
-    return { color: "#f59e0b", label: "Adjusted" };
-  }
-  return { color: "#22c55e", label: "On target" };
-};
+
 
 const MacroTooltip = ({ active, payload, label }: TooltipContentProps<ValueType, NameType>) => {
   if (!active || !payload?.length) return null;
@@ -1823,10 +1810,10 @@ function MealsPageContent() {
     () => displayDays.find((day) => day.id === expandedDayId) ?? displayDays[0] ?? null,
     [displayDays, expandedDayId]
   );
-  const selectedDayIsToday = Boolean(
-    selectedDay && toDateOnly(selectedDay.date) === toDateOnly(new Date().toISOString())
-  );
-  const nextMeal = selectedDay?.meals.find((meal) => mealLogs[meal.instanceId] !== "eaten") ?? null;
+  const localToday = new Date();
+  const localTodayKey = `${localToday.getFullYear()}-${String(localToday.getMonth() + 1).padStart(2, "0")}-${String(localToday.getDate()).padStart(2, "0")}`;
+  const selectedDayIsToday = Boolean(selectedDay && toDateOnly(selectedDay.date) === localTodayKey);
+  const failedDayCount = plan ? enforcement?.days.filter((day) => !day.passed || day.status === "partial").length ?? 0 : 0;
 
   const chartData = useMemo(() => {
     return displayDays.map((day) => ({
@@ -2102,7 +2089,7 @@ function MealsPageContent() {
   }
 
   return (
-    <Stack spacing={{ xs: 3, md: 4 }} sx={{ minWidth: 0, "& .MuiButton-root": { minHeight: 44 }, "& .MuiButton-root:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 3 } }}>
+    <Stack spacing={{ xs: 2, md: 2.5 }} sx={{ minWidth: 0, "& .MuiButton-root": { minHeight: 44 }, "& .MuiButton-root:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 3 } }}>
       <Stack
         direction={{ xs: "column", md: "row" }}
         justifyContent="space-between"
@@ -2113,13 +2100,13 @@ function MealsPageContent() {
           <Typography variant="overline" color="secondary">
             Your plan
           </Typography>
-          <Typography variant="h3" component="h1" fontWeight={700} gutterBottom sx={{ fontSize: { xs: "2rem", md: "2.75rem" }, letterSpacing: "-0.04em", lineHeight: 1.15 }}>
-            Your week, taken care of
+          <Typography variant="h3" component="h1" fontWeight={700} gutterBottom sx={{ fontSize: { xs: "1.7rem", md: "2rem" }, letterSpacing: "-0.04em", lineHeight: 1.15 }}>
+            Your meal plan
           </Typography>
-          <Typography color="text.secondary">
+          <Typography variant="body2" color="text.secondary">
             Meals planned around your goals and the time you have.
           </Typography>
-          {preferenceTastes.length > 0 && (
+          {!plan && preferenceTastes.length > 0 && (
             <Stack direction="row" spacing={1} mt={2} flexWrap="wrap" useFlexGap>
               {preferenceTastes.slice(0, 4).map((taste) => (
                 <Chip
@@ -2133,14 +2120,13 @@ function MealsPageContent() {
           )}
           {(enforcement || basketPricing) && (
             <Stack direction="row" spacing={1} mt={1.5} flexWrap="wrap" useFlexGap>
-              {enforcement && (
+              {plan && enforcement?.passed && (
                 <Tooltip title={enforcement.summary} arrow>
                   <Chip
                     size="small"
                     variant="outlined"
-                    color={macroStatusMeta(enforcement).color}
-                    icon={macroStatusMeta(enforcement).icon}
-                    label={macroStatusMeta(enforcement).label}
+                    icon={<CheckCircleOutlineRoundedIcon fontSize="small" />}
+                    label="Within target range"
                   />
                 </Tooltip>
               )}
@@ -2155,7 +2141,7 @@ function MealsPageContent() {
           )}
         </Box>
 
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap sx={{ "& .MuiButton-root": { fontSize: { xs: "0.75rem", sm: "0.875rem" }, px: { xs: 1, sm: 2 }, textTransform: "none" } }}>
           <Button
             variant="text"
             color="secondary"
@@ -2277,7 +2263,7 @@ function MealsPageContent() {
               gap: 2,
               gridTemplateColumns: {
                 xs: "1fr",
-                md: "repeat(5, minmax(0, 1fr))",
+                md: "1fr",
               },
             }}
           >
@@ -2288,7 +2274,7 @@ function MealsPageContent() {
                 sx={{
                   borderColor: "rgba(255,255,255,0.08)",
                   bgcolor: "rgba(10,14,26,0.84)",
-                  minHeight: 220,
+                  minHeight: 100,
                 }}
               >
                 <CardContent>
@@ -2320,7 +2306,7 @@ function MealsPageContent() {
         <Card variant="outlined" sx={{ maxWidth: 620, mx: "auto", mt: 2 }}>
           <CardContent>
             <Stack spacing={2}>
-              <Typography variant="h5">Generate your first meal plan</Typography>
+              <Typography variant="h5">{error?.includes("no longer meets") ? "Your plan needs a refresh" : "Generate your first meal plan"}</Typography>
               <Typography color="text.secondary">
                 Create a full week in one click, then swap or regenerate anything you want.
               </Typography>
@@ -2347,18 +2333,15 @@ function MealsPageContent() {
               overflow: "hidden",
             }}
           >
-            <CardContent sx={{ p: { xs: 2.5, md: 3 }, pb: "24px !important", minWidth: 0 }}>
-              <Stack spacing={2}>
+            <CardContent sx={{ p: 2, pb: "8px !important", minWidth: 0 }}>
+              <Stack spacing={1}>
                 <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={1}>
                   <Box>
                     <Typography variant="overline" color="secondary">
-                      {selectedDayIsToday ? "Today" : "Your next planned day"}
+                      {selectedDayIsToday ? "Today" : "Planned day"}
                     </Typography>
                     <Typography variant="h5" fontWeight={700}>
                       {selectedDay?.label ?? "Your meals"}
-                    </Typography>
-                    <Typography color="text.secondary" variant="body2">
-                      Your meals for the day.
                     </Typography>
                   </Box>
                   <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
@@ -2373,7 +2356,6 @@ function MealsPageContent() {
                   </Stack>
                 </Stack>
                 <Box>
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>This week</Typography>
                   <Stack direction="row" spacing={1} sx={{ overflowX: "auto", maxWidth: "100%", pb: 1 }}>
                     {displayDays.map((day) => (
                       <Button
@@ -2383,30 +2365,59 @@ function MealsPageContent() {
                         color={expandedDayId === day.id ? "secondary" : "primary"}
                         onClick={() => setExpandedDayId(day.id)}
                         aria-pressed={expandedDayId === day.id}
-                        sx={{ flexShrink: 0, minHeight: 40 }}
+                        sx={{ flexShrink: 0, minHeight: 44, textTransform: "none", px: 1.5 }}
                       >
-                        {day.label} · {formatDate(day.date)}
+                        {day.label.slice(0, 3)} · {formatDate(day.date)}
                       </Button>
                     ))}
                   </Stack>
                 </Box>
-                {nextMeal && (
-                  <Box
-                    sx={{
-                      borderLeft: "3px solid",
-                      borderColor: "secondary.main",
-                      pl: 1.5,
-                    }}
+
+              </Stack>
+            </CardContent>
+          </Card>
+          <Stack spacing={2}>
+            {displayDays.filter((day) => day.id === expandedDayId).map((day) => {
+              const dayIndex = displayDays.findIndex((candidate) => candidate.id === day.id);
+              const dayEnforcement = enforcement?.days?.[dayIndex] ?? null;
+              const dayFailed = dayEnforcement ? !dayEnforcement.passed || dayEnforcement.status === "partial" : calorieStatusMeta(day.totals.calories, macroTargets?.calories).label === "Off target";
+              const expandedMealForDay =
+                day.meals.find((meal) => meal.instanceId === expandedMealId) ?? null;
+              const expandedRecipeSteps = expandedMealForDay
+                ? resolveRecipeSteps(expandedMealForDay)
+                : [];
+              const expandedProteinMeta = expandedMealForDay
+                ? proteinTypeMeta(expandedMealForDay.proteinType)
+                : null;
+              return (
+              <Box key={day.id} sx={{ minWidth: 0 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                  <Typography variant="subtitle2" color="text.secondary">{day.meals.length} meals planned</Typography>
+                  {!dayFailed && (<Button size="small" color="inherit" onClick={() => void handleRegenerateDay(dayIndex)} disabled={regeneratingDayIndex !== null || planLoading}>{regeneratingDayIndex === dayIndex ? "Regenerating..." : "Change day"}</Button>)}
+                </Stack>
+                {(dayFailed || failedDayCount > 0) && (
+                  <Alert
+                    severity="warning"
+                    sx={{ mb: 2, "& .MuiAlert-action": { alignItems: "center" } }}
+                    action={
+                      <Button color="inherit" size="small" disabled={regeneratingDayIndex !== null || planLoading}
+                        onClick={() => {
+                          if (dayFailed) void handleRegenerateDay(dayIndex);
+                          else {
+                            const failedIndex = enforcement?.days.findIndex((entry) => !entry.passed || entry.status === "partial") ?? -1;
+                            if (displayDays[failedIndex]) setExpandedDayId(displayDays[failedIndex].id);
+                          }
+                        }}
+                      >
+                        {regeneratingDayIndex === dayIndex ? "Regenerating..." : dayFailed ? "Try new meals" : "Review day"}
+                      </Button>
+                    }
                   >
-                    <Typography variant="caption" color="text.secondary">
-                      Next up
-                    </Typography>
-                    <Typography fontWeight={700}>
-                      {nextMeal.title} · {nextMeal.readyInMinutes} min
-                    </Typography>
-                  </Box>
+                    {dayFailed ? "This day is outside your nutrition targets. Try a different meal mix." : "Other days in this plan are outside your nutrition targets."}
+                    {failedDayCount > 1 ? ` ${failedDayCount} days this week need a refresh.` : ""}
+                  </Alert>
                 )}
-                <Accordion disableGutters elevation={0} sx={{ bgcolor: "transparent", "&:before": { display: "none" } }}>
+                      <Accordion disableGutters elevation={0} sx={{ bgcolor: "transparent", "&:before": { display: "none" } }}>
                   <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: 0 }}>
                     <Typography variant="body2" color="text.secondary">Log something else you ate</Typography>
                   </AccordionSummary>
@@ -2438,142 +2449,7 @@ function MealsPageContent() {
                 </Typography>
                   </AccordionDetails>
                 </Accordion>
-              </Stack>
-            </CardContent>
-          </Card>
-          <Stack spacing={2}>
-            {displayDays.filter((day) => day.id === expandedDayId).map((day) => {
-              const dayIndex = displayDays.findIndex((candidate) => candidate.id === day.id);
-              const calorieStatus = calorieStatusMeta(
-                day.totals.calories,
-                macroTargets?.calories
-              );
-              const dayEnforcement = enforcement?.days?.[dayIndex] ?? null;
-              const enforcedStatus = dayEnforcementMeta(dayEnforcement);
-              const dayEnforcementStatus = dayEnforcement
-                ? dayEnforcement.status ??
-                  (!dayEnforcement.passed
-                    ? "partial"
-                    : dayEnforcement.corrected
-                    ? "adjusted"
-                    : "verified")
-                : null;
-              const statusColor = enforcedStatus?.color ?? calorieStatus.color;
-              const statusLabel = enforcedStatus?.label ?? calorieStatus.label;
-              const expandedMealForDay =
-                day.meals.find((meal) => meal.instanceId === expandedMealId) ?? null;
-              const expandedRecipeSteps = expandedMealForDay
-                ? resolveRecipeSteps(expandedMealForDay)
-                : [];
-              const expandedProteinMeta = expandedMealForDay
-                ? proteinTypeMeta(expandedMealForDay.proteinType)
-                : null;
-              return (
-              <Accordion
-                key={day.id}
-                disableGutters
-                expanded={expandedDayId === day.id}
-                onChange={(_, expanded) => {
-                  if (expanded) setExpandedDayId(day.id);
-                }}
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  bgcolor: "rgba(10,14,26,0.85)",
-                  "&:before": { display: "none" },
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={<ExpandMoreRoundedIcon />}
-                  sx={{
-                    px: { xs: 2, md: 3 },
-                    py: 1.5,
-                    "& .MuiAccordionSummary-content": {
-                      margin: 0,
-                    },
-                  }}
-                >
-                  <Stack
-                    direction={{ xs: "column", md: "row" }}
-                    spacing={1}
-                    alignItems={{ xs: "flex-start", md: "center" }}
-                    justifyContent="space-between"
-                    width="100%"
-                  >
-                    <Stack spacing={0.75}>
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {day.label} | {formatDate(day.date)}
-                      </Typography>
-                      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-                        <Box
-                          sx={{
-                            width: 10,
-                            height: 10,
-                            borderRadius: "50%",
-                            bgcolor: statusColor,
-                            boxShadow: `0 0 0 3px ${statusColor}22`,
-                          }}
-                        />
-                        <Typography variant="body2" color="text.secondary">
-                          {`${day.totals.calories.toLocaleString()} kcal • ${day.totals.protein.toLocaleString()}g protein`}
-                        </Typography>
-                        {statusLabel !== "No target" && (
-                          <Typography variant="caption" color="text.secondary">
-                            {statusLabel}
-                          </Typography>
-                        )}
-                        {dayEnforcementStatus === "adjusted" && (
-                          <Tooltip
-                            title="Portions adjusted to meet macro targets."
-                            arrow
-                          >
-                            <Chip
-                              size="small"
-                              variant="outlined"
-                              color="warning"
-                              label="Adjusted"
-                            />
-                          </Tooltip>
-                        )}
-                        {dayEnforcementStatus === "partial" && (
-                          <Tooltip
-                            title="Current meal mix cannot meet targets within safe portion limits."
-                            arrow
-                          >
-                            <Chip
-                              size="small"
-                              variant="outlined"
-                              color="error"
-                              label="Needs different meals"
-                            />
-                          </Tooltip>
-                        )}
-                      </Stack>
-                    </Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="secondary"
-                        startIcon={
-                          regeneratingDayIndex === dayIndex ? (
-                            <CircularProgress size={14} color="inherit" />
-                          ) : (
-                            <AutorenewRoundedIcon fontSize="small" />
-                          )
-                        }
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          void handleRegenerateDay(dayIndex);
-                        }}
-                        disabled={regeneratingDayIndex !== null || planLoading}
-                      >
-                        {regeneratingDayIndex === dayIndex ? "Regenerating..." : "Regenerate day"}
-                      </Button>
-                    </Stack>
-                  </Stack>
-                </AccordionSummary>
-                <AccordionDetails
+          <AccordionDetails
                   sx={{
                     px: { xs: 2, md: 3 },
                     pb: 3,
@@ -2608,7 +2484,7 @@ function MealsPageContent() {
                               ? "rgba(125, 211, 252, 0.45)"
                               : "rgba(255,255,255,0.08)",
                             bgcolor: "rgba(5,7,15,0.88)",
-                            borderRadius: 2.5,
+                            borderRadius: "16px",
                             boxShadow: expanded
                               ? "0 0 0 1px rgba(125,211,252,0.22)"
                               : "none",
@@ -2720,7 +2596,14 @@ function MealsPageContent() {
                       );
                     })}
                   </Box>
-                  <Collapse id={`recipe-${day.id}`} in={Boolean(expandedMealForDay)} timeout="auto" unmountOnExit>
+                  <Collapse
+                    id={`recipe-${day.id}`}
+                    in={Boolean(expandedMealForDay)}
+                    timeout="auto"
+                    unmountOnExit
+                    onEntered={(element) => element.scrollIntoView({ behavior: "smooth", block: "start" })}
+                    sx={{ scrollMarginTop: 80 }}
+                  >
                     {expandedMealForDay && expandedProteinMeta && (
                       <Box
                         sx={{
@@ -2850,7 +2733,7 @@ function MealsPageContent() {
                     )}
                   </Collapse>
                 </AccordionDetails>
-              </Accordion>
+              </Box>
               );
             })}
           </Stack>
