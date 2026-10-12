@@ -2110,7 +2110,7 @@ function MealsPageContent() {
   }
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={{ xs: 3, md: 4 }} sx={{ minWidth: 0, "& .MuiButton-root": { minHeight: 44 }, "& .MuiButton-root:focus-visible": { outline: "2px solid", outlineColor: "primary.main", outlineOffset: 3 } }}>
       <Stack
         direction={{ xs: "column", md: "row" }}
         justifyContent="space-between"
@@ -2119,13 +2119,13 @@ function MealsPageContent() {
       >
         <Box>
           <Typography variant="overline" color="secondary">
-            Meal studio
+            Your plan
           </Typography>
-          <Typography variant="h3" component="h1" fontWeight={700} gutterBottom>
-            Your weekly meals
+          <Typography variant="h3" component="h1" fontWeight={700} gutterBottom sx={{ fontSize: { xs: "2rem", md: "2.75rem" }, letterSpacing: "-0.04em", lineHeight: 1.15 }}>
+            Your week, taken care of
           </Typography>
           <Typography color="text.secondary">
-            Fresh plan generated from your tastes, goals, and cooking bandwidth.
+            Meals planned around your goals and the time you have.
           </Typography>
           {preferenceTastes.length > 0 && (
             <Stack direction="row" spacing={1} mt={2} flexWrap="wrap" useFlexGap>
@@ -2173,7 +2173,7 @@ function MealsPageContent() {
               setPreferencesPanelOpen(true);
             }}
           >
-            Refine tastes
+            Preferences
           </Button>
           <Button
             variant="outlined"
@@ -2191,81 +2191,15 @@ function MealsPageContent() {
                 <RefreshRoundedIcon />
               )
             }
-            variant="contained"
+            variant="text"
             color="secondary"
             onClick={handleRegenerate}
             disabled={regeneratingWeek || planLoading}
           >
-            {regeneratingWeek ? "Regenerating week..." : "Regenerate week"}
+            {regeneratingWeek ? "Regenerating week..." : "Make a new plan"}
           </Button>
         </Stack>
       </Stack>
-
-      {historyInsights && (
-        <Card
-          variant="outlined"
-          sx={{
-            borderColor: "rgba(255,255,255,0.08)",
-            bgcolor: "rgba(10,14,26,0.7)",
-          }}
-        >
-          <CardContent>
-            <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
-              <Box flex={1}>
-                <Typography variant="overline" color="secondary">
-                  Last {historyInsights.trackedWeeks} weeks
-                </Typography>
-                <Typography variant="h5" fontWeight={600}>
-                  Ovona is personalizing from your history
-                </Typography>
-                <Typography color="text.secondary">
-                  {historyInsights.totalMeals} meals logged - this week looks to balance
-                  your proteins and recover skipped meals.
-                </Typography>
-              </Box>
-              <Stack
-                direction="row"
-                spacing={2}
-                flexWrap="wrap"
-                useFlexGap
-                alignItems="center"
-              >
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Top proteins last week
-                  </Typography>
-                  <Stack direction="row" spacing={1} mt={1} flexWrap="wrap" useFlexGap>
-                    {historyInsights.topProteins.map(([protein, count]) => (
-                      <Chip key={protein} label={`${protein} (${count})`} size="small" />
-                    ))}
-                  </Stack>
-                </Box>
-                {historyInsights.leastServed && (
-                  <Box>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      Needs love
-                    </Typography>
-                    <Chip
-                      label={`${historyInsights.leastServed[0]} (${historyInsights.leastServed[1]})`}
-                      size="small"
-                      color="warning"
-                      sx={{ mt: 1 }}
-                    />
-                  </Box>
-                )}
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Meals skipped last week
-                  </Typography>
-                  <Typography variant="h5" fontWeight={600}>
-                    {historyInsights.recentWeek.skippedMeals}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Stack>
-          </CardContent>
-        </Card>
-      )}
 
       {error && <Alert severity="error">{error}</Alert>}
       {preferencesNotice && (
@@ -2411,12 +2345,12 @@ function MealsPageContent() {
           <Card
             variant="outlined"
             sx={{
-              borderColor: "rgba(125,211,252,0.28)",
+              borderColor: "rgba(255,255,255,0.08)",
               bgcolor: "rgba(10,14,26,0.86)",
               overflow: "hidden",
             }}
           >
-            <CardContent sx={{ pb: "16px !important" }}>
+            <CardContent sx={{ p: { xs: 2.5, md: 3 }, pb: "24px !important", minWidth: 0 }}>
               <Stack spacing={2}>
                 <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={1}>
                   <Box>
@@ -2427,7 +2361,7 @@ function MealsPageContent() {
                       {selectedDay?.label ?? "Your meals"}
                     </Typography>
                     <Typography color="text.secondary" variant="body2">
-                      Start with the next meal, then make any change you need.
+                      Your meals for the day.
                     </Typography>
                   </Box>
                   <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
@@ -2435,14 +2369,15 @@ function MealsPageContent() {
                       <Chip
                         color="secondary"
                         variant="outlined"
-                        label={`${selectedDay.totals.calories.toLocaleString()} kcal • ${selectedDay.totals.protein.toLocaleString()}g protein`}
+                        sx={{ maxWidth: "100%", height: "auto", "& .MuiChip-label": { whiteSpace: "normal", py: 1 } }}
+                        label={`Planned: ${selectedDay.totals.calories.toLocaleString()}${macroTargets?.calories ? ` / ${macroTargets.calories.toLocaleString()}` : ""} kcal · ${selectedDay.totals.protein.toLocaleString()}${macroTargets?.protein ? ` / ${macroTargets.protein.toLocaleString()}` : ""}g protein`}
                       />
                     )}
                   </Stack>
                 </Stack>
                 <Box>
                   <Typography variant="subtitle2" sx={{ mb: 1 }}>This week</Typography>
-                  <Stack direction="row" spacing={1} sx={{ overflowX: "auto", pb: 0.5 }}>
+                  <Stack direction="row" spacing={1} sx={{ overflowX: "auto", maxWidth: "100%", pb: 1 }}>
                     {displayDays.map((day) => (
                       <Button
                         key={day.id}
@@ -2474,6 +2409,11 @@ function MealsPageContent() {
                     </Typography>
                   </Box>
                 )}
+                <Accordion disableGutters elevation={0} sx={{ bgcolor: "transparent", "&:before": { display: "none" } }}>
+                  <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: 0 }}>
+                    <Typography variant="body2" color="text.secondary">Log something else you ate</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ px: 0 }}>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "stretch", sm: "center" }}>
                   <TextField
                     size="small"
@@ -2499,371 +2439,11 @@ function MealsPageContent() {
                 <Typography variant="caption" color="text.secondary">
                   A quick note helps future suggestions; your current plan stays as written.
                 </Typography>
+                  </AccordionDetails>
+                </Accordion>
               </Stack>
             </CardContent>
           </Card>
-          <Stack
-            spacing={3}
-            direction={{ xs: "column", md: "row" }}
-            alignItems="stretch"
-          >
-            <Card
-              variant="outlined"
-              sx={{
-                width: { xs: "100%", md: 320 },
-                flexShrink: 0,
-                bgcolor: "rgba(12,16,32,0.85)",
-                backdropFilter: "blur(18px)",
-              }}
-            >
-              <CardHeader
-                avatar={<RestaurantMenuRoundedIcon color="secondary" />}
-                title="Weekly totals"
-                subheader={weekRange}
-              />
-              <CardContent>
-                <Stack spacing={2}>
-                  <Stack direction="row" spacing={1}>
-                    <Chip
-                      label={goalLabels[preferences.goal ?? "maintain"] ?? "Balanced"}
-                      size="small"
-                    />
-                    {preferences.mealComplexity && (
-                      <Chip
-                        label={complexityLabels[preferences.mealComplexity]}
-                        size="small"
-                      />
-                    )}
-                  </Stack>
-                  {enforcement && (
-                    <Tooltip title={enforcement.summary} arrow>
-                      <Chip
-                        size="small"
-                        variant="outlined"
-                        color={macroStatusMeta(enforcement).color}
-                        icon={macroStatusMeta(enforcement).icon}
-                        label={macroStatusMeta(enforcement).label}
-                        sx={{ alignSelf: "flex-start" }}
-                      />
-                    </Tooltip>
-                  )}
-                  <Grid container spacing={2}>
-                    {macroDisplay.map((macro) => {
-                      const macroKey = macro.key as keyof MacroTargets;
-                      const weeklyTarget = weeklyMacroTargets?.[macroKey] ?? null;
-                      const dailyTarget = macroTargets?.[macroKey] ?? null;
-                      const total = workweekTotals[macro.key];
-                      const average = workweekAverages[macro.key];
-                      const unitLabel = macro.key === "calories" ? "kcal" : macro.unit;
-                      return (
-                        <Grid size={6} key={macro.key}>
-                          <Box
-                            sx={{
-                              borderRadius: 2,
-                              p: 2,
-                              border: "1px solid rgba(255,255,255,0.08)",
-                            }}
-                          >
-                            <Typography variant="subtitle2" color="text.secondary">
-                              {macro.label}
-                            </Typography>
-                            <Typography variant="h5" sx={{ mb: 0.25 }}>
-                              {total.toLocaleString()} {unitLabel}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {`Weekly: ${total.toLocaleString()} ${unitLabel} (avg ${average.toLocaleString()}/day)`}
-                            </Typography>
-                            {typeof dailyTarget === "number" && (
-                              <Typography variant="body2" color="text.secondary">
-                                {`Target ${
-                                  typeof weeklyTarget === "number"
-                                    ? formatNumber(weeklyTarget)
-                                    : "-"
-                                } ${unitLabel}/wk (${formatNumber(dailyTarget)} ${
-                                  unitLabel
-                                }/day)`}
-                              </Typography>
-                            )}
-                          </Box>
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
-                </Stack>
-              </CardContent>
-            </Card>
-
-            <Card
-              variant="outlined"
-              sx={{
-                flex: 1,
-                bgcolor: "rgba(15,19,40,0.9)",
-                backdropFilter: "blur(18px)",
-                minHeight: { xs: 360, md: 520 },
-              }}
-            >
-              <CardHeader
-                avatar={<TimelineRoundedIcon color="primary" />}
-                title="Macro overview"
-                subheader="Per day totals"
-              />
-              <CardContent
-                sx={{
-                  height: { xs: 320, sm: 360, md: 520 },
-                  pt: 3,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                }}
-              >
-                {hasMacroTargets && (
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    {macroDisplay.map((macro) => {
-                      const value = macroTargets?.[macro.key as keyof MacroTargets];
-                      if (typeof value !== "number") return null;
-                      return (
-                        <Chip
-                          key={macro.key}
-                          label={`${macro.label}: ${value.toLocaleString()} ${
-                            macro.unit
-                          }/day`}
-                          variant="outlined"
-                          size="small"
-                          sx={{ borderColor: "rgba(255,255,255,0.2)" }}
-                        />
-                      );
-                    })}
-                  </Stack>
-                )}
-                <Box sx={{ flex: 1 }}>
-                  {canRenderMacroChart ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData} margin={{ top: 12, right: 18, left: 0, bottom: 8 }}>
-                        <XAxis dataKey="label" stroke="#94a3b8" />
-                        <YAxis stroke="#94a3b8" unit=" kcal" />
-                        <RechartsTooltip content={MacroTooltip} />
-                        {typeof macroTargets?.calories === "number" && (
-                          <ReferenceLine
-                            y={macroTargets.calories}
-                            stroke={chartColors.calories}
-                            strokeDasharray="4 4"
-                            label={{ value: "Cal target", position: "insideTopRight", fill: chartColors.calories }}
-                          />
-                        )}
-                        <Line
-                          type="monotone"
-                          dataKey="calories"
-                          name="Calories"
-                          stroke={chartColors.calories}
-                          strokeWidth={3}
-                          dot={{ r: 5 }}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <Stack
-                      alignItems="center"
-                      justifyContent="center"
-                      sx={{ height: "100%", color: "text.secondary" }}
-                    >
-                      <Typography variant="body2">
-                        Macro chart will appear once your meal data is loaded.
-                      </Typography>
-                    </Stack>
-                  )}
-                </Box>
-                {hasMacroTargets && (
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    {macroDisplay
-                      .filter((macro) => macro.key !== "calories")
-                      .map((macro) => {
-                        const target = macroTargets?.[macro.key as keyof MacroTargets];
-                        const average = workweekAverages[macro.key as keyof MacroBreakdown];
-                        if (typeof target !== "number" || typeof average !== "number") return null;
-                        return (
-                          <Chip
-                            key={`progress-${macro.key}`}
-                            size="small"
-                            variant="outlined"
-                            label={`${macro.label}: ${Math.round(average)}/${target} ${macro.unit}/day`}
-                            sx={{ borderColor: chartColors[macro.key as keyof typeof chartColors] }}
-                          />
-                        );
-                      })}
-                  </Stack>
-                )}
-              </CardContent>
-            </Card>
-          </Stack>
-
-          {displayShoppingList.length > 0 ? (
-            <Accordion
-              expanded={shoppingExpanded}
-              onChange={(_, expanded) => setShoppingExpanded(expanded)}
-              disableGutters
-              sx={{
-                borderRadius: 3,
-                border: "1px solid rgba(255,255,255,0.08)",
-                bgcolor: "rgba(10,14,26,0.85)",
-                "&:before": { display: "none" },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreRoundedIcon />}
-                sx={{
-                  px: { xs: 2, md: 3 },
-                  py: 1.5,
-                  "& .MuiAccordionSummary-content": { margin: 0 },
-                }}
-              >
-                <Stack
-                  direction={{ xs: "column", md: "row" }}
-                  spacing={1}
-                  justifyContent="space-between"
-                  alignItems={{ xs: "flex-start", md: "center" }}
-                  width="100%"
-                >
-                  <Stack spacing={0.5}>
-                    <Typography variant="h6">Weekly shopping list</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {displayShoppingList.length} unique items
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Estimated weekly cost:{" "}
-                      {basketPricing ? `~${formatGbp(basketPricing.subtotal)}` : "—"}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Prices approximate, based on Tesco online
-                    </Typography>
-                    {basketPricing?.unmatchedItems?.length ? (
-                      <Typography variant="caption" color="warning.main">
-                        {basketPricing.unmatchedItems.length} item(s) missing price match
-                      </Typography>
-                    ) : null}
-                    {normalizingList && (
-                      <Typography variant="caption" color="text.secondary">
-                        Loading shopping list...
-                      </Typography>
-                    )}
-                  </Stack>
-                  <Chip
-                    label={shoppingExpanded ? "Hide items" : "View items"}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                  />
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  px: { xs: 2, md: 3 },
-                  pb: 3,
-                }}
-              >
-                <Stack spacing={2}>
-                  {shoppingListError && (
-                    <Alert
-                      severity="error"
-                      action={
-                        <Button color="inherit" size="small" onClick={retryShoppingList}>
-                          Retry
-                        </Button>
-                      }
-                    >
-                      Couldn&apos;t load shopping list. Try again.
-                    </Alert>
-                  )}
-
-                  {normalizingList && (
-                    <Stack spacing={1.25}>
-                      {Array.from({ length: 4 }).map((_, index) => (
-                        <Skeleton
-                          key={`shopping-skeleton-${index}`}
-                          variant="rounded"
-                          height={34}
-                          sx={{ borderRadius: 1.5 }}
-                        />
-                      ))}
-                    </Stack>
-                  )}
-
-                  {groupedShoppingList.map(({ category, items, subtotal, hasPricedItems }) => (
-                    <Box
-                      key={category}
-                      sx={{
-                        borderRadius: 2,
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        p: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="subtitle2"
-                        sx={{ mb: 1, textTransform: "uppercase", letterSpacing: 0.5 }}
-                      >
-                        {category}
-                      </Typography>
-                      <Stack spacing={1}>
-                        {items.map((item) => {
-                          const itemPrice = shoppingItemPrices.get(shoppingItemKey(item));
-                          const displayLine = shoppingDisplayLine(item);
-                          return (
-                            <Stack
-                              key={shoppingItemKey(item)}
-                              direction="row"
-                              justifyContent="space-between"
-                              alignItems="center"
-                              spacing={1}
-                            >
-                              <Typography fontWeight={600} sx={{ minWidth: 84 }}>
-                                {displayLine.amount}
-                              </Typography>
-                              <Typography color="text.secondary" sx={{ flexGrow: 1 }}>
-                                {displayLine.name}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                sx={{ minWidth: 64, textAlign: "right", fontWeight: 600 }}
-                              >
-                                {typeof itemPrice === "number" ? formatGbp(itemPrice) : "—"}
-                              </Typography>
-                            </Stack>
-                          );
-                        })}
-                        <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", my: 0.25 }} />
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Typography variant="caption" color="text.secondary">
-                            Category subtotal
-                          </Typography>
-                          <Typography variant="subtitle2">
-                            {hasPricedItems ? formatGbp(subtotal) : "—"}
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                    </Box>
-                  ))}
-                </Stack>
-              </AccordionDetails>
-            </Accordion>
-          ) : (
-            <Card
-              variant="outlined"
-              sx={{
-                borderColor: "rgba(255,255,255,0.08)",
-                bgcolor: "rgba(10,14,26,0.72)",
-              }}
-            >
-              <CardContent>
-                <Typography color="text.secondary">
-                  Generate a meal plan to see your shopping list.
-                </Typography>
-              </CardContent>
-            </Card>
-          )}
-
           <Stack spacing={2}>
             {displayDays.filter((day) => day.id === expandedDayId).map((day) => {
               const dayIndex = displayDays.findIndex((candidate) => candidate.id === day.id);
@@ -3279,6 +2859,448 @@ function MealsPageContent() {
               );
             })}
           </Stack>
+          <Accordion disableGutters sx={{ border: "1px solid rgba(255,255,255,0.08)", bgcolor: "rgba(10,14,26,0.7)", borderRadius: 3, "&:before": { display: "none" } }}>
+            <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: { xs: 2, md: 3 }, minHeight: 64 }}>
+              <Typography fontWeight={600}>Nutrition details · weekly totals and trends</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ px: { xs: 2, md: 3 }, pb: 3 }}>
+          <Stack
+            spacing={3}
+            direction={{ xs: "column", md: "row" }}
+            alignItems="stretch"
+          >
+            <Card
+              variant="outlined"
+              sx={{
+                width: { xs: "100%", md: 320 },
+                flexShrink: 0,
+                bgcolor: "rgba(12,16,32,0.85)",
+                backdropFilter: "blur(18px)",
+              }}
+            >
+              <CardHeader
+                avatar={<RestaurantMenuRoundedIcon color="secondary" />}
+                title="Weekly totals"
+                subheader={weekRange}
+              />
+              <CardContent>
+                <Stack spacing={2}>
+                  <Stack direction="row" spacing={1}>
+                    <Chip
+                      label={goalLabels[preferences.goal ?? "maintain"] ?? "Balanced"}
+                      size="small"
+                    />
+                    {preferences.mealComplexity && (
+                      <Chip
+                        label={complexityLabels[preferences.mealComplexity]}
+                        size="small"
+                      />
+                    )}
+                  </Stack>
+                  {enforcement && (
+                    <Tooltip title={enforcement.summary} arrow>
+                      <Chip
+                        size="small"
+                        variant="outlined"
+                        color={macroStatusMeta(enforcement).color}
+                        icon={macroStatusMeta(enforcement).icon}
+                        label={macroStatusMeta(enforcement).label}
+                        sx={{ alignSelf: "flex-start" }}
+                      />
+                    </Tooltip>
+                  )}
+                  <Grid container spacing={2}>
+                    {macroDisplay.map((macro) => {
+                      const macroKey = macro.key as keyof MacroTargets;
+                      const weeklyTarget = weeklyMacroTargets?.[macroKey] ?? null;
+                      const dailyTarget = macroTargets?.[macroKey] ?? null;
+                      const total = workweekTotals[macro.key];
+                      const average = workweekAverages[macro.key];
+                      const unitLabel = macro.key === "calories" ? "kcal" : macro.unit;
+                      return (
+                        <Grid size={6} key={macro.key}>
+                          <Box
+                            sx={{
+                              borderRadius: 2,
+                              p: 2,
+                              border: "1px solid rgba(255,255,255,0.08)",
+                            }}
+                          >
+                            <Typography variant="subtitle2" color="text.secondary">
+                              {macro.label}
+                            </Typography>
+                            <Typography variant="h5" sx={{ mb: 0.25 }}>
+                              {total.toLocaleString()} {unitLabel}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {`Weekly: ${total.toLocaleString()} ${unitLabel} (avg ${average.toLocaleString()}/day)`}
+                            </Typography>
+                            {typeof dailyTarget === "number" && (
+                              <Typography variant="body2" color="text.secondary">
+                                {`Target ${
+                                  typeof weeklyTarget === "number"
+                                    ? formatNumber(weeklyTarget)
+                                    : "-"
+                                } ${unitLabel}/wk (${formatNumber(dailyTarget)} ${
+                                  unitLabel
+                                }/day)`}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
+                </Stack>
+              </CardContent>
+            </Card>
+
+            <Card
+              variant="outlined"
+              sx={{
+                flex: 1,
+                bgcolor: "rgba(15,19,40,0.9)",
+                backdropFilter: "blur(18px)",
+                minHeight: { xs: 360, md: 520 },
+              }}
+            >
+              <CardHeader
+                avatar={<TimelineRoundedIcon color="primary" />}
+                title="Macro overview"
+                subheader="Per day totals"
+              />
+              <CardContent
+                sx={{
+                  height: { xs: 320, sm: 360, md: 520 },
+                  pt: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                {hasMacroTargets && (
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {macroDisplay.map((macro) => {
+                      const value = macroTargets?.[macro.key as keyof MacroTargets];
+                      if (typeof value !== "number") return null;
+                      return (
+                        <Chip
+                          key={macro.key}
+                          label={`${macro.label}: ${value.toLocaleString()} ${
+                            macro.unit
+                          }/day`}
+                          variant="outlined"
+                          size="small"
+                          sx={{ borderColor: "rgba(255,255,255,0.2)" }}
+                        />
+                      );
+                    })}
+                  </Stack>
+                )}
+                <Box sx={{ flex: 1 }}>
+                  {canRenderMacroChart ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={chartData} margin={{ top: 12, right: 18, left: 0, bottom: 8 }}>
+                        <XAxis dataKey="label" stroke="#94a3b8" />
+                        <YAxis stroke="#94a3b8" unit=" kcal" />
+                        <RechartsTooltip content={MacroTooltip} />
+                        {typeof macroTargets?.calories === "number" && (
+                          <ReferenceLine
+                            y={macroTargets.calories}
+                            stroke={chartColors.calories}
+                            strokeDasharray="4 4"
+                            label={{ value: "Cal target", position: "insideTopRight", fill: chartColors.calories }}
+                          />
+                        )}
+                        <Line
+                          type="monotone"
+                          dataKey="calories"
+                          name="Calories"
+                          stroke={chartColors.calories}
+                          strokeWidth={3}
+                          dot={{ r: 5 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <Stack
+                      alignItems="center"
+                      justifyContent="center"
+                      sx={{ height: "100%", color: "text.secondary" }}
+                    >
+                      <Typography variant="body2">
+                        Macro chart will appear once your meal data is loaded.
+                      </Typography>
+                    </Stack>
+                  )}
+                </Box>
+                {hasMacroTargets && (
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {macroDisplay
+                      .filter((macro) => macro.key !== "calories")
+                      .map((macro) => {
+                        const target = macroTargets?.[macro.key as keyof MacroTargets];
+                        const average = workweekAverages[macro.key as keyof MacroBreakdown];
+                        if (typeof target !== "number" || typeof average !== "number") return null;
+                        return (
+                          <Chip
+                            key={`progress-${macro.key}`}
+                            size="small"
+                            variant="outlined"
+                            label={`${macro.label}: ${Math.round(average)}/${target} ${macro.unit}/day`}
+                            sx={{ borderColor: chartColors[macro.key as keyof typeof chartColors] }}
+                          />
+                        );
+                      })}
+                  </Stack>
+                )}
+              </CardContent>
+            </Card>
+          </Stack>
+
+            </AccordionDetails>
+          </Accordion>
+          <Accordion disableGutters sx={{ border: "1px solid rgba(255,255,255,0.08)", bgcolor: "rgba(10,14,26,0.7)", borderRadius: 3, "&:before": { display: "none" } }}>
+            <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: { xs: 2, md: 3 }, minHeight: 64 }}>
+              <Typography fontWeight={600}>Your meal history</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ px: { xs: 2, md: 3 }, pb: 3 }}>
+      {historyInsights && (
+        <Card
+          variant="outlined"
+          sx={{
+            borderColor: "rgba(255,255,255,0.08)",
+            bgcolor: "rgba(10,14,26,0.7)",
+          }}
+        >
+          <CardContent>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
+              <Box flex={1}>
+                <Typography variant="overline" color="secondary">
+                  Last {historyInsights.trackedWeeks} weeks
+                </Typography>
+                <Typography variant="h5" fontWeight={600}>
+                  Ovona is personalizing from your history
+                </Typography>
+                <Typography color="text.secondary">
+                  {historyInsights.totalMeals} meals logged - this week looks to balance
+                  your proteins and recover skipped meals.
+                </Typography>
+              </Box>
+              <Stack
+                direction="row"
+                spacing={2}
+                flexWrap="wrap"
+                useFlexGap
+                alignItems="center"
+              >
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Top proteins last week
+                  </Typography>
+                  <Stack direction="row" spacing={1} mt={1} flexWrap="wrap" useFlexGap>
+                    {historyInsights.topProteins.map(([protein, count]) => (
+                      <Chip key={protein} label={`${protein} (${count})`} size="small" />
+                    ))}
+                  </Stack>
+                </Box>
+                {historyInsights.leastServed && (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Needs love
+                    </Typography>
+                    <Chip
+                      label={`${historyInsights.leastServed[0]} (${historyInsights.leastServed[1]})`}
+                      size="small"
+                      color="warning"
+                      sx={{ mt: 1 }}
+                    />
+                  </Box>
+                )}
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    Meals skipped last week
+                  </Typography>
+                  <Typography variant="h5" fontWeight={600}>
+                    {historyInsights.recentWeek.skippedMeals}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Stack>
+          </CardContent>
+        </Card>
+      )}
+
+            </AccordionDetails>
+          </Accordion>
+          {displayShoppingList.length > 0 ? (
+            <Accordion
+              expanded={shoppingExpanded}
+              onChange={(_, expanded) => setShoppingExpanded(expanded)}
+              disableGutters
+              sx={{
+                borderRadius: 3,
+                border: "1px solid rgba(255,255,255,0.08)",
+                bgcolor: "rgba(10,14,26,0.85)",
+                "&:before": { display: "none" },
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreRoundedIcon />}
+                sx={{
+                  px: { xs: 2, md: 3 },
+                  py: 1.5,
+                  "& .MuiAccordionSummary-content": { margin: 0 },
+                }}
+              >
+                <Stack
+                  direction={{ xs: "column", md: "row" }}
+                  spacing={1}
+                  justifyContent="space-between"
+                  alignItems={{ xs: "flex-start", md: "center" }}
+                  width="100%"
+                >
+                  <Stack spacing={0.5}>
+                    <Typography variant="h6">Weekly shopping list</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {displayShoppingList.length} unique items
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Estimated weekly cost:{" "}
+                      {basketPricing ? `~${formatGbp(basketPricing.subtotal)}` : "—"}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Prices approximate, based on Tesco online
+                    </Typography>
+                    {basketPricing?.unmatchedItems?.length ? (
+                      <Typography variant="caption" color="warning.main">
+                        {basketPricing.unmatchedItems.length} item(s) missing price match
+                      </Typography>
+                    ) : null}
+                    {normalizingList && (
+                      <Typography variant="caption" color="text.secondary">
+                        Loading shopping list...
+                      </Typography>
+                    )}
+                  </Stack>
+                  <Chip
+                    label={shoppingExpanded ? "Hide items" : "View items"}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                </Stack>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  px: { xs: 2, md: 3 },
+                  pb: 3,
+                }}
+              >
+                <Stack spacing={2}>
+                  {shoppingListError && (
+                    <Alert
+                      severity="error"
+                      action={
+                        <Button color="inherit" size="small" onClick={retryShoppingList}>
+                          Retry
+                        </Button>
+                      }
+                    >
+                      Couldn&apos;t load shopping list. Try again.
+                    </Alert>
+                  )}
+
+                  {normalizingList && (
+                    <Stack spacing={1.25}>
+                      {Array.from({ length: 4 }).map((_, index) => (
+                        <Skeleton
+                          key={`shopping-skeleton-${index}`}
+                          variant="rounded"
+                          height={34}
+                          sx={{ borderRadius: 1.5 }}
+                        />
+                      ))}
+                    </Stack>
+                  )}
+
+                  {groupedShoppingList.map(({ category, items, subtotal, hasPricedItems }) => (
+                    <Box
+                      key={category}
+                      sx={{
+                        borderRadius: 2,
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        p: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ mb: 1, textTransform: "uppercase", letterSpacing: 0.5 }}
+                      >
+                        {category}
+                      </Typography>
+                      <Stack spacing={1}>
+                        {items.map((item) => {
+                          const itemPrice = shoppingItemPrices.get(shoppingItemKey(item));
+                          const displayLine = shoppingDisplayLine(item);
+                          return (
+                            <Stack
+                              key={shoppingItemKey(item)}
+                              direction="row"
+                              justifyContent="space-between"
+                              alignItems="center"
+                              spacing={1}
+                            >
+                              <Typography fontWeight={600} sx={{ minWidth: 84 }}>
+                                {displayLine.amount}
+                              </Typography>
+                              <Typography color="text.secondary" sx={{ flexGrow: 1 }}>
+                                {displayLine.name}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                sx={{ minWidth: 64, textAlign: "right", fontWeight: 600 }}
+                              >
+                                {typeof itemPrice === "number" ? formatGbp(itemPrice) : "—"}
+                              </Typography>
+                            </Stack>
+                          );
+                        })}
+                        <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", my: 0.25 }} />
+                        <Stack
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Typography variant="caption" color="text.secondary">
+                            Category subtotal
+                          </Typography>
+                          <Typography variant="subtitle2">
+                            {hasPricedItems ? formatGbp(subtotal) : "—"}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                    </Box>
+                  ))}
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          ) : (
+            <Card
+              variant="outlined"
+              sx={{
+                borderColor: "rgba(255,255,255,0.08)",
+                bgcolor: "rgba(10,14,26,0.72)",
+              }}
+            >
+              <CardContent>
+                <Typography color="text.secondary">
+                  Generate a meal plan to see your shopping list.
+                </Typography>
+              </CardContent>
+            </Card>
+          )}
+
         </>
       )}
       <Drawer
