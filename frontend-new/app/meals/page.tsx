@@ -2417,38 +2417,7 @@ function MealsPageContent() {
                     {failedDayCount > 1 ? ` ${failedDayCount} days this week need a refresh.` : ""}
                   </Alert>
                 )}
-                      <Accordion disableGutters elevation={0} sx={{ bgcolor: "transparent", "&:before": { display: "none" } }}>
-                  <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: 0 }}>
-                    <Typography variant="body2" color="text.secondary">Log something else you ate</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails sx={{ px: 0 }}>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "stretch", sm: "center" }}>
-                  <TextField
-                    size="small"
-                    value={foodNote}
-                    onChange={(event) => setFoodNote(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter") void handleFoodCapture();
-                    }}
-                    placeholder="Something else you ate (e.g. chocolate)"
-                    inputProps={{ "aria-label": "Something else you ate" }}
-                    sx={{ flex: 1, minWidth: 0 }}
-                  />
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => void handleFoodCapture()}
-                    disabled={!foodNote.trim() || loggingFood}
-                    sx={{ minHeight: 40, flexShrink: 0 }}
-                  >
-                    {loggingFood ? "Saving..." : "I ate this"}
-                  </Button>
-                </Stack>
-                <Typography variant="caption" color="text.secondary">
-                  A quick note helps future suggestions; your current plan stays as written.
-                </Typography>
-                  </AccordionDetails>
-                </Accordion>
+
           <AccordionDetails
                   sx={{
                     px: { xs: 2, md: 3 },
@@ -2733,6 +2702,38 @@ function MealsPageContent() {
                     )}
                   </Collapse>
                 </AccordionDetails>
+                      <Accordion disableGutters elevation={0} sx={{ bgcolor: "transparent", "&:before": { display: "none" } }}>
+                  <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: 0 }}>
+                    <Typography variant="body2" color="text.secondary">Log something else you ate</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails sx={{ px: 0 }}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems={{ xs: "stretch", sm: "center" }}>
+                  <TextField
+                    size="small"
+                    value={foodNote}
+                    onChange={(event) => setFoodNote(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") void handleFoodCapture();
+                    }}
+                    placeholder="Something else you ate (e.g. chocolate)"
+                    inputProps={{ "aria-label": "Something else you ate" }}
+                    sx={{ flex: 1, minWidth: 0 }}
+                  />
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => void handleFoodCapture()}
+                    disabled={!foodNote.trim() || loggingFood}
+                    sx={{ minHeight: 40, flexShrink: 0 }}
+                  >
+                    {loggingFood ? "Saving..." : "I ate this"}
+                  </Button>
+                </Stack>
+                <Typography variant="caption" color="text.secondary">
+                  A quick note helps future suggestions; your current plan stays as written.
+                </Typography>
+                  </AccordionDetails>
+                </Accordion>
               </Box>
               );
             })}
