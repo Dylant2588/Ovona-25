@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import NextLink from "next/link";
+import { MealThumbnail } from "@/components/MealThumbnail";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import SwapHorizRoundedIcon from "@mui/icons-material/SwapHorizRounded";
@@ -2483,6 +2484,8 @@ function MealsPageContent() {
                           <CardContent
                             sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: { md: "center" }, gap: { xs: 1, md: 2 }, p: 2, "&:last-child": { pb: 2 } }}
                           >
+                            <Stack direction="row" spacing={2} alignItems="center" sx={{ flex: 1, minWidth: 0 }}>
+                            <MealThumbnail meal={meal} />
                             <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Typography
                               variant="caption"
@@ -2502,6 +2505,7 @@ function MealsPageContent() {
                               {meal.readyInMinutes > 0 ? `${meal.readyInMinutes} min · ` : ""}{mealMacroLine(meal)}
                             </Typography>
                             </Box>
+                            </Stack>
                             <Stack direction={{ xs: "column", sm: "row" }} spacing={0.5} sx={{ flexShrink: 0 }}>
                               <Button
                                 variant="text"
@@ -2592,6 +2596,8 @@ function MealsPageContent() {
                           alignItems={{ xs: "flex-start", md: "center" }}
                           sx={{ mb: 2 }}
                         >
+                          <Stack direction="row" spacing={2} alignItems="center">
+                          <MealThumbnail meal={expandedMealForDay} size={96} />
                           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                             {expandedMealForDay.portionMultiplier !== 1 && (
                               <Chip size="small" variant="outlined" label={`Portion ×${expandedMealForDay.portionMultiplier}`} />
@@ -2620,6 +2626,7 @@ function MealsPageContent() {
                               sx={{ maxWidth: "100%", height: "auto", "& .MuiChip-label": { whiteSpace: "normal", py: 0.75 } }}
                               label={`${expandedMealForDay.macros.calories} kcal • ${expandedMealForDay.macros.protein}g protein • ${expandedMealForDay.macros.carbs}g carbs • ${expandedMealForDay.macros.fat}g fat`}
                             />
+                          </Stack>
                           </Stack>
                           <Button
                             size="small"
