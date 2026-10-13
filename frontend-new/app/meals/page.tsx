@@ -21,6 +21,7 @@ import NatureRoundedIcon from "@mui/icons-material/NatureRounded";
 import LunchDiningRoundedIcon from "@mui/icons-material/LunchDiningRounded";
 import LocalDiningRoundedIcon from "@mui/icons-material/LocalDiningRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import {
   Accordion,
   AccordionDetails,
@@ -706,6 +707,7 @@ function MealsPageContent() {
   const planSignatureRef = useRef<string | null>(null);
   const [mealHistorySummary, setMealHistorySummary] = useState<MealHistorySummary | null>(null);
   const [expandedMealId, setExpandedMealId] = useState<string | null>(null);
+  const [expandedMealActionsId, setExpandedMealActionsId] = useState<string | null>(null);
   const [expandedDayId, setExpandedDayId] = useState<string | null>(null);
   const [preferencesPanelOpen, setPreferencesPanelOpen] = useState(false);
   const [preferencesSaving, setPreferencesSaving] = useState(false);
@@ -2429,6 +2431,7 @@ function MealsPageContent() {
                     {day.meals.map((meal, mealIndex) => {
                       const expanded = expandedMealId === meal.instanceId;
                       const swapping = swappingMealId === meal.instanceId;
+                      const actionsExpanded = expandedMealActionsId === meal.instanceId;
                       return (
                         <Card
                           key={meal.instanceId}
@@ -2561,7 +2564,7 @@ function MealsPageContent() {
                                   }
                                   onClick={() => void handleSwapMeal(dayIndex, mealIndex)}
                                   disabled={Boolean(swappingMealId)}
-                                  sx={{ minHeight: 44 }}
+                                  sx={{ minHeight: 44, display: { xs: "none", sm: "inline-flex" } }}
                                 >
                                   {swapping ? "Swapping..." : isSocialMeal(meal) ? "Add a recipe" : "Swap meal"}
                                 </Button>
@@ -2572,13 +2575,33 @@ function MealsPageContent() {
                                   startIcon={<LocalDiningRoundedIcon fontSize="small" />}
                                   onClick={() => void handlePlanMealOut(dayIndex, mealIndex)}
                                   disabled={Boolean(swappingMealId)}
-                                  sx={{ minHeight: 44 }}
+                                  sx={{ minHeight: 44, display: { xs: "none", sm: "inline-flex" } }}
                                 >
                                   Meal out
                                 </Button>}
+                                <Button
+                                  size="small"
+                                  color="inherit"
+                                  variant="text"
+                                  startIcon={<MoreHorizRoundedIcon fontSize="small" />}
+                                  onClick={() => setExpandedMealActionsId(actionsExpanded ? null : meal.instanceId)}
+                                  sx={{ minHeight: 44, display: { xs: "inline-flex", sm: "none" } }}
+                                >
+                                  {actionsExpanded ? "Less" : "More"}
+                                </Button>
                               </Stack>
                             </Stack>
                           </CardContent>
+                          <Collapse in={actionsExpanded} timeout="auto" unmountOnExit sx={{ display: { xs: "block", sm: "none" } }}>
+                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ px: 2, pb: 2 }}>
+                              <Button size="small" color="inherit" variant="outlined" startIcon={<SwapHorizRoundedIcon fontSize="small" />} onClick={() => void handleSwapMeal(dayIndex, mealIndex)} disabled={Boolean(swappingMealId)} sx={{ minHeight: 44 }}>
+                                {isSocialMeal(meal) ? "Add a recipe" : "Swap meal"}
+                              </Button>
+                              {!isSocialMeal(meal) && <Button size="small" color="inherit" variant="outlined" startIcon={<LocalDiningRoundedIcon fontSize="small" />} onClick={() => void handlePlanMealOut(dayIndex, mealIndex)} disabled={Boolean(swappingMealId)} sx={{ minHeight: 44 }}>
+                                Meal out
+                              </Button>}
+                            </Stack>
+                          </Collapse>
                           {!isSocialMeal(meal) && (
                             <Collapse
                               id={`recipe-${meal.instanceId}`}
