@@ -10,7 +10,7 @@ import { loadServerConstraints, type ConstraintDatabase } from "../recipes/serve
 export type DeterministicPlanningInput = Readonly<{
   context: GenerationContext; profile: PlannerProfile; candidates: readonly VerifiedCandidateMeal[];
   recipes: readonly RecipeRecord[]; constraints: RecipeConstraints;
-  history: Readonly<{ recentCandidateIds: readonly string[] }>;
+  history: Readonly<{ recentCandidateIds: readonly string[]; recentSimilarityKeys?: readonly string[]; recentProteinTypes?: readonly string[]; recentCuisines?: readonly string[]; recentFormats?: readonly string[] }>;
 }>;
 export type DeterministicPlanningInputResult = { ok: true; value: DeterministicPlanningInput } |
   { ok: false; error: Readonly<{ statusCode: number; code: string; reasons: readonly string[] }> };
@@ -34,7 +34,7 @@ export async function buildDeterministicPlanningInput(userId: string,
       allergens: [...new Set(recipe.ingredients.flatMap((ingredient) => ingredient.allergens))],
       dietaryTags: [], nutrition: { ...recipe.macros },
       // Unknown pricing is neutral during selection; never displayed as a cost estimate.
-      cost: 0, prepMinutes: recipe.readyInMinutes, servings: 1, similarityKey: recipe.id,
+      cost: 0, prepMinutes: recipe.readyInMinutes, servings: 1, similarityKey: recipe.id, proteinType: recipe.proteinType, format: slot,
     })));
     const requiredSlots = context.slotLabels.map((slot) => slot.toLowerCase());
     const reasons = requiredSlots.filter((slot) => !candidates.some((candidate) => candidate.slot === slot))
@@ -44,7 +44,7 @@ export async function buildDeterministicPlanningInput(userId: string,
     const profile = normalizePlannerProfile({ calorieTarget: context.calorieTarget, proteinTarget: context.proteinTarget,
       allergies: [], dislikes: constraints.dislikes, dietaryRules: [], maxPrepMinutes: constraints.maxPrepMinutes,
       householdSize: 1, preferredMealTypes: context.cuisinePreferences, requiredSlots });
-    return { ok: true, value: { context, profile, candidates, recipes, constraints, history: { recentCandidateIds: [] } } };
+    return { ok: true, value: { context, profile, candidates, recipes, constraints, history: context.rotationHistory ?? { recentCandidateIds: [], recentSimilarityKeys: context.recentMealNames.map((name) => name.toLowerCase()), recentProteinTypes: context.recentProteinTypes } } };
   } catch (error) {
     const failure = error as Error & { statusCode?: number; code?: string };
     return { ok: false, error: { statusCode: failure.statusCode ?? 503, code: failure.code ?? "recipe_library_unavailable", reasons: [failure.message] } };

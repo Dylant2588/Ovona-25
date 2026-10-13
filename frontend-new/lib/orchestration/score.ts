@@ -3,6 +3,9 @@ import type { CandidateScore, PlannerProfile, SelectedMeal, VerifiedCandidateMea
 export type ScoreContext = Readonly<{
   selected: readonly SelectedMeal[];
   recentCandidateIds: readonly string[];
+  recentProteinTypes?: readonly string[];
+  recentCuisines?: readonly string[];
+  recentFormats?: readonly string[];
 }>;
 
 const overlapCount = (candidate: VerifiedCandidateMeal, selected: readonly SelectedMeal[]) => {
@@ -11,6 +14,19 @@ const overlapCount = (candidate: VerifiedCandidateMeal, selected: readonly Selec
 };
 
 const finite = (value: number) => Number.isFinite(value) ? value : 0;
+
+const diversityPenalty = (candidate: VerifiedCandidateMeal, context: ScoreContext) => {
+  const used = context.selected;
+  const repeats = [
+    candidate.proteinType && used.some((meal) => meal.proteinType === candidate.proteinType),
+    candidate.cuisine && used.some((meal) => meal.cuisine === candidate.cuisine),
+    candidate.format && used.some((meal) => meal.format === candidate.format),
+    candidate.proteinType && (context.recentProteinTypes ?? []).includes(candidate.proteinType),
+    candidate.cuisine && (context.recentCuisines ?? []).includes(candidate.cuisine),
+    candidate.format && (context.recentFormats ?? []).includes(candidate.format),
+  ].filter(Boolean).length;
+  return repeats ? -repeats * 0.05 : 0;
+};
 
 export const scoreCandidate = (profile: PlannerProfile, candidate: VerifiedCandidateMeal, context: ScoreContext): CandidateScore => {
   const targetCaloriesPerSlot = profile.calorieTarget / profile.hardConstraints.requiredSlots.length;
@@ -25,6 +41,7 @@ export const scoreCandidate = (profile: PlannerProfile, candidate: VerifiedCandi
     prep: finite(profile.policy.scoreWeights.prep * Math.max(0, 1 - candidate.prepMinutes / Math.max(1, profile.hardConstraints.maxPrepMinutes))),
     cost: finite(profile.policy.scoreWeights.cost * Math.max(0, 1 - candidate.cost / 20)),
     repetition: context.recentCandidateIds.includes(candidate.id) ? -profile.policy.scoreWeights.repetition : 0,
+    diversity: diversityPenalty(candidate, context),
   };
   const facts = [
     "target contribution",

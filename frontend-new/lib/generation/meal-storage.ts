@@ -1,6 +1,9 @@
-import { generateFallbackMealPlan, type PreferencesInput } from "@/lib/meal-generator";
+import { generateFallbackMealPlan, type PreferencesInput, type WeeklyMealPlan } from "@/lib/meal-generator";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { MealConcept, PortionedMeal } from "@/lib/generation/types";
+import { approvedHistoryRecords, eatenHistoryRecord } from "./rotation-history";
+
+export { approvedHistoryRecords } from "./rotation-history";
 
 const normalize = (value: string) =>
   value
@@ -102,6 +105,22 @@ export async function recordMealHistory(
   if (error) {
     console.warn("[meal-storage] user_meal_history insert failed:", error.message);
   }
+}
+
+/** Call only after the approved plan rows have been persisted successfully. */
+export async function recordAcceptedMealHistory(userId: string, plan: WeeklyMealPlan, supabase: SupabaseClient): Promise<void> {
+  const records = approvedHistoryRecords(userId, plan);
+  if (!records.length) return;
+  const { error } = await supabase.from("user_meal_history").insert(records);
+  if (error) throw new Error(`Accepted meal history could not be saved: ${error.message}`);
+}
+
+/** The meal must come from an already approved persisted plan, never the client payload. */
+export async function recordEatenMealHistory(userId: string, date: string, meal: unknown, supabase: SupabaseClient): Promise<void> {
+  const record = eatenHistoryRecord(userId, date, meal as Parameters<typeof eatenHistoryRecord>[2]);
+  if (!record) return;
+  const { error } = await supabase.from("user_meal_history").insert(record);
+  if (error) throw new Error(`Eaten meal history could not be saved: ${error.message}`);
 }
 
 export async function getRecentHistory(

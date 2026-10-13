@@ -7,6 +7,7 @@ import type {
   MicroTargets,
   SlotBudget,
 } from "@/lib/generation/types";
+import { rotationHistoryFromRows } from "./rotation-history";
 
 type PreferencesRow = Record<string, unknown> | null;
 type ProfileRow = Record<string, unknown> | null;
@@ -251,48 +252,27 @@ const fetchRecentHistory = async (
   userId: string,
   supabase: GenerationSupabase
 ) => {
-  const twoWeeksAgo = new Date();
-  twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const now = new Date();
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const twoWeeksAgo = new Date(today);
+  twoWeeksAgo.setUTCDate(twoWeeksAgo.getUTCDate() - 14);
 
   const { data, error } = await supabase
     .from("user_meal_history")
-    .select("meal_name, protein_type, date")
+    .select("meal_name, protein_type, date, recipe_id, recipe_version, similarity_key, cuisine, format, planning_state")
     .eq("user_id", userId)
     .gte("date", twoWeeksAgo.toISOString().split("T")[0])
+    .lt("date", today.toISOString().split("T")[0])
     .order("date", { ascending: false });
 
   if (error || !Array.isArray(data)) {
     if (error) {
       console.warn("[context-builder] user_meal_history unavailable:", error.message);
     }
-    return { recentMealNames: [] as string[], recentProteinTypes: [] as string[] };
+    return rotationHistoryFromRows([], now);
   }
 
-  const recentMealNames = Array.from(
-    new Set(
-      data
-        .map((row) => parseString((row as Record<string, unknown>).meal_name))
-        .filter(Boolean)
-    )
-  );
-
-  const recentProteinTypes = Array.from(
-    new Set(
-      data
-        .filter((row) => {
-          const dateValue = parseString((row as Record<string, unknown>).date);
-          if (!dateValue) return false;
-          const parsed = new Date(dateValue);
-          return !Number.isNaN(parsed.getTime()) && parsed >= oneWeekAgo;
-        })
-        .map((row) => parseString((row as Record<string, unknown>).protein_type).toLowerCase())
-        .filter(Boolean)
-    )
-  );
-
-  return { recentMealNames, recentProteinTypes };
+  return rotationHistoryFromRows(data as Record<string, unknown>[], now);
 };
 
 const parseAllergyRows = (rows: unknown): string[] => {
@@ -417,8 +397,9 @@ export async function buildContext(
     mealsPerDay,
     slotLabels,
     weeklyBudget,
-    recentMealNames: history.recentMealNames,
-    recentProteinTypes: history.recentProteinTypes,
+    recentMealNames: [...history.recentMealNames],
+    recentProteinTypes: [...history.recentProteinTypes],
+    rotationHistory: history,
     slotBudgets,
   };
 }

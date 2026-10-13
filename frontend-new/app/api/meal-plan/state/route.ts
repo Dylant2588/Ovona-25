@@ -6,7 +6,8 @@ import {
 } from "@/lib/meal-generator";
 import type { EnforcementInfo } from "@/lib/macro-enforcement";
 import { resolveRequestAuth } from "@/lib/serverAuth";
-import { approvePlanForUser, approvalFailure } from "@/lib/recipes/plan-boundary";
+import { writeApprovedPlan, approvalFailure } from "@/lib/recipes/plan-boundary";
+import { recordAcceptedMealHistory } from "@/lib/generation/meal-storage";
 
 type StoredDay = {
   id: string;
@@ -178,77 +179,89 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    plan = await approvePlanForUser(supabase as never, user.id, plan);
+    return await writeApprovedPlan(supabase as never, user.id, plan, async (approved) => {
+      plan = approved;
+      const planId = plan.id ?? `plan-${effectiveWeekStart}`;
+      const persistedDays = (plan.days ?? []).slice(0, WORKDAY_COUNT);
+      const persistedTotals = sumMacros(
+        persistedDays.map((day) => day.totals as MacroBreakdown)
+      );
+
+      let rows: Array<{
+        user_id: string;
+        plan_id: string;
+        day_id: string;
+        date: string;
+        week_start: string;
+        meals: unknown;
+      }> = [];
+      try {
+        rows = persistedDays.map((day) => ({
+          user_id: user.id,
+          plan_id: planId,
+          day_id: day.id,
+          date: toISODate(day.date),
+          week_start: effectiveWeekStart,
+          meals: {
+            id: day.id,
+            label: day.label,
+            date: day.date,
+            meals: day.meals,
+            totals: day.totals,
+            preferenceSignature: plan!.preferenceSignature ?? null,
+            enforcement: enforcement ?? null,
+          },
+        }));
+      } catch {
+        return NextResponse.json(
+          { error: "invalid day date in plan payload" },
+          { status: 400 }
+        );
+      }
+
+      // Replace existing rows for the week to keep latest swaps and portions.
+      await supabase
+        .from("plan_history")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("week_start", effectiveWeekStart)
+        .neq("day_id", "alternatives");
+
+      if (rows.length) {
+        const { error } = await supabase
+          .from("plan_history")
+          .insert(rows);
+        if (error) {
+          return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+      }
+
+      const { error: mealPlanError } = await supabase.from("meal_plans").upsert(
+        {
+          user_id: user.id,
+          name:
+            (plan as WeeklyMealPlan & { name?: string }).name ??
+            `Week of ${effectiveWeekStart}`,
+          week_start_date: effectiveWeekStart,
+          total_calories: persistedTotals.calories ?? null,
+        },
+        { onConflict: "user_id,week_start_date" }
+      );
+      if (mealPlanError) {
+        return NextResponse.json({ error: mealPlanError.message }, { status: 500 });
+      }
+
+      try {
+        await recordAcceptedMealHistory(user.id, plan, supabase as never);
+      } catch (error) {
+        console.error("[meal-plan/state] accepted history failed after plan persistence", error);
+        return NextResponse.json({ ok: true, rotationHistoryRecorded: false });
+      }
+
+      return NextResponse.json({ ok: true });
+    });
   } catch (error) {
     const failure = approvalFailure(error);
     return NextResponse.json(failure.body, { status: failure.status });
   }
-  const planId = plan.id ?? `plan-${effectiveWeekStart}`;
-  const persistedDays = (plan.days ?? []).slice(0, WORKDAY_COUNT);
-  const persistedTotals = sumMacros(
-    persistedDays.map((day) => day.totals as MacroBreakdown)
-  );
-
-  let rows: Array<{
-    user_id: string;
-    plan_id: string;
-    day_id: string;
-    date: string;
-    week_start: string;
-    meals: unknown;
-  }> = [];
-  try {
-    rows = persistedDays.map((day) => ({
-      user_id: user.id,
-      plan_id: planId,
-      day_id: day.id,
-      date: toISODate(day.date),
-      week_start: effectiveWeekStart,
-      meals: {
-        id: day.id,
-        label: day.label,
-        date: day.date,
-        meals: day.meals,
-        totals: day.totals,
-        preferenceSignature: plan.preferenceSignature ?? null,
-        enforcement: enforcement ?? null,
-      },
-    }));
-  } catch {
-    return NextResponse.json(
-      { error: "invalid day date in plan payload" },
-      { status: 400 }
-    );
-  }
-
-  // replace existing rows for the week to keep latest swaps/portions
-  await supabase
-    .from("plan_history")
-    .delete()
-    .eq("user_id", user.id)
-    .eq("week_start", effectiveWeekStart)
-    .neq("day_id", "alternatives");
-
-  if (rows.length) {
-    const { error } = await supabase
-      .from("plan_history")
-      .insert(rows);
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-  }
-
-  await supabase.from("meal_plans").upsert(
-    {
-      user_id: user.id,
-      name:
-        (plan as WeeklyMealPlan & { name?: string }).name ??
-        `Week of ${effectiveWeekStart}`,
-      week_start_date: effectiveWeekStart,
-      total_calories: persistedTotals.calories ?? null,
-    },
-    { onConflict: "user_id,week_start_date" }
-  );
-
-  return NextResponse.json({ ok: true });
 }

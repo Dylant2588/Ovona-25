@@ -3,7 +3,7 @@ import { rankCandidates } from "./score.ts";
 import { validateAndRepairWeek } from "./validate.ts";
 import type { PlannerProfile, SelectedMeal, VerifiedCandidateMeal, WeekScheduleResult } from "./types.ts";
 
-export type CandidateHistory = Readonly<{ recentCandidateIds?: readonly string[] }>;
+export type CandidateHistory = Readonly<{ recentCandidateIds?: readonly string[]; recentSimilarityKeys?: readonly string[]; recentProteinTypes?: readonly string[]; recentCuisines?: readonly string[]; recentFormats?: readonly string[] }>;
 
 const similarity = (candidate: VerifiedCandidateMeal) => candidate.similarityKey?.trim().toLowerCase() || candidate.id;
 
@@ -15,6 +15,9 @@ const canUseCandidate = (candidate: VerifiedCandidateMeal, selected: readonly Se
   if (!similar.length) return true;
   return candidate.isLeftover === true && !!candidate.leftoverFromCandidateId && selected.some((meal) => meal.candidateId === candidate.leftoverFromCandidateId);
 };
+
+const isRecentMatch = (candidate: VerifiedCandidateMeal, history: CandidateHistory) =>
+  (history.recentCandidateIds ?? []).includes(candidate.id) || (history.recentSimilarityKeys ?? []).includes(similarity(candidate));
 
 const selectedMeal = (candidate: VerifiedCandidateMeal, score: ReturnType<typeof rankCandidates>[number], profile: PlannerProfile): SelectedMeal => {
   const recipeServings = candidate.servings;
@@ -30,6 +33,9 @@ const selectedMeal = (candidate: VerifiedCandidateMeal, score: ReturnType<typeof
     nutrition: { ...candidate.nutrition },
     cost: candidate.cost,
     prepMinutes: candidate.prepMinutes,
+    proteinType: candidate.proteinType,
+    cuisine: candidate.cuisine,
+    format: candidate.format,
     isLeftover: candidate.isLeftover === true,
     ...(candidate.leftoverFromCandidateId ? { leftoverFromCandidateId: candidate.leftoverFromCandidateId } : {}),
     recipeServings,
@@ -56,7 +62,10 @@ export const orchestrateWeek = (
     const meals: SelectedMeal[] = [];
     for (const slot of profile.hardConstraints.requiredSlots) {
       const slotCandidates = eligibility.eligible.filter((candidate) => candidate.slot === slot && canUseCandidate(candidate, selected, profile.policy));
-      const ranked = rankCandidates(profile, slotCandidates, { selected, recentCandidateIds: history.recentCandidateIds ?? [] });
+      const freshCandidates = slotCandidates.filter((candidate) => !isRecentMatch(candidate, history));
+      // A reviewed catalogue can be scarce; only exclude recent meals while a
+      // safe alternative exists for this exact slot.
+      const ranked = rankCandidates(profile, freshCandidates.length ? freshCandidates : slotCandidates, { selected, recentCandidateIds: history.recentCandidateIds ?? [], recentProteinTypes: history.recentProteinTypes, recentCuisines: history.recentCuisines, recentFormats: history.recentFormats });
       const best = ranked[0];
       if (!best) {
         return { ok: false, error: { code: "insufficient_candidates", violations: [{ day, code: "insufficient_candidates", message: `No safe ${slot} candidate can fill day ${day}.` }] } };

@@ -63,6 +63,9 @@ export type VerifiedCandidateMeal = {
   similarityKey?: string;
   /** A bounded AI ordering hint after server-side recipe/version resolution. */
   aiPriority?: number;
+  proteinType?: string;
+  cuisine?: string;
+  format?: string;
 };
 
 export type SelectedMealServing = {
@@ -79,6 +82,7 @@ export type ScoreComponents = Readonly<{
   prep: number;
   cost: number;
   repetition: number;
+  diversity: number;
 }>;
 
 export type CandidateScore = Readonly<{
@@ -97,6 +101,9 @@ export type SelectedMeal = Readonly<{
   nutrition: Readonly<{ calories: number; protein: number; carbs: number; fat: number }>;
   cost: number;
   prepMinutes: number;
+  proteinType?: string;
+  cuisine?: string;
+  format?: string;
   isLeftover: boolean;
   leftoverFromCandidateId?: string;
   score: CandidateScore;
