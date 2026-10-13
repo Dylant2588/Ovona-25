@@ -41,13 +41,42 @@ export default function AuthCallbackPage() {
     let active = true;
     const MAX_LOOKUP_ATTEMPTS = 3;
     const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+    const clearCallbackFragment = () => {
+      if (typeof window === "undefined" || !window.location.hash) return;
+      // Supabase has already consumed the fragment by this point. Remove it
+      // before navigating so access/refresh credentials never remain in the
+      // visible URL or browser history.
+      window.history.replaceState(
+        window.history.state,
+        document.title,
+        `${window.location.pathname}${window.location.search}`
+      );
+    };
 
     async function handleAuthRedirect() {
       let user: User | null = null;
       let authLookupTransient = false;
       let authLookupUnauthorized = false;
 
-      for (let attempt = 0; attempt < MAX_LOOKUP_ATTEMPTS; attempt += 1) {
+      try {
+        // Await the client session first: this consumes an OAuth implicit-flow
+        // fragment and persists the session before any authenticated lookup.
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (session?.user) {
+          user = session.user;
+          clearCallbackFragment();
+        } else if (error) {
+          authLookupUnauthorized = isExplicitUnauthorizedError(error);
+          authLookupTransient = !authLookupUnauthorized;
+        }
+      } catch {
+        authLookupTransient = true;
+      }
+
+      for (let attempt = 0; !user && attempt < MAX_LOOKUP_ATTEMPTS; attempt += 1) {
         try {
           const {
             data: { user: nextUser },
@@ -63,6 +92,7 @@ export default function AuthCallbackPage() {
           } else if (nextUser) {
             user = nextUser;
             authLookupTransient = false;
+            clearCallbackFragment();
             break;
           } else {
             authLookupUnauthorized = true;
