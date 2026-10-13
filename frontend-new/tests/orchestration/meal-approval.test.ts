@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { approveRecipe, validateMealAgainstRecipe, validatePlanAgainstRecipes } from "../../lib/recipes/approval.ts";
+import { approveRecipe, validateMealAgainstRecipe, validatePlanAgainstRecipes, validateSocialMeal } from "../../lib/recipes/approval.ts";
 import { reviewedMeal, reviewedRecipe } from "./recipe-fixtures.ts";
 test("approved evidence admits safe two-serving recipe once and scales trusted portions", () => {
   const recipe = reviewedRecipe(), meal = reviewedMeal();
@@ -56,4 +56,17 @@ test("final portion dietary thresholds and malformed untrusted plans fail closed
   meal.macros = { calories: 450, protein: 60, carbs: 38, fat: 15 };
   assert.equal(validateMealAgainstRecipe(meal, recipe, { dietaryMode: "low_carb" }).approved, false);
   for (const days of [[null], [{ meals: [null] }], [{ meals: [{ baseId: "missing" }] }]]) assert.equal(validatePlanAgainstRecipes(days as never, [recipe]).approved, false);
+});
+test("a meal out is a narrow nutrition-unknown exception, never an unchecked recipe", () => {
+  const socialMeal = {
+    baseId: "social-meal", mealSlot: "dinner", title: "Meal out", portionMultiplier: 1,
+    mealKind: "social" as const, nutritionStatus: "unknown" as const,
+    ingredients: [], baseIngredients: [],
+    macros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    baseMacros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  };
+  assert.equal(validateSocialMeal(socialMeal).approved, true);
+  assert.equal(validatePlanAgainstRecipes([{ meals: [socialMeal] }], [reviewedRecipe()]).approved, true);
+  assert.equal(validateSocialMeal({ ...socialMeal, macros: { ...socialMeal.macros, calories: 600 } }).approved, false);
+  assert.equal(validateSocialMeal({ ...socialMeal, title: "Unchecked dinner" }).approved, false);
 });

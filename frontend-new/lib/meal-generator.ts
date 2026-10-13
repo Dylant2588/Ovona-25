@@ -33,8 +33,10 @@ export type ProteinType = "poultry" | "red_meat" | "fish" | "seafood" | "plant" 
 export type MealInstance = {
   instanceId: string;
   baseId: string;
-
   recipeVersion?: number;
+  /** A user-declared meal out is deliberately excluded from recipe verification. */
+  mealKind?: "recipe" | "social";
+  nutritionStatus?: "checked" | "unknown";
   mealSlot: MealSlot;
   title: string;
   description: string;
@@ -2769,6 +2771,9 @@ export const buildShoppingList = (plan: WeeklyMealPlan): ShoppingListItem[] => {
   const map = new Map<string, ShoppingListItem>();
   plan.days.forEach((day) => {
     day.meals.forEach((meal) => {
+      // A meal out has no ingredient list to buy. It is kept in the plan so the
+      // user sees the exception, but must never inflate the shopping basket.
+      if (meal.mealKind === "social") return;
       const useBaseIngredients = Boolean(meal.baseIngredients?.length);
       const sourceIngredients = useBaseIngredients
         ? meal.baseIngredients

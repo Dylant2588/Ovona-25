@@ -56,8 +56,9 @@ export async function approvePlanForUser(database: RecipeReader, userId: string,
       day.meals.filter((meal) => meal.mealSlot === "lunch").length !== 1 ||
       day.meals.filter((meal) => meal.mealSlot === "dinner").length !== 1 ||
       day.meals.filter((meal) => meal.mealSlot === "snack").length !== context.mealsPerDay - 3 ||
-      day.totals.calories < context.calorieTarget * 0.95 || day.totals.calories > context.calorieTarget * 1.08 ||
-      day.totals.protein < context.proteinTarget * 0.98 || day.totals.protein > context.proteinTarget * 1.1)) {
+      (!day.meals.some((meal) => meal.mealKind === "social") &&
+        (day.totals.calories < context.calorieTarget * 0.95 || day.totals.calories > context.calorieTarget * 1.08 ||
+        day.totals.protein < context.proteinTarget * 0.98 || day.totals.protein > context.proteinTarget * 1.1)))) {
     throw new MealApprovalError("meal_approval_failed", ["Daily meal slots or nutrition do not meet saved targets."]);
   }
   const weeklyTotals = days.reduce((total, day) => ({ calories: total.calories + day.totals.calories,

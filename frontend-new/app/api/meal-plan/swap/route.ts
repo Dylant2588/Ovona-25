@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     const payload = await request.json() as { plan?: WeeklyMealPlan; preferences?: PreferencesInput; dayIndex?: number; mealIndex?: number; mealSlot?: MealSlot };
     if (!payload.plan) return NextResponse.json({ error: "Current plan required" }, { status: 400 });
-    const plan = await approvePlanForUser(supabase, user.id, payload.plan, payload.preferences);
+    const plan = await approvePlanForUser(supabase as never, user.id, payload.plan, payload.preferences);
     const dayIndex = payload.dayIndex ?? 0;
     const day = plan.days[dayIndex];
     const mealIndex = payload.mealIndex ?? day?.meals.findIndex((meal) => meal.mealSlot === payload.mealSlot) ?? -1;
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const enforced = enforceMacros(plan, { calories: artifacts.context.calorieTarget, protein: artifacts.context.proteinTarget,
       carbs: artifacts.context.carbTarget, fat: artifacts.context.fatTarget });
     if (!enforced.passed) throw new MealApprovalError("insufficient_reviewed_catalogue", ["The replacement couldn't meet daily targets."]);
-    const approved = await approvePlanForUser(supabase, user.id, plan, payload.preferences);
+    const approved = await approvePlanForUser(supabase as never, user.id, plan, payload.preferences);
     // State persistence performs its own fresh approval; swap itself has no partial history writes.
     return NextResponse.json({ plan: approved, day: approved.days[dayIndex], meal: approved.days[dayIndex].meals[mealIndex],
       dayIndex, mealIndex, source: "reviewed_library", approval: "checked", enforcement: toEnforcementInfo(enforced) });

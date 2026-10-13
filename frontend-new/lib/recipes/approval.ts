@@ -40,9 +40,28 @@ export function approveRecipe(recipe: RecipeRecord, constraints: ApprovalConstra
 type Ingredient = { name: string; amount: number; unit: string };
 export type CheckableMeal = {
   baseId: string; recipeVersion?: number; mealSlot: string; title: string; portionMultiplier: number;
+  mealKind?: "recipe" | "social"; nutritionStatus?: "checked" | "unknown";
   ingredients: Ingredient[]; baseIngredients: Ingredient[]; macros: RecipeMacros; baseMacros: RecipeMacros;
   steps?: string[]; recipeSteps?: string[];
 };
+const zeroMacros = (macros: RecipeMacros | undefined) =>
+  !!macros && Object.values(macros).every((value) => value === 0);
+
+/**
+ * A meal out is a user-declared planning exception, not a recipe. Keeping the
+ * shape deliberately narrow prevents it being used to smuggle an unchecked
+ * recipe through the approval gate.
+ */
+export function validateSocialMeal(meal: CheckableMeal): ApprovalResult {
+  const r: ApprovalResult = { approved: true, reasons: [], recipeId: "social-meal", recipeVersion: 1, policyVersion: APPROVAL_POLICY_VERSION };
+  const isValid = meal?.mealKind === "social" && meal.nutritionStatus === "unknown" &&
+    meal.baseId === "social-meal" && meal.title === "Meal out" && meal.recipeVersion === undefined &&
+    meal.portionMultiplier === 1 && Array.isArray(meal.ingredients) && !meal.ingredients.length &&
+    Array.isArray(meal.baseIngredients) && !meal.baseIngredients.length &&
+    zeroMacros(meal.macros) && zeroMacros(meal.baseMacros);
+  if (!isValid) deny(r, "invalid_social_meal", "A meal out must remain an explicit nutrition-unknown exception with no ingredients.");
+  return r;
+}
 const close = (actual: number, expected: number) => Number.isFinite(actual) && Math.abs(actual - expected) <= Math.max(0.011, expected * 0.0001);
 const scaledMacros = (macros: RecipeMacros, multiplier: number): RecipeMacros => Object.fromEntries(Object.entries(macros).map(([key, value]) => [key, Math.round(value * multiplier)])) as RecipeMacros;
 export function validateMealAgainstRecipe<T extends CheckableMeal>(meal: T, recipe: RecipeRecord, constraints: ApprovalConstraints = {}): ApprovalResult & { meal?: T } {
@@ -69,6 +88,11 @@ export function validatePlanAgainstRecipes<T extends { meals: CheckableMeal[]; t
   const sanitized = days.map(day => {
     if (!day || !Array.isArray(day.meals) || !day.meals.length) { reasons.push({ code: "empty_day", message: "Day contains no meals" }); return day; }
     const meals = day.meals.map(meal => {
+      if (meal?.mealKind === "social") {
+        const checked = validateSocialMeal(meal);
+        reasons.push(...checked.reasons);
+        return meal;
+      }
       const recipe = recipes.find(r => !!meal && r.id === meal.baseId && r.version === meal.recipeVersion);
       if (!recipe) { reasons.push({ code: "recipe_not_found", message: "Reviewed recipe/version was not found" }); return meal; }
       const checked = validateMealAgainstRecipe(meal, recipe, constraints);

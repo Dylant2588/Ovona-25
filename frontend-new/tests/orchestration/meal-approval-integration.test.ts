@@ -12,6 +12,30 @@ test("actual persistence boundary writes a reviewed fixture with recomputed tota
   }, undefined, dependencies);
   assert.equal(result.weeklyTotals.calories, 11550); assert.deepEqual(mutations, ["delete", "insert", "history"]);
 });
+test("a deliberate meal out persists as nutrition-unknown without weakening recipe approval", async () => {
+  const plan = reviewedPlan();
+  const day = plan.days[0];
+  const original = day.meals[2];
+  day.meals[2] = {
+    ...original,
+    baseId: "social-meal",
+    recipeVersion: undefined,
+    mealKind: "social",
+    nutritionStatus: "unknown",
+    title: "Meal out",
+    description: "A planned meal out. Nutrition is not verified.",
+    tags: ["social-meal", "nutrition-unverified"],
+    readyInMinutes: 0,
+    portionMultiplier: 1,
+    baseMacros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    macros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    baseIngredients: [],
+    ingredients: [],
+  };
+  const saved = await writeApprovedPlan(recipeDatabase(), "user-1", plan, async (approved) => approved, undefined, dependencies);
+  assert.equal(saved.days[0].meals[2].mealKind, "social");
+  assert.equal(saved.days[0].totals.calories, 1100);
+});
 test("forged approval, changed ingredient, version, owner, nutrition and incomplete days produce zero writes", async () => {
   const mutations: string[] = [];
   const altered = [

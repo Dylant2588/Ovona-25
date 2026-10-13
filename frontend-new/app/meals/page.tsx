@@ -80,6 +80,7 @@ import {
   type MealHistorySummary,
   type ShoppingListItem,
   type IngredientLine,
+  type MealInstance,
   type WeeklyMealPlan,
 } from "@/lib/meal-generator";
 import type { StoredMealInstance } from "@/lib/history";
@@ -413,6 +414,29 @@ const sumMacroBreakdowns = (items: MacroBreakdown[]): MacroBreakdown =>
 const cloneWeeklyPlan = (plan: WeeklyMealPlan): WeeklyMealPlan =>
   JSON.parse(JSON.stringify(plan)) as WeeklyMealPlan;
 
+const isSocialMeal = (meal: MealInstance) => meal.mealKind === "social";
+
+const socialMealFrom = (meal: MealInstance): MealInstance => ({
+  instanceId: meal.instanceId,
+  baseId: "social-meal",
+  mealSlot: meal.mealSlot,
+  mealKind: "social",
+  nutritionStatus: "unknown",
+  title: "Meal out",
+  description: "A planned meal out. Nutrition is not verified.",
+  tags: ["social-meal", "nutrition-unverified"],
+  image: "",
+  readyInMinutes: 0,
+  portionMultiplier: 1,
+  baseMacros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  macros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+  baseIngredients: [],
+  ingredients: [],
+});
+
+const planHasSocialMeal = (value: WeeklyMealPlan) =>
+  value.days.some((day) => day.meals.some(isSocialMeal));
+
 const enforcePlanMacros = (
   plan: WeeklyMealPlan,
   prefs: PreferencesInput
@@ -561,7 +585,9 @@ const mealSlotDisplayLabel = (
 };
 
 const mealMacroLine = (meal: PlanMeal) =>
-  `${meal.macros.calories} kcal • ${meal.macros.protein}g protein`;
+  meal.mealKind === "social"
+    ? "Nutrition not verified"
+    : `${meal.macros.calories} kcal • ${meal.macros.protein}g protein`;
 
 const normalizeSteps = (value: unknown) =>
   Array.isArray(value)
@@ -1211,7 +1237,7 @@ function MealsPageContent() {
                 enforcement: storedPayload.enforcement,
               }
             : enforcePlanMacros(storedPayload.plan, preferences);
-          if (storedEnforced.enforcement?.passed === false) {
+          if (storedEnforced.enforcement?.passed === false && !planHasSocialMeal(storedEnforced.plan)) {
             setPlan(null);
             setEnforcement(storedEnforced.enforcement);
             setError(
@@ -1223,7 +1249,9 @@ function MealsPageContent() {
           }
           setPlan(storedEnforced.plan);
           setEnforcement(storedEnforced.enforcement);
-          setError("Saved plan: ingredient and allergy checks have not been verified against the reviewed recipe library. Generate a checked plan when the library is ready.");
+          setError(planHasSocialMeal(storedEnforced.plan)
+            ? "This plan includes a meal out. Its nutrition is intentionally unverified and its ingredients are excluded from your shopping list."
+            : "Saved plan: ingredient and allergy checks have not been verified against the reviewed recipe library. Generate a checked plan when the library is ready.");
           setPlanLoading(false);
           setLoadingStepIndex(LOADING_STEPS.length);
           console.log("Meal plan load", {
@@ -1239,7 +1267,7 @@ function MealsPageContent() {
 
       if (cachedPlan && cachedPlan.preferenceSignature === signature) {
         const cachedEnforced = enforcePlanMacros(cachedPlan, preferences);
-        if (!cachedEnforced.enforcement.passed) {
+        if (!cachedEnforced.enforcement.passed && !planHasSocialMeal(cachedEnforced.plan)) {
           setPlan(null);
           setEnforcement(cachedEnforced.enforcement);
           setError(
@@ -1494,6 +1522,27 @@ function MealsPageContent() {
       showToast(message, "error");
     } finally {
       setRegeneratingDayIndex(null);
+    }
+  };
+
+  const handlePlanMealOut = async (dayIndex: number, mealIndex: number) => {
+    if (!plan) return;
+    const existingMeal = plan.days[dayIndex]?.meals[mealIndex];
+    if (!existingMeal || isSocialMeal(existingMeal)) return;
+    const nextPlan = cloneWeeklyPlan(plan);
+    nextPlan.days[dayIndex].meals[mealIndex] = socialMealFrom(existingMeal);
+    nextPlan.days[dayIndex].totals = sumMacroBreakdowns(nextPlan.days[dayIndex].meals.map((meal) => meal.macros));
+    nextPlan.weeklyTotals = sumMacroBreakdowns(nextPlan.days.map((day) => day.totals));
+    try {
+      // The state boundary accepts only the exact nutrition-unknown social-meal
+      // shape, then excludes its ingredients from any future basket calculation.
+      await persistPlan(nextPlan, preferenceSignature, null);
+      setPlan(nextPlan);
+      setEnforcement(null);
+      setExpandedMealId(null);
+      showToast("Meal out added. Its nutrition is not counted and its ingredients were removed from your shopping list.", "info");
+    } catch (error) {
+      console.error("Unable to add meal out", error);
     }
   };
 
@@ -2319,7 +2368,8 @@ function MealsPageContent() {
             {displayDays.filter((day) => day.id === expandedDayId).map((day) => {
               const dayIndex = displayDays.findIndex((candidate) => candidate.id === day.id);
               const dayEnforcement = enforcement?.days?.[dayIndex] ?? null;
-              const dayFailed = dayEnforcement ? !dayEnforcement.passed || dayEnforcement.status === "partial" : calorieStatusMeta(day.totals.calories, macroTargets?.calories).label === "Off target";
+              const dayHasSocialMeal = day.meals.some(isSocialMeal);
+              const dayFailed = !dayHasSocialMeal && (dayEnforcement ? !dayEnforcement.passed || dayEnforcement.status === "partial" : calorieStatusMeta(day.totals.calories, macroTargets?.calories).label === "Off target");
               const expandedMealForDay =
                 day.meals.find((meal) => meal.instanceId === expandedMealId) ?? null;
               const expandedRecipeSteps = expandedMealForDay
@@ -2354,6 +2404,11 @@ function MealsPageContent() {
                   >
                     {dayFailed ? "This day is outside your nutrition targets. Try a different meal mix." : "Other days in this plan are outside your nutrition targets."}
                     {failedDayCount > 1 ? ` ${failedDayCount} days this week need a refresh.` : ""}
+                  </Alert>
+                )}
+                {dayHasSocialMeal && (
+                  <Alert severity="info" sx={{ mb: 2 }}>
+                    A meal out is planned for this day. We have removed its ingredients from your shopping list, but cannot verify its nutrition or allergy fit.
                   </Alert>
                 )}
 
@@ -2439,13 +2494,23 @@ function MealsPageContent() {
                             <Typography variant="h6" component="h2" sx={{ fontSize: { xs: "1.15rem", md: "1.25rem" }, fontWeight: 600, letterSpacing: "-0.025em", lineHeight: 1.35, my: 0.5, overflowWrap: "break-word" }}>
                               {meal.title}
                             </Typography>
+                            {isSocialMeal(meal) && (
+                              <Chip
+                                size="small"
+                                color="warning"
+                                variant="outlined"
+                                icon={<WarningAmberRoundedIcon fontSize="small" />}
+                                label="Nutrition not verified"
+                                sx={{ mb: 0.75 }}
+                              />
+                            )}
                             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
                               {meal.readyInMinutes > 0 ? `${meal.readyInMinutes} min · ` : ""}{mealMacroLine(meal)}
                             </Typography>
                             </Box>
                             </Stack>
                             <Stack direction={{ xs: "column", sm: "row" }} spacing={0.5} sx={{ flexShrink: 0 }}>
-                              <Button
+                              {!isSocialMeal(meal) && <Button
                                 variant="text"
                                 aria-expanded={expanded}
                                 aria-controls={`recipe-${day.id}`}
@@ -2464,7 +2529,7 @@ function MealsPageContent() {
                                 sx={{ minHeight: 44 }}
                               >
                                 {expanded ? "Hide recipe" : "View recipe"}
-                              </Button>
+                              </Button>}
                               <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                                 <Button
                                   size="small"
@@ -2498,8 +2563,19 @@ function MealsPageContent() {
                                   disabled={Boolean(swappingMealId)}
                                   sx={{ minHeight: 44 }}
                                 >
-                                  {swapping ? "Swapping..." : "Swap meal"}
+                                  {swapping ? "Swapping..." : isSocialMeal(meal) ? "Add a recipe" : "Swap meal"}
                                 </Button>
+                                {!isSocialMeal(meal) && <Button
+                                  size="small"
+                                  color="inherit"
+                                  variant="text"
+                                  startIcon={<LocalDiningRoundedIcon fontSize="small" />}
+                                  onClick={() => void handlePlanMealOut(dayIndex, mealIndex)}
+                                  disabled={Boolean(swappingMealId)}
+                                  sx={{ minHeight: 44 }}
+                                >
+                                  Meal out
+                                </Button>}
                               </Stack>
                             </Stack>
                           </CardContent>

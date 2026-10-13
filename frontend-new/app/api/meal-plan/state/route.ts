@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    plan = await approvePlanForUser(supabase, user.id, plan);
+    plan = await approvePlanForUser(supabase as never, user.id, plan);
   } catch (error) {
     const failure = approvalFailure(error);
     return NextResponse.json(failure.body, { status: failure.status });

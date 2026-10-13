@@ -2,7 +2,7 @@ import type { MealInstance } from "./meal-generator";
 
 export type StoredMealInstance = Pick<
   MealInstance,
-  "instanceId" | "baseId" | "mealSlot" | "title" | "description" | "tags" | "image" | "readyInMinutes" | "portionMultiplier" | "baseMacros" | "macros" | "baseIngredients" | "ingredients" | "proteinType"
+  "instanceId" | "baseId" | "mealSlot" | "title" | "description" | "tags" | "image" | "readyInMinutes" | "portionMultiplier" | "baseMacros" | "macros" | "baseIngredients" | "ingredients" | "proteinType" | "mealKind" | "nutritionStatus"
 >;
 
 export type MealHistoryEntry = {
