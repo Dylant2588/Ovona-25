@@ -184,6 +184,6 @@ export async function seedMealConceptsFromStaticLibrary(
   );
   if (!unique.length) return 0;
 
-  await storeMealConcepts(unique, supabase, { source: "seed", verified: true });
+  await storeMealConcepts(unique, supabase, { source: "seed", verified: false });
   return unique.length;
 }

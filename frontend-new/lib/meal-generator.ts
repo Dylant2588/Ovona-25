@@ -33,6 +33,8 @@ export type ProteinType = "poultry" | "red_meat" | "fish" | "seafood" | "plant" 
 export type MealInstance = {
   instanceId: string;
   baseId: string;
+
+  recipeVersion?: number;
   mealSlot: MealSlot;
   title: string;
   description: string;
@@ -465,6 +467,11 @@ const MEAL_LIBRARY: BaseMeal[] = [
     proteinType: "mixed",
   },
 ];
+
+/** Complete deterministic catalogue export; these records are unreviewed internal drafts. */
+export function exportStaticRecipeCatalogue() {
+  return MEAL_LIBRARY.map(meal => ({ ...meal, macros: mealMacrosFromIngredients(meal), ingredients: meal.ingredients.map(i => ({ ...i })), steps: [...(meal.steps ?? [])] }));
+}
 
 const GOAL_MULTIPLIERS: Record<string, number> = {
   lose_weight: 0.92,

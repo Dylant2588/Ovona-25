@@ -68,14 +68,10 @@ import { supabase } from "@/lib/supabaseClient";
 import {
   buildRecipeSteps,
   buildShoppingList,
-  generateFallbackMealPlan,
   preferenceSignatureFor,
-  regenerateDayInPlan,
-  regenerateWeekInPlan,
   resolveMacroTargets,
   rotationHistoryFromPlan,
   sanitizeRecipeSteps,
-  swapMealInPlan,
   WORKDAY_COUNT,
   type MacroTargets,
   type MacroBreakdown,
@@ -1227,11 +1223,7 @@ function MealsPageContent() {
           }
           setPlan(storedEnforced.plan);
           setEnforcement(storedEnforced.enforcement);
-          await persistPlan(
-            storedEnforced.plan,
-            storedEnforced.plan.preferenceSignature ?? signature,
-            storedEnforced.enforcement
-          );
+          setError("Saved plan: ingredient and allergy checks have not been verified against the reviewed recipe library. Generate a checked plan when the library is ready.");
           setPlanLoading(false);
           setLoadingStepIndex(LOADING_STEPS.length);
           console.log("Meal plan load", {
@@ -1260,7 +1252,7 @@ function MealsPageContent() {
         setPlan(cachedEnforced.plan);
         setEnforcement(cachedEnforced.enforcement);
         planSignatureRef.current = signature;
-        void persistPlan(cachedEnforced.plan, signature, cachedEnforced.enforcement);
+        setError("Cached plan: ingredient and allergy checks have not been verified against the reviewed recipe library.");
         setPlanLoading(false);
         setLoadingStepIndex(LOADING_STEPS.length);
         console.log("Meal plan load", {
@@ -1292,12 +1284,8 @@ function MealsPageContent() {
     enforcementState: EnforcementInfo | null = enforcement
   ) => {
     if (!user || typeof window === "undefined") return;
-    window.localStorage.setItem(storageKeyFor(user.id), JSON.stringify(nextPlan));
-    if (signature) {
-      planSignatureRef.current = signature;
-    }
     try {
-      await authFetchWithRetry("/api/meal-plan/state", {
+      const response = await authFetchWithRetry("/api/meal-plan/state", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1306,6 +1294,12 @@ function MealsPageContent() {
           enforcement: enforcementState,
         }),
       });
+      if (!response.ok) {
+        const rejected = await response.json() as { message?: string };
+        throw new Error(rejected.message ?? "Recipe checks prevented saving. Your previous plan is unchanged.");
+      }
+      window.localStorage.setItem(storageKeyFor(user.id), JSON.stringify(nextPlan));
+      if (signature) planSignatureRef.current = signature;
     } catch (error) {
       console.error("Failed to persist plan state", error);
       showToast("Couldn't save your latest plan changes. Try again.", "error", {
@@ -1314,6 +1308,7 @@ function MealsPageContent() {
           void persistPlan(nextPlan, signature, enforcementState);
         },
       });
+      throw error;
     }
   };
 
@@ -1448,39 +1443,16 @@ function MealsPageContent() {
       setLoadingStepIndex(1);
       const aiResponse = await fetchPlanFromAi(rotationHistory);
       const aiPlan = aiResponse.plan;
+      await persistPlan(aiPlan, preferenceSignature, aiResponse.enforcement ?? null);
       setPlan(aiPlan);
       setEnforcement(aiResponse.enforcement);
-      await persistPlan(aiPlan, preferenceSignature, aiResponse.enforcement ?? null);
+      setError(null);
       setLoadingStepIndex(LOADING_STEPS.length);
       showToast("Week regenerated.", "success");
     } catch (error) {
-      console.error("Unable to regenerate via AI, using fallback", error);
-      if (
-        error instanceof Error &&
-        error.message.includes("couldn't build a safe plan that meets")
-      ) {
-        setError(error.message);
-        showToast(error.message, "error");
-        return;
-      }
-      const fallbackPlan = plan
-        ? regenerateWeekInPlan(plan, preferences)
-        : generateFallbackMealPlan(preferences);
-      const fallbackEnforced = enforcePlanMacros(fallbackPlan, preferences);
-      setPlan(fallbackEnforced.plan);
-      setEnforcement(fallbackEnforced.enforcement);
-      await persistPlan(
-        fallbackEnforced.plan,
-        preferenceSignature,
-        fallbackEnforced.enforcement
-      );
-      setLoadingStepIndex(LOADING_STEPS.length);
-      showToast("Couldn't regenerate from server. Showing fallback meals.", "error", {
-        actionLabel: "Retry",
-        onAction: () => {
-          void handleRegenerate();
-        },
-      });
+      const message = error instanceof Error ? error.message : "Reviewed recipes are not ready yet. Your existing plan is unchanged.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setPlanLoading(false);
       setRegeneratingWeek(false);
@@ -1509,39 +1481,17 @@ function MealsPageContent() {
         plan?: WeeklyMealPlan;
         enforcement?: EnforcementInfo | null;
       };
-      const nextPlan = data.plan ?? regenerateDayInPlan(plan, dayIndex, preferences);
+      if (!data.plan) throw new Error("No checked plan was returned. Your existing plan is unchanged.");
+      const nextPlan = data.plan;
       const nextEnforcement = data.enforcement ?? null;
+      await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
       setPlan(nextPlan);
       setEnforcement(nextEnforcement);
-      await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
       showToast("Day regenerated.", "success");
     } catch (error) {
-      console.error("Unable to regenerate day via API, using fallback", error);
-      try {
-        const fallbackPlan = regenerateDayInPlan(plan, dayIndex, preferences);
-        const fallbackEnforced = enforcePlanMacros(fallbackPlan, preferences);
-        setPlan(fallbackEnforced.plan);
-        setEnforcement(fallbackEnforced.enforcement);
-        await persistPlan(
-          fallbackEnforced.plan,
-          preferenceSignature,
-          fallbackEnforced.enforcement
-        );
-        showToast("Couldn't regenerate from server. Applied local fallback.", "error", {
-          actionLabel: "Retry",
-          onAction: () => {
-            void handleRegenerateDay(dayIndex);
-          },
-        });
-      } catch {
-        setError("We couldn't regenerate that day. Please try again.");
-        showToast("Couldn't regenerate day. Try again.", "error", {
-          actionLabel: "Retry",
-          onAction: () => {
-            void handleRegenerateDay(dayIndex);
-          },
-        });
-      }
+      const message = error instanceof Error ? error.message : "Couldn't produce a checked day. Your existing plan is unchanged.";
+      setError(message);
+      showToast(message, "error");
     } finally {
       setRegeneratingDayIndex(null);
     }
@@ -1569,11 +1519,12 @@ function MealsPageContent() {
         plan?: WeeklyMealPlan;
         enforcement?: EnforcementInfo | null;
       };
-      const nextPlan = data.plan ?? swapMealInPlan(plan, dayIndex, mealIndex, preferences);
+      if (!data.plan) throw new Error("No checked replacement was returned.");
+      const nextPlan = data.plan;
       const nextEnforcement = data.enforcement ?? null;
+      await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
       setPlan(nextPlan);
       setEnforcement(nextEnforcement);
-      await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
       showToast("Meal swapped.", "success");
     } catch (error) {
       console.error("Unable to swap meal", error);
@@ -1710,27 +1661,14 @@ function MealsPageContent() {
       try {
         setLoadingStepIndex(1);
         const aiResponse = await fetchPlanFromAi(rotationHistory, nextPreferences);
+        await persistPlan(aiResponse.plan, nextSignature, aiResponse.enforcement ?? null);
         setPlan(aiResponse.plan);
         setEnforcement(aiResponse.enforcement);
-        await persistPlan(aiResponse.plan, nextSignature, aiResponse.enforcement ?? null);
         showToast("Preferences applied.", "success");
       } catch (generationError) {
         console.error("Unable to regenerate via AI after saving preferences", generationError);
-        const fallbackPlan = plan
-          ? regenerateWeekInPlan(plan, nextPreferences)
-          : generateFallbackMealPlan(nextPreferences);
-        const fallbackEnforced = enforcePlanMacros(fallbackPlan, nextPreferences);
-        setPlan(fallbackEnforced.plan);
-        setEnforcement(fallbackEnforced.enforcement);
-        await persistPlan(
-          fallbackEnforced.plan,
-          nextSignature,
-          fallbackEnforced.enforcement
-        );
-        showToast("Applied preferences with local fallback generation.", "error", {
-          actionLabel: "Retry",
-          onAction: () => void handleSavePreferencePanel(),
-        });
+        setError("Preferences saved. A checked replacement plan isn't available yet; the displayed plan has not been checked against these new preferences.");
+        showToast("Preferences saved; your previous plan is retained pending recipe checks.", "warning");
       } finally {
         setPlanLoading(false);
         setRegeneratingWeek(false);

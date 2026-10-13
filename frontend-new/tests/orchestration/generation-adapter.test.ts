@@ -1,61 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { buildDeterministicPlanningInput } from "../../lib/orchestration/candidate-adapter.ts";
-import {
-  assertCompleteWeeklyAvailability,
-  materializeVerifiedCatalogue,
-} from "../../lib/orchestration/verified-catalogue.ts";
-import { normalizePlannerProfile } from "../../lib/orchestration/normalize-profile.ts";
-import { orchestrateWeek } from "../../lib/orchestration/schedule.ts";
-
-const profile = normalizePlannerProfile({
-  calorieTarget: 2200,
-  proteinTarget: 160,
-  householdSize: 1,
-  maxPrepMinutes: 30,
-  requiredSlots: ["breakfast", "lunch", "dinner", "snack"],
-});
-
-test("a provenance-complete curated catalogue schedules every slot for seven days", () => {
-  const candidates = materializeVerifiedCatalogue();
-  assert.equal(candidates.length, 28);
-  assert.ok(candidates.every((candidate) => candidate.verified));
-  assert.ok(candidates.every((candidate) => Object.isFrozen(candidate)));
-  assert.ok(candidates.every((candidate) => Number.isFinite(candidate.nutrition.calories)));
-  assert.ok(candidates.every((candidate) => candidate.ingredients.every((ingredient) => ingredient.quantity > 0 && ingredient.unit.length > 0)));
-  assert.ok(candidates.every((candidate) => candidate.provenance.source === "ovona-curated-catalogue" && candidate.provenance.version));
-
-  const availability = assertCompleteWeeklyAvailability(profile, candidates, profile.policy);
-  assert.equal(availability.ok, true);
-  if (!availability.ok) return;
-
-  const schedule = orchestrateWeek(profile, availability.value);
-  assert.equal(schedule.ok, true);
-  if (schedule.ok) assert.equal(schedule.value.days.length, 7);
-});
-
-test("the adapter excludes untrusted stored concepts and returns truthful verified-catalogue insufficiency", async () => {
-  const insufficient = materializeVerifiedCatalogue().filter((candidate) => candidate.slot !== "snack");
-  const availability = assertCompleteWeeklyAvailability(profile, insufficient, profile.policy);
-  assert.equal(availability.ok, false);
-  if (!availability.ok) {
-    assert.equal(availability.error.code, "INSUFFICIENT_VERIFIED_CATALOGUE");
-    assert.match(availability.error.reasons.join(" "), /snack/i);
-  }
-
-  const result = await buildDeterministicPlanningInput("user-1", {
-    context: {
-      calorieTarget: 2200, proteinTarget: 160, carbTarget: 200, fatTarget: 70,
-      dietaryMode: "mixed", allergies: [], dislikes: [], cuisinePreferences: [],
-      maxPrepMinutes: 30, healthConditions: [], microTargets: {}, mealsPerDay: 5,
-      slotLabels: ["Breakfast", "Snack", "Lunch", "Snack", "Dinner"], weeklyBudget: 55,
-      recentMealNames: ["Unknown concept"], recentProteinTypes: [], slotBudgets: [],
-    },
-    preferences: { tastes: [], profile: { mealsPerDay: 5 } },
-  });
+import type { GenerationSupabase, GenerationContext } from "../../lib/generation/types.ts";
+import { recipeDatabase, reviewedRecipe } from "./reviewed-recipe-fixture.ts";
+const context: GenerationContext = { calorieTarget: 1650, proteinTarget: 120, carbTarget: 180, fatTarget: 48, dietaryMode: "mixed", allergies: [], dislikes: [], cuisinePreferences: [],
+  maxPrepMinutes: 30, healthConditions: [], microTargets: {}, mealsPerDay: 5, slotLabels: ["Breakfast", "Snack", "Lunch", "Snack", "Dinner"], weeklyBudget: 55,
+  recentMealNames: [], recentProteinTypes: [], slotBudgets: [] };
+test("adapter admits only reviewed database recipes and preserves duplicate snack slots", async () => {
+  const result = await buildDeterministicPlanningInput("user-1", { context, supabase: recipeDatabase() as unknown as GenerationSupabase });
   assert.equal(result.ok, true);
-  if (result.ok) {
-    assert.equal(result.value.candidates.length, 28);
-    assert.ok(result.value.candidates.every((candidate) => candidate.id !== "llm-concept"));
+  if (result.ok) { assert.equal(result.value.candidates.length, 4); assert.equal(result.value.profile.hardConstraints.requiredSlots.length, 5);
+    assert.equal(result.value.candidates[0].title, reviewedRecipe().title); }
+});
+test("pending, missing-schema, restrictions and preference-read failures cannot use synthetic meals", async () => {
+  const pending = reviewedRecipe(); pending.review.status = "pending_review";
+  for (const options of [{ recipes: [] }, { recipes: [pending] }, { failed: "recipe_library" }, { failed: "user_allergies" }, { allergy: "unknown-new-allergy" }]) {
+    const result = await buildDeterministicPlanningInput("user-1", { context, supabase: recipeDatabase(options) as unknown as GenerationSupabase });
+    assert.equal(result.ok, false);
   }
 });

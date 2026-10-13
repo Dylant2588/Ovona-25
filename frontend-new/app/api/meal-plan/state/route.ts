@@ -6,6 +6,7 @@ import {
 } from "@/lib/meal-generator";
 import type { EnforcementInfo } from "@/lib/macro-enforcement";
 import { resolveRequestAuth } from "@/lib/serverAuth";
+import { approvePlanForUser, approvalFailure } from "@/lib/recipes/plan-boundary";
 
 type StoredDay = {
   id: string;
@@ -128,17 +129,19 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     plan,
     source: "storage",
+    approval: "unchecked",
     enforcement: firstDayPayload?.enforcement ?? null,
   });
 }
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { weekStart, plan, enforcement } = body as {
+  const { weekStart, enforcement } = body as {
     weekStart?: string;
     plan?: WeeklyMealPlan;
     enforcement?: EnforcementInfo | null;
   };
+  let plan = body.plan as WeeklyMealPlan | undefined;
 
   if (!plan) {
     return NextResponse.json(
@@ -174,6 +177,12 @@ export async function POST(request: NextRequest) {
     console.warn("[meal-plan/state] using bearer fallback auth");
   }
 
+  try {
+    plan = await approvePlanForUser(supabase, user.id, plan);
+  } catch (error) {
+    const failure = approvalFailure(error);
+    return NextResponse.json(failure.body, { status: failure.status });
+  }
   const planId = plan.id ?? `plan-${effectiveWeekStart}`;
   const persistedDays = (plan.days ?? []).slice(0, WORKDAY_COUNT);
   const persistedTotals = sumMacros(
