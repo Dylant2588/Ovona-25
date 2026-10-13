@@ -18,7 +18,7 @@ export const reviewedPlan = (): WeeklyMealPlan => {
 };
 export const recipeDatabase = (options: { allergy?: string; failed?: string; recipes?: RecipeRecord[]; dietary?: string } = {}) => ({
   from: (table: string) => ({ select: () => ({ eq: async () => ({ error: options.failed === table ? { message: "unavailable" } : null,
-    data: table === "recipe_library" ? (options.recipes ?? [reviewedRecipe()]).map((record) => ({ id: record.id, version: record.version, record })) :
+    data: table === "recipe_library" ? (options.recipes ?? [reviewedRecipe()]).map((record) => ({ id: record.id, version: record.version, review_status: record.review.status, record })) :
       table === "user_allergies" ? options.allergy ? [{ allergy_name: options.allergy }] : [] :
       table === "user_preferences" ? [{ dietary_mode: options.dietary ?? "mixed" }] : [] }) }) }),
 });

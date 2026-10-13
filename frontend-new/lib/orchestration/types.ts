@@ -61,6 +61,8 @@ export type VerifiedCandidateMeal = {
   leftoverFromCandidateId?: string;
   /** Explicitly verified similarity group; absence means the candidate ID is its group. */
   similarityKey?: string;
+  /** A bounded AI ordering hint after server-side recipe/version resolution. */
+  aiPriority?: number;
 };
 
 export type SelectedMealServing = {

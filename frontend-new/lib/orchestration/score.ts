@@ -32,7 +32,10 @@ export const scoreCandidate = (profile: PlannerProfile, candidate: VerifiedCandi
     ...(candidate.prepMinutes <= 20 ? ["prep time"] : []),
     ...(candidate.cost <= 3 ? ["cost"] : []),
   ];
-  return { candidate, components, total: Object.values(components).reduce((sum, value) => sum + value, 0), facts };
+  // AI may only settle otherwise-near deterministic choices. It cannot create
+  // a candidate or outweigh validated nutrition and hard constraints.
+  const aiTieBreaker = candidate.aiPriority == null ? 0 : Math.max(0, 0.001 - candidate.aiPriority / 1_000_000);
+  return { candidate, components, total: Object.values(components).reduce((sum, value) => sum + value, 0) + aiTieBreaker, facts };
 };
 
 export const rankCandidates = (profile: PlannerProfile, candidates: readonly VerifiedCandidateMeal[], context: ScoreContext): CandidateScore[] =>
