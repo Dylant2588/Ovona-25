@@ -28,13 +28,13 @@ export async function loadReviewedRecipes(supabase: RecipeReader): Promise<
   { ok: true; recipes: RecipeRecord[] } | { ok: false; code: "recipe_library_unavailable" | "invalid_recipe_library"; reasons: string[] }
 > {
   try {
-    const { data, error } = await supabase.from("recipe_library").select("id,version,record").eq("review_status", "approved");
+    const { data, error } = await supabase.from("recipe_library").select("id,version,review_status,record").eq("review_status", "approved");
     if (error || !Array.isArray(data)) return { ok: false, code: "recipe_library_unavailable", reasons: ["Reviewed recipe library could not be loaded"] };
     const recipes: RecipeRecord[] = [];
     for (const row of data) {
       const record = row?.record;
       const errors = recipeRecordErrors(record);
-      if (errors.length || record?.id !== row.id || record?.version !== row.version || record?.review?.status !== "approved") return { ok: false, code: "invalid_recipe_library", reasons: errors.length ? errors : ["Recipe identity or approval mismatch"] };
+      if (errors.length || record?.id !== row.id || record?.version !== row.version || record?.review?.status !== "approved" || row?.review_status !== "approved") return { ok: false, code: "invalid_recipe_library", reasons: errors.length ? errors : ["Recipe identity or approval mismatch"] };
       recipes.push(record as RecipeRecord);
     }
     return { ok: true, recipes };

@@ -6,7 +6,7 @@ import { reviewedRecipe } from "./recipe-fixtures.ts";
 const reader = (data: unknown, error: unknown = null) => ({ from: () => ({ select: () => ({ eq: async () => ({ data, error }) }) }) });
 test("reviewed recipes retain batch measurements, source and nutrition evidence", async () => {
   const recipe = reviewedRecipe();
-  const loaded = await loadReviewedRecipes(reader([{ id: recipe.id, version: recipe.version, record: JSON.parse(JSON.stringify(recipe)) }]));
+  const loaded = await loadReviewedRecipes(reader([{ id: recipe.id, version: recipe.version, review_status: "approved", record: JSON.parse(JSON.stringify(recipe)) }]));
   assert.equal(loaded.ok, true);
   if (loaded.ok) assert.deepEqual(loaded.recipes[0], recipe);
   assert.deepEqual(recipeRecordErrors(recipe), []);
@@ -15,7 +15,7 @@ test("missing schema, malformed recipe and forged row approval fail closed", asy
   assert.equal((await loadReviewedRecipes(reader(null, { code: "42P01" }))).ok, false);
   for (const mutate of [(r: ReturnType<typeof reviewedRecipe>) => { r.ingredients[0].amount = 0; }, (r: ReturnType<typeof reviewedRecipe>) => { r.review.status = "pending_review"; }, (r: ReturnType<typeof reviewedRecipe>) => { r.nutrition.reviewed = false; }]) {
     const recipe = reviewedRecipe(); mutate(recipe);
-    assert.equal((await loadReviewedRecipes(reader([{ id: recipe.id, version: recipe.version, record: recipe }]))).ok, false);
+    assert.equal((await loadReviewedRecipes(reader([{ id: recipe.id, version: recipe.version, review_status: "approved", record: recipe }]))).ok, false);
   }
 });
 test("catalogue export is complete deterministic and never certifies internal drafts", () => {
