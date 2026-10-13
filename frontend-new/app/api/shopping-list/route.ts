@@ -5,7 +5,7 @@ import {
   type ShoppingListItem,
   type WeeklyMealPlan,
 } from "@/lib/meal-generator";
-import { priceBasket } from "@/lib/tesco-prices";
+import { compareRetailerBaskets, type RetailerObservation } from "@/lib/retailer-comparison";
 import { resolveRequestAuth } from "@/lib/serverAuth";
 
 const toISODate = (value: string) => {
@@ -16,34 +16,29 @@ const toISODate = (value: string) => {
   return parsed.toISOString().split("T")[0];
 };
 
-const shoppingListResponse = (items: ShoppingListItem[]) => {
-  let basket:
-    | ReturnType<typeof priceBasket>
-    | null = null;
-  try {
-    basket = priceBasket(items);
-  } catch (error) {
-    console.error("shopping list pricing failed", error);
-  }
+const toObservation = (row: Record<string, unknown>): RetailerObservation | null => {
+  const text = (value: unknown) => typeof value === "string" ? value : "";
+  const number = (value: unknown) => typeof value === "number" ? value : Number(value);
+  const provenance = text(row.provenance_status);
+  if (provenance !== "operator_imported" && provenance !== "licensed_feed") return null;
+  return {
+    retailerId: text(row.retailer_id), retailerName: text(row.retailer_name), ingredientKey: text(row.ingredient_key),
+    packSize: number(row.pack_size), packUnit: text(row.pack_unit), unitPrice: number(row.unit_price), currency: text(row.currency),
+    estimated: row.estimated === true, sourceReference: text(row.source_reference), provenanceStatus: provenance, observedAt: text(row.observed_at),
+  };
+};
+
+const shoppingListResponse = async (items: ShoppingListItem[], supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"], userId: string) => {
+  const [observationResponse, preferenceResponse] = await Promise.all([
+    supabase.from("retailer_price_observations").select("retailer_id, retailer_name, ingredient_key, pack_size, pack_unit, unit_price, currency, estimated, source_reference, provenance_status, observed_at"),
+    supabase.from("user_preferences").select("weekly_budget").eq("user_id", userId).maybeSingle(),
+  ]);
+  const comparison = observationResponse.error
+    ? { status: "price_comparison_unavailable" as const, claimable: false as const, reasons: ["price_observations_unavailable"], unmatchedItems: [] }
+    : compareRetailerBaskets(items, (observationResponse.data ?? []).map((row) => toObservation(row as Record<string, unknown>)).filter((row): row is RetailerObservation => row !== null), Number(preferenceResponse.data?.weekly_budget));
   return NextResponse.json({
     items,
-    pricing: {
-      subtotal: basket?.subtotal ?? 0,
-      freshCost: basket?.freshCost ?? 0,
-      staplesCost: basket?.staplesCost ?? 0,
-      itemCount: basket?.itemCount ?? items.length,
-      unmatchedItems: basket?.unmatchedItems ?? [],
-      itemPrices: (basket?.items ?? []).map((item) => ({
-        ingredient: item.ingredient,
-        packsNeeded: item.packsNeeded,
-        packSize: item.packSize,
-        totalCost: item.totalCost,
-        matched: item.matched,
-        amountNeeded: item.amountNeeded,
-        amountToBuy: item.amountToBuy,
-        unit: item.unit,
-      })),
-    },
+    priceComparison: comparison,
   });
 };
 
@@ -87,7 +82,7 @@ export async function GET(request: NextRequest) {
   const items =
     (data?.meals as { items?: ShoppingListItem[] } | null)?.items ?? [];
 
-  return shoppingListResponse(items);
+  return shoppingListResponse(items, supabase, user.id);
 }
 
 export async function POST(request: NextRequest) {
@@ -162,5 +157,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return shoppingListResponse(normalized);
+  return shoppingListResponse(normalized, supabase, user.id);
 }

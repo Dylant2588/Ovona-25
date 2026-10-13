@@ -91,11 +91,11 @@ import {
   toEnforcementInfo,
   type EnforcementInfo,
 } from "@/lib/macro-enforcement";
-import { priceBasket } from "@/lib/tesco-prices";
 import {
   formatIngredientLineForDisplay,
   formatShoppingLineForDisplay,
 } from "@/lib/ingredient-display";
+import type { RetailerComparison } from "@/lib/retailer-comparison";
 
 type RawPreferences = {
   taste_preferences: string[] | string | null;
@@ -544,32 +544,6 @@ const shoppingDisplayLine = (item: ShoppingListItem) => {
   });
 };
 
-const buildLocalBasketPricing = (items: ShoppingListItem[]): BasketPricing | null => {
-  try {
-    const basket = priceBasket(items);
-    return {
-      subtotal: basket.subtotal,
-      freshCost: basket.freshCost,
-      staplesCost: basket.staplesCost,
-      itemCount: basket.itemCount,
-      unmatchedItems: basket.unmatchedItems,
-      itemPrices: basket.items.map((item) => ({
-        ingredient: item.ingredient,
-        packsNeeded: item.packsNeeded,
-        packSize: item.packSize,
-        totalCost: item.totalCost,
-        matched: item.matched,
-        amountNeeded: item.amountNeeded,
-        amountToBuy: item.amountToBuy,
-        unit: item.unit,
-      })),
-    };
-  } catch (error) {
-    console.error("Local basket pricing failed", error);
-    return null;
-  }
-};
-
 const mealSlotLabel = (slot: string) =>
   slot.charAt(0).toUpperCase() + slot.slice(1);
 
@@ -724,6 +698,7 @@ function MealsPageContent() {
   const [dislikeInput, setDislikeInput] = useState("");
   const [enforcement, setEnforcement] = useState<EnforcementInfo | null>(null);
   const [basketPricing, setBasketPricing] = useState<BasketPricing | null>(null);
+  const [priceComparison, setPriceComparison] = useState<RetailerComparison | null>(null);
   const [regeneratingWeek, setRegeneratingWeek] = useState(false);
   const [regeneratingDayIndex, setRegeneratingDayIndex] = useState<number | null>(null);
   const [swappingMealId, setSwappingMealId] = useState<string | null>(null);
@@ -1834,13 +1809,15 @@ function MealsPageContent() {
     if (!plan || !shoppingList.length) {
       setNormalizedList([]);
       setBasketPricing(null);
+      setPriceComparison(null);
       setNormalizingList(false);
       setShoppingListError(null);
       return;
     }
     if (authLoading || !userId) {
       setNormalizedList(shoppingList);
-      setBasketPricing(buildLocalBasketPricing(shoppingList));
+      setBasketPricing(null);
+      setPriceComparison(null);
       setNormalizingList(false);
       setShoppingListError(null);
       return;
@@ -1863,14 +1840,15 @@ function MealsPageContent() {
         if (cached.ok) {
           const data = (await cached.json()) as {
             items?: ShoppingListItem[];
-            pricing?: BasketPricing;
+            priceComparison?: RetailerComparison;
           };
           const cacheHasNeededAmounts =
             Array.isArray(data.items) &&
             data.items.every((item) => typeof item.amountNeeded === "number");
           if (active && data.items?.length && cacheHasNeededAmounts) {
             setNormalizedList(data.items);
-            setBasketPricing(data.pricing ?? buildLocalBasketPricing(data.items));
+            setBasketPricing(null);
+            setPriceComparison(data.priceComparison ?? null);
             setNormalizingList(false);
             return;
           }
@@ -1896,12 +1874,13 @@ function MealsPageContent() {
         if (response.ok) {
           const data = (await response.json()) as {
             items?: ShoppingListItem[];
-            pricing?: BasketPricing;
+            priceComparison?: RetailerComparison;
           };
           if (active) {
             const resolvedItems = data.items ?? shoppingList;
             setNormalizedList(resolvedItems);
-            setBasketPricing(data.pricing ?? buildLocalBasketPricing(resolvedItems));
+            setBasketPricing(null);
+            setPriceComparison(data.priceComparison ?? null);
             setNormalizingList(false);
             return;
           }
@@ -1915,22 +1894,17 @@ function MealsPageContent() {
 
       if (active) {
         setNormalizedList(shoppingList);
-        const localPricing = buildLocalBasketPricing(shoppingList);
-        setBasketPricing(localPricing);
+        setBasketPricing(null);
+        setPriceComparison(null);
         setNormalizingList(false);
         if (hadFailure) {
-          if (localPricing) {
-            setShoppingListError(null);
-            showToast("Using local shopping list estimates.", "info");
-          } else {
-            setShoppingListError("Couldn't load shopping list. Try again.");
-            showToast("Couldn't load shopping list. Try again.", "error", {
-              actionLabel: "Retry",
-              onAction: () => {
-                setShoppingReloadToken((prev) => prev + 1);
-              },
+          setShoppingListError("Couldn't load shopping list. Try again.");
+          showToast("Couldn't load shopping list. Try again.", "error", {
+            actionLabel: "Retry",
+            onAction: () => {
+              setShoppingReloadToken((prev) => prev + 1);
+            },
             });
-          }
         }
       }
     };
@@ -2108,7 +2082,7 @@ function MealsPageContent() {
               ))}
             </Stack>
           )}
-          {(enforcement || basketPricing) && (
+          {(enforcement || priceComparison) && (
             <Stack direction="row" spacing={1} mt={1.5} flexWrap="wrap" useFlexGap>
               {plan && enforcement?.passed && (
                 <Tooltip title={enforcement.summary} arrow>
@@ -2120,11 +2094,11 @@ function MealsPageContent() {
                   />
                 </Tooltip>
               )}
-              {basketPricing && (
+              {priceComparison?.status === "qualified" && (
                 <Chip
                   size="small"
                   variant="outlined"
-                  label={`Estimated weekly cost: ~${formatGbp(basketPricing.subtotal)}`}
+                  label={`${priceComparison.bestRetailer.name}: ${formatGbp(priceComparison.lowestObservedCompleteBasket)}`}
                 />
               )}
             </Stack>
@@ -3133,11 +3107,12 @@ function MealsPageContent() {
                       {displayShoppingList.length} unique items
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Estimated weekly cost:{" "}
-                      {basketPricing ? `~${formatGbp(basketPricing.subtotal)}` : "—"}
+                      {priceComparison?.status === "qualified"
+                        ? `${priceComparison.bestRetailer.name}: ${formatGbp(priceComparison.lowestObservedCompleteBasket)}${priceComparison.withinBudget ? " · within your budget" : " · over your budget"}`
+                        : "Price comparison unavailable until fresh retailer data is sourced"}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      Prices approximate, based on Tesco online
+                      Ovona only shows a retailer total when every list item has fresh, sourced evidence.
                     </Typography>
                     {basketPricing?.unmatchedItems?.length ? (
                       <Typography variant="caption" color="warning.main">
