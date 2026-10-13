@@ -2579,13 +2579,54 @@ function MealsPageContent() {
                               </Stack>
                             </Stack>
                           </CardContent>
+                          {!isSocialMeal(meal) && (
+                            <Collapse
+                              id={`recipe-${meal.instanceId}`}
+                              in={expanded}
+                              timeout="auto"
+                              unmountOnExit
+                              onEntered={(element) => element.scrollIntoView({ behavior: "smooth", block: "nearest" })}
+                              sx={{ scrollMarginTop: 80 }}
+                            >
+                              <Box sx={{ borderTop: "1px solid rgba(255,255,255,0.08)", bgcolor: "rgba(5,7,15,0.7)", p: { xs: 2, md: 2.5 } }}>
+                                <Stack direction={{ xs: "column", sm: "row" }} spacing={1} justifyContent="space-between" alignItems={{ sm: "center" }} sx={{ mb: 2 }}>
+                                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                    <Chip size="small" icon={<ScheduleRoundedIcon fontSize="small" />} label={`Prep ${meal.readyInMinutes} min`} />
+                                    <Chip size="small" label={`${meal.macros.calories} kcal · ${meal.macros.protein}g protein`} />
+                                  </Stack>
+                                  <Button size="small" color="secondary" onClick={() => setExpandedMealId(null)}>Close recipe</Button>
+                                </Stack>
+                                {meal.description && <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{meal.description}</Typography>}
+                                <Box sx={{ display: "grid", gap: 2.5, gridTemplateColumns: { xs: "1fr", md: "minmax(0, 0.4fr) minmax(0, 0.6fr)" } }}>
+                                  <Stack spacing={1}>
+                                    <Typography variant="subtitle2" color="text.secondary">Ingredients</Typography>
+                                    {(meal.ingredients ?? []).length ? (meal.ingredients ?? []).map((ingredient) => (
+                                      <Typography key={`${meal.instanceId}-${ingredient.name}-${ingredient.unit}-${ingredient.amount}`} variant="body2">{formatIngredientLine(ingredient)}</Typography>
+                                    )) : <Typography variant="body2" color="text.secondary">Ingredients will appear here for this meal.</Typography>}
+                                  </Stack>
+                                  <Stack spacing={1}>
+                                    <Typography variant="subtitle2" color="text.secondary">Method</Typography>
+                                    {resolveRecipeSteps(meal).length ? resolveRecipeSteps(meal).map((step, index) => (
+                                      <Stack key={`${meal.instanceId}-step-${index}`} direction="row" spacing={1} alignItems="flex-start">
+                                        <Typography variant="subtitle2" fontWeight={700} sx={{ minWidth: 22, color: "secondary.main" }}>{index + 1}.</Typography>
+                                        <Typography variant="body2" color="text.secondary">{step}</Typography>
+                                      </Stack>
+                                    )) : <Typography variant="body2" color="text.secondary">Cooking steps not available for this meal.</Typography>}
+                                  </Stack>
+                                </Box>
+                              </Box>
+                            </Collapse>
+                          )}
                         </Card>
                       );
                     })}
                   </Box>
                   <Collapse
                     id={`recipe-${day.id}`}
-                    in={Boolean(expandedMealForDay)}
+                    // Recipe content now belongs directly beneath its meal card;
+                    // retain this legacy block temporarily while its shared
+                    // presentation helpers are migrated out of the page.
+                    in={false}
                     timeout="auto"
                     unmountOnExit
                     onEntered={(element) => element.scrollIntoView({ behavior: "smooth", block: "start" })}
