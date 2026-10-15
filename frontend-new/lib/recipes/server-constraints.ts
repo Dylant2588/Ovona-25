@@ -32,10 +32,13 @@ export async function loadServerConstraints(database: ConstraintDatabase, userId
   });
   const union = (values: string[]) => [...new Set(values.map((value) => value.trim().toLowerCase()).filter(Boolean))];
   const dietaryModes = union(sources.flatMap((row) => [...strings(row.dietary_mode), ...strings(row.lifestyle)]).concat(strings(requested?.profile?.dietaryMode)));
+  const neverFoods = union(sources.flatMap((row) => strings(row.never_foods)));
   const prepLimits = sources.map((row) => Number(row.max_prep_minutes)).filter((value) => Number.isFinite(value) && value > 0);
   return {
     allergies: union(sources.flatMap((row) => strings(row.allergies)).concat(allergyRows, strings(requested?.profile?.allergies))),
+    // Dislikes are intentionally a ranking signal. Only neverFoods is enforced as a hard exclusion.
     dislikes: union(sources.flatMap((row) => strings(row.dislikes)).concat(strings(requested?.profile?.dislikes))),
+    neverFoods,
     dietaryModes,
     maxPrepMinutes: prepLimits.length ? Math.min(...prepLimits) : undefined,
   };

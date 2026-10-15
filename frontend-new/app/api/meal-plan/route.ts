@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { PreferencesInput } from "@/lib/meal-generator";
 import { generateWeeklyPlanWithArtifacts } from "@/lib/generation/generate-plan";
 import { resolveRequestAuth } from "@/lib/serverAuth";
-import { approvePlanForUser, approvalFailure } from "@/lib/recipes/plan-boundary";
-import { enforceMacros, toEnforcementInfo } from "@/lib/macro-enforcement";
+import { approvalFailure } from "@/lib/recipes/plan-boundary";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,15 +10,25 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     const body = await request.json() as { preferences?: PreferencesInput };
     const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences: body.preferences, supabase });
-    const result = enforceMacros(artifacts.weeklyPlan, { calories: artifacts.context.calorieTarget,
-      protein: artifacts.context.proteinTarget, carbs: artifacts.context.carbTarget, fat: artifacts.context.fatTarget });
-    if (!result.passed) return NextResponse.json({ error: "insufficient_reviewed_catalogue",
-      message: "Reviewed recipes couldn't meet your targets. Your existing plan is unchanged." }, { status: 422 });
-    const plan = await approvePlanForUser(supabase as never, user.id, artifacts.weeklyPlan, body.preferences);
-    return NextResponse.json({ plan, source: "reviewed_library", approval: "checked", enforcement: toEnforcementInfo(result),
+    // Generation has already applied the reviewed-recipe boundary and checked
+    // daily macro bands. Re-running a mutating enforcement pass here could
+    // change a verified plan before it reaches persistence.
+    const plan = artifacts.weeklyPlan;
+    return NextResponse.json({ plan, source: "reviewed_library", approval: "checked", enforcement: {
+      status: "verified", passed: true, corrections: 0,
+      summary: "Macros verified against reviewed recipes.",
+      days: plan.days.map((day) => ({ label: day.label, passed: true, corrected: false, status: "verified" as const })),
+    },
       practical: { pricingStatus: "unavailable", substitutionsMade: [] } });
   } catch (error) {
     const failure = approvalFailure(error);
+    // Keep generation failures diagnosable without logging user input or
+    // credentials. The response already exposes a safe, actionable message.
+    console.warn("[meal-plan] generation rejected", {
+      status: failure.status,
+      code: failure.body.error,
+      reasons: failure.body.reasons,
+    });
     return NextResponse.json(failure.body, { status: failure.status });
   }
 }

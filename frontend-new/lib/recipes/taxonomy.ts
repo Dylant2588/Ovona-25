@@ -30,5 +30,18 @@ export const INGREDIENT_TAXONOMY: IngredientTaxon[] = [
   ...["water", "spinach", "cucumber", "avocado", "blueberries", "banana", "lime", "carrots", "cabbage", "dates", "scallions", "rice vinegar", "maple syrup", "chia seeds", "pumpkin seeds", "espresso powder", "sea salt", "olive oil", "coconut milk", "snap peas", "corn kernels", "chipotle peppers", "cinnamon", "paprika", "garlic", "onion", "broccoli", "courgette"].map(name => taxon(name.replaceAll(" ", "_"), [name])),
   taxon("rice", ["brown rice", "jasmine rice", "rice"]), taxon("chickpea", ["chickpea", "chickpeas"]), taxon("tomato", ["tomatoes", "cherry tomatoes", "diced tomatoes", "tomato", "passata"]),
   taxon("pepper", ["bell pepper", "red pepper", "bell peppers", "peppers"]), taxon("black_beans", ["black beans"]),
+  // Early imports used explicit `unreviewed_*` canonical IDs until a human
+  // reviewer attested their ingredient evidence. Keep those immutable record
+  // IDs valid after review, with conservative allergy metadata, so an
+  // approved recipe is not silently unusable by the planning gate.
+  taxon("unreviewed_apple", ["apple"]),
+  taxon("unreviewed_pea_protein", ["pea protein"]),
+  taxon("unreviewed_mixed_berries", ["mixed berries"]),
+  taxon("unreviewed_cocoa_powder", ["cocoa powder"]),
+  taxon("unreviewed_olives", ["olives"]),
+  taxon("unreviewed_mashed_white_beans", ["mashed white beans"]),
+  taxon("unreviewed_honey", ["honey"], [], ["animal_product"]),
+  taxon("unreviewed_almond_milk", ["almond milk"], ["tree_nuts"]),
+  taxon("unreviewed_dark_chocolate", ["dark chocolate"], ["milk", "tree_nuts"]),
 ];
 export const findIngredientTaxon = (name: string) => INGREDIENT_TAXONOMY.find(entry => entry.aliases.includes(normalizeIngredient(name)));

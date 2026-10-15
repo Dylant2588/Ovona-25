@@ -108,6 +108,9 @@ type RawPreferences = {
   target_protein: number | null;
   target_carbs: number | null;
   target_fat: number | null;
+  never_foods: string[] | null;
+  food_likes: string[] | null;
+  max_prep_minutes: number | null;
 };
 
 type ProfileRow = {
@@ -155,7 +158,10 @@ type PreferencePanelState = {
   dietaryMode: DietaryModeOption;
   allergies: string[];
   dislikes: string[];
+  neverFoods: string[];
+  foodLikes: string[];
   cuisines: string[];
+  maxPrepMinutes: number | null;
 };
 
 type UserAllergyRow = {
@@ -612,7 +618,10 @@ const panelStateFromPreferences = (prefs: PreferencesInput | null): PreferencePa
     dietaryMode: normalizeDietaryModeValue(profile?.dietaryMode ?? null),
     allergies: uniqueStrings(profile?.allergies ?? []),
     dislikes: uniqueStrings(profile?.dislikes ?? []),
+    neverFoods: uniqueStrings(profile?.neverFoods ?? []),
+    foodLikes: uniqueStrings(profile?.foodLikes ?? []),
     cuisines: uniqueStrings(profile?.cuisines ?? []),
+    maxPrepMinutes: profile?.maxPrepMinutes ?? null,
   };
 };
 
@@ -693,9 +702,14 @@ function MealsPageContent() {
     dietaryMode: "mixed",
     allergies: [],
     dislikes: [],
+    neverFoods: [],
+    foodLikes: [],
     cuisines: [],
+    maxPrepMinutes: null,
   });
   const [dislikeInput, setDislikeInput] = useState("");
+  const [neverFoodInput, setNeverFoodInput] = useState("");
+  const [foodLikeInput, setFoodLikeInput] = useState("");
   const [enforcement, setEnforcement] = useState<EnforcementInfo | null>(null);
   const [basketPricing, setBasketPricing] = useState<BasketPricing | null>(null);
   const [priceComparison, setPriceComparison] = useState<RetailerComparison | null>(null);
@@ -1006,9 +1020,9 @@ function MealsPageContent() {
         ] = await Promise.all([
             supabase
               .from("user_preferences")
-              .select(
-                "taste_preferences, goal, meal_complexity, lifestyle, cuisines, allergies, target_calories, target_protein, target_carbs, target_fat"
-              )
+              // `*` keeps the existing app usable until the additive structured
+              // preference migration has reached a given Supabase environment.
+              .select("*")
               .eq("user_id", userId)
               .limit(1),
             supabase
@@ -1075,6 +1089,8 @@ function MealsPageContent() {
           trainingSchedule: ensureStringArray(profileData?.training_schedule),
           allergies: mergedAllergies,
           dislikes: ensureStringArray(profileData?.dislikes),
+          neverFoods: ensureStringArray(prefData?.never_foods),
+          foodLikes: ensureStringArray(prefData?.food_likes),
           cuisines: uniqueStrings([
             ...ensureStringArray(profileData?.cuisines),
             ...parseDelimitedList(prefData?.cuisines),
@@ -1089,6 +1105,7 @@ function MealsPageContent() {
             onboardingMeta?.mealsPerDay ??
             localOnboardingMeta?.mealsPerDay ??
             5,
+          maxPrepMinutes: parseNumberField(prefData?.max_prep_minutes),
         };
 
         setHasCanonicalPreferences(canonicalPreferencesFound);
@@ -1126,6 +1143,8 @@ function MealsPageContent() {
             trainingSchedule: [],
             allergies: [],
             dislikes: [],
+            neverFoods: [],
+            foodLikes: [],
             cuisines: [],
             pantryStaples: [],
             household: [],
@@ -1134,6 +1153,7 @@ function MealsPageContent() {
             stressLevel: null,
             notes: null,
             mealsPerDay: readOnboardingMetaFromStorage(userId)?.mealsPerDay ?? 5,
+            maxPrepMinutes: null,
           },
         });
       } finally {
@@ -1525,9 +1545,24 @@ function MealsPageContent() {
 
   const handleSwapMeal = async (dayIndex: number, mealIndex: number) => {
     if (!plan || !preferences) return;
-    const mealId = plan.days[dayIndex]?.meals[mealIndex]?.instanceId ?? null;
+    const mealToReplace = plan.days[dayIndex]?.meals[mealIndex];
+    const mealId = mealToReplace?.instanceId ?? null;
     setSwappingMealId(mealId);
     try {
+      // A swap is useful preference feedback, but it must be resolved from the
+      // stored, approved plan on the server; the browser never submits recipe identity.
+      if (mealId) {
+        const feedback = await authFetchWithRetry("/api/meal-feedback/reject", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            weekStart: plan.weekStart.slice(0, 10),
+            mealInstanceId: mealId,
+            reason: "not_interested",
+          }),
+        });
+        if (!feedback.ok) console.warn("Meal feedback was not saved; continuing with the swap.");
+      }
       const response = await authFetchWithRetry("/api/meal-plan/generate/meal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1595,6 +1630,17 @@ function MealsPageContent() {
     }));
   };
 
+  const addFoodTag = (key: "neverFoods" | "foodLikes", rawValue: string, clear: () => void) => {
+    const normalized = rawValue.trim();
+    if (!normalized) return;
+    setPreferencesPanelState((prev) => ({ ...prev, [key]: uniqueStrings([...prev[key], normalized]) }));
+    clear();
+  };
+
+  const removeFoodTag = (key: "neverFoods" | "foodLikes", tag: string) => {
+    setPreferencesPanelState((prev) => ({ ...prev, [key]: prev[key].filter((item) => item !== tag) }));
+  };
+
   const handleSavePreferencePanel = async () => {
     if (!user || !preferences) return;
     setPreferencesSaving(true);
@@ -1602,6 +1648,8 @@ function MealsPageContent() {
     setPreferencesNotice(null);
     const sanitizedAllergies = uniqueStrings(preferencesPanelState.allergies);
     const sanitizedDislikes = uniqueStrings(preferencesPanelState.dislikes);
+    const sanitizedNeverFoods = uniqueStrings(preferencesPanelState.neverFoods);
+    const sanitizedFoodLikes = uniqueStrings(preferencesPanelState.foodLikes);
     const sanitizedCuisines = uniqueStrings(preferencesPanelState.cuisines);
     const dietaryMode =
       preferencesPanelState.dietaryMode === "mixed"
@@ -1615,7 +1663,10 @@ function MealsPageContent() {
         dietaryMode,
         allergies: sanitizedAllergies,
         dislikes: sanitizedDislikes,
+        neverFoods: sanitizedNeverFoods,
+        foodLikes: sanitizedFoodLikes,
         cuisines: sanitizedCuisines,
+        maxPrepMinutes: preferencesPanelState.maxPrepMinutes,
       },
     };
     const nextSignature = preferenceSignatureFor(nextPreferences);
@@ -1630,7 +1681,10 @@ function MealsPageContent() {
           dietaryMode: preferencesPanelState.dietaryMode,
           allergies: sanitizedAllergies,
           dislikes: sanitizedDislikes,
+          neverFoods: sanitizedNeverFoods,
+          foodLikes: sanitizedFoodLikes,
           cuisines: sanitizedCuisines,
+          maxPrepMinutes: preferencesPanelState.maxPrepMinutes,
           tastePreferences: nextPreferences.tastes,
           goal: nextPreferences.goal,
           mealComplexity: nextPreferences.mealComplexity,
@@ -1828,39 +1882,9 @@ function MealsPageContent() {
       setNormalizingList(true);
       setShoppingListError(null);
       let hadFailure = false;
-      // Try cached server list first
-      try {
-        const cached = await authFetchWithRetry(
-          `/api/shopping-list?weekStart=${weekStart}`,
-          {
-          method: "GET",
-          cache: "no-store",
-          }
-        );
-        if (cached.ok) {
-          const data = (await cached.json()) as {
-            items?: ShoppingListItem[];
-            priceComparison?: RetailerComparison;
-          };
-          const cacheHasNeededAmounts =
-            Array.isArray(data.items) &&
-            data.items.every((item) => typeof item.amountNeeded === "number");
-          if (active && data.items?.length && cacheHasNeededAmounts) {
-            setNormalizedList(data.items);
-            setBasketPricing(null);
-            setPriceComparison(data.priceComparison ?? null);
-            setNormalizingList(false);
-            return;
-          }
-        } else {
-          hadFailure = true;
-        }
-      } catch (error) {
-        console.error("Failed to load cached shopping list", error);
-        hadFailure = true;
-      }
-
-      // Regenerate and persist
+      // A same-plan-ID cache is not sufficient evidence: older saved baskets
+      // can predate portion, swap, or ledger fixes. Rebuild directly from the
+      // final ingredients currently shown to the user and replace that cache.
       try {
         const response = await authFetchWithRetry("/api/shopping-list", {
           method: "POST",
@@ -1874,6 +1898,7 @@ function MealsPageContent() {
         if (response.ok) {
           const data = (await response.json()) as {
             items?: ShoppingListItem[];
+            planId?: string | null;
             priceComparison?: RetailerComparison;
           };
           if (active) {
@@ -2388,12 +2413,14 @@ function MealsPageContent() {
                   </Alert>
                 )}
 
-          <AccordionDetails
-                  sx={{
-                    px: { xs: 2, md: 3 },
-                    pb: 3,
-                  }}
-                >
+          <Box
+            component="section"
+            aria-label={`${day.label} meals`}
+            sx={{
+              pt: 0.5,
+              pb: 1,
+            }}
+          >
                   <Box
                     sx={{
                       display: "grid",
@@ -2490,7 +2517,7 @@ function MealsPageContent() {
                               {!isSocialMeal(meal) && <Button
                                 variant="text"
                                 aria-expanded={expanded}
-                                aria-controls={`recipe-${day.id}`}
+                                aria-controls={`recipe-${meal.instanceId}`}
                                 aria-label={`${expanded ? "Hide" : "View"} recipe for ${meal.title}`}
                                 color="secondary"
                                 startIcon={<MenuBookRoundedIcon fontSize="small" />}
@@ -2760,7 +2787,7 @@ function MealsPageContent() {
                       </Box>
                     )}
                   </Collapse>
-                </AccordionDetails>
+                </Box>
                       <Accordion disableGutters elevation={0} sx={{ bgcolor: "transparent", "&:before": { display: "none" } }}>
                   <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: 0 }}>
                     <Typography variant="body2" color="text.secondary">Log something else you ate</Typography>
@@ -3272,7 +3299,7 @@ function MealsPageContent() {
               Refine meal filters
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Update dietary mode, allergies, dislikes, and cuisine preferences.
+              Allergies and never-include foods are enforced. Likes and avoid foods guide the plan.
             </Typography>
           </Box>
           <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
@@ -3329,7 +3356,10 @@ function MealsPageContent() {
 
           <Stack spacing={1.25}>
             <Typography variant="subtitle2" color="text.secondary">
-              3. Dislikes
+              3. Avoid foods
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              We will try to avoid these, while still keeping your plan practical.
             </Typography>
             <TextField
               placeholder="Type an ingredient and press Enter"
@@ -3357,8 +3387,38 @@ function MealsPageContent() {
           </Stack>
 
           <Stack spacing={1.25}>
+            <Typography variant="subtitle2" color="text.secondary">4. Never include</Typography>
+            <Typography variant="caption" color="text.secondary">
+              A hard ingredient exclusion. Use allergies above for medical restrictions.
+            </Typography>
+            <TextField placeholder="Type an ingredient and press Enter" value={neverFoodInput} onChange={(event) => setNeverFoodInput(event.target.value)} onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addFoodTag("neverFoods", neverFoodInput, () => setNeverFoodInput("")); }
+            }} fullWidth size="small" />
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {preferencesPanelState.neverFoods.map((tag) => <Chip key={tag} label={tag} size="small" color="error" variant="outlined" onDelete={() => removeFoodTag("neverFoods", tag)} />)}
+            </Stack>
+          </Stack>
+
+          <Stack spacing={1.25}>
+            <Typography variant="subtitle2" color="text.secondary">5. Foods you like</Typography>
+            <TextField placeholder="Type a food and press Enter" value={foodLikeInput} onChange={(event) => setFoodLikeInput(event.target.value)} onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === ",") { event.preventDefault(); addFoodTag("foodLikes", foodLikeInput, () => setFoodLikeInput("")); }
+            }} fullWidth size="small" />
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+              {preferencesPanelState.foodLikes.map((tag) => <Chip key={tag} label={tag} size="small" color="secondary" variant="outlined" onDelete={() => removeFoodTag("foodLikes", tag)} />)}
+            </Stack>
+          </Stack>
+
+          <Stack spacing={1.25}>
+            <Typography variant="subtitle2" color="text.secondary">6. Quick-meal limit</Typography>
+            <TextField select SelectProps={{ native: true }} value={preferencesPanelState.maxPrepMinutes ?? ""} onChange={(event) => setPreferencesPanelState((prev) => ({ ...prev, maxPrepMinutes: event.target.value ? Number(event.target.value) : null }))} fullWidth size="small">
+              <option value="">Standard 30-minute limit</option><option value="10">10 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option>
+            </TextField>
+          </Stack>
+
+          <Stack spacing={1.25}>
             <Typography variant="subtitle2" color="text.secondary">
-              4. Cuisine Preferences (optional)
+              7. Cuisine Preferences (optional)
             </Typography>
             <FormGroup>
               <Grid container spacing={0.5}>

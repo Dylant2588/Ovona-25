@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { resolveRequestAuth } from "@/lib/serverAuth";
+import { normalizeTerms, PlanningInputError } from "@/lib/planning-input";
 
 type SavePreferencesPayload = {
   dietaryMode?: string | null;
@@ -9,6 +10,9 @@ type SavePreferencesPayload = {
   dislikes?: string[];
   cuisines?: string[];
   tastePreferences?: string[];
+  neverFoods?: string[];
+  foodLikes?: string[];
+  maxPrepMinutes?: number | null;
   goal?: string | null;
   mealComplexity?: string | number | null;
   macroTargets?: {
@@ -246,9 +250,36 @@ export async function POST(request: NextRequest) {
 
     const dietaryModeRaw = (body.dietaryMode ?? "").trim().toLowerCase();
     const dietaryMode = dietaryModeRaw && dietaryModeRaw !== "mixed" ? dietaryModeRaw : null;
-    const allergies = uniqueStrings(body.allergies);
-    const dislikes = uniqueStrings(body.dislikes);
-    const cuisines = uniqueStrings(body.cuisines);
+    // Read server-owned allergy records before accepting a client patch. An
+    // empty browser form must never downgrade an existing safety restriction.
+    const { data: existingAllergyRows, error: existingAllergyError } = await writeClient
+      .from("user_allergies").select("*").eq("user_id", userId);
+    if (existingAllergyError) {
+      return NextResponse.json({ error: "Unable to verify saved allergies before saving preferences." }, { status: 503 });
+    }
+    const savedAllergies = Array.isArray(existingAllergyRows) ? existingAllergyRows.flatMap((row) => {
+      const record = row as Record<string, unknown>;
+      return [record.allergy_name, record.allergy, record.allergen, record.name].filter((value): value is string => typeof value === "string");
+    }) : [];
+    let allergies: string[];
+    let dislikes: string[];
+    let cuisines: string[];
+    let neverFoods: string[];
+    let foodLikes: string[];
+    try {
+      allergies = [...new Set([...normalizeTerms(savedAllergies, "saved allergies"), ...normalizeTerms(body.allergies ?? [], "allergies")])];
+      dislikes = normalizeTerms(body.dislikes ?? [], "dislikes");
+      cuisines = normalizeTerms(body.cuisines ?? [], "cuisines");
+      neverFoods = normalizeTerms(body.neverFoods ?? [], "neverFoods");
+      foodLikes = normalizeTerms(body.foodLikes ?? [], "foodLikes");
+    } catch (error) {
+      const message = error instanceof PlanningInputError ? error.message : "Invalid preference values.";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+    const prepMinutes = body.maxPrepMinutes == null ? null : parseNumberOrNull(body.maxPrepMinutes);
+    if (body.maxPrepMinutes != null && (!prepMinutes || prepMinutes > 240)) {
+      return NextResponse.json({ error: "maxPrepMinutes must be between 1 and 240." }, { status: 400 });
+    }
     const tastePreferences = uniqueStrings(body.tastePreferences);
     const mealComplexity = normalizeMealComplexity(body.mealComplexity);
     const normalizedGoal = normalizeGoal(body.goal);
@@ -284,6 +315,8 @@ export async function POST(request: NextRequest) {
       lifestyle: dietaryMode,
       allergies: allergies.length ? allergies.join(", ") : null,
       cuisines: cuisines.length ? cuisines.join(", ") : null,
+      never_foods: neverFoods.length ? neverFoods : null,
+      food_likes: foodLikes.length ? foodLikes : null,
     };
 
     if (normalizedGoal) {
@@ -301,8 +334,12 @@ export async function POST(request: NextRequest) {
       userPreferencesPayload.target_carbs = parseNumberOrNull(body.macroTargets.carbs);
       userPreferencesPayload.target_fat = parseNumberOrNull(body.macroTargets.fat);
     }
+    if (prepMinutes) userPreferencesPayload.max_prep_minutes = prepMinutes;
 
     const preferencePayloadVariants: Array<Record<string, unknown>> = [userPreferencesPayload];
+    // Older schema deployments do not have structured fields yet. Retry with
+    // the legacy-safe payload instead of silently claiming that safety data was saved.
+    preferencePayloadVariants.push(Object.fromEntries(Object.entries(userPreferencesPayload).filter(([key]) => !["never_foods", "food_likes", "max_prep_minutes"].includes(key))));
 
     if (userPreferencesPayload.goal === "lose_weight") {
       preferencePayloadVariants.push({ ...userPreferencesPayload, goal: "lose" });

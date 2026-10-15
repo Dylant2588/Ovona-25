@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { resolveReviewedProposal, type AiMealProposal } from "../../lib/generation/ai-proposal.ts";
+import { buildReviewedProposalRequest, resolveReviewedProposal, type AiMealProposal } from "../../lib/generation/ai-proposal.ts";
+import { buildPlanningInput } from "../../lib/planning-input.ts";
 import { reviewedRecipe } from "./reviewed-recipe-fixture.ts";
 
 const choices = (): AiMealProposal => ({ choices: [
@@ -28,4 +29,15 @@ test("forged versions, unknown IDs, duplicate slots, and missing slots fail clos
     assert.equal(result.ok, false);
     if (!result.ok) assert.match(result.error.code, /ai_proposal_/);
   }
+});
+
+test("AI brief receives structured constraints without identity or free-form notes", () => {
+  const input = buildPlanningInput({ requested: { allergies: ["wheat"], dislikes: ["mushrooms"], maxPrepMinutes: 10 },
+    defaults: { maxPrepMinutes: 30, mealsPerDay: 5, weeklyBudget: 55, macroTargets: { calories: 1800, protein: 150, carbs: 180, fat: 60 } },
+    history: { recentCandidateIds: [], recentSimilarityKeys: [], recentProteinTypes: [], recentCuisines: [], recentFormats: [], recentMealNames: [], rejectedRecipeIds: [], rejectedSimilarityKeys: [] } });
+  const request = buildReviewedProposalRequest([{ slot: "breakfast", recipeId: "test-reviewed", recipeVersion: 1, title: "Safe meal" }], input);
+  assert.deepEqual(request.planningBrief?.hardExclusions.allergies, ["wheat"]);
+  assert.deepEqual(request.planningBrief?.foodPreferences.dislikes, ["mushrooms"]);
+  assert.equal(request.planningBrief?.mealConstraints.maxPrepMinutes, 10);
+  assert.doesNotMatch(JSON.stringify(request), /userId|notes|token/i);
 });

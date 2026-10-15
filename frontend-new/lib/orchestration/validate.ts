@@ -1,4 +1,5 @@
 import type { PlannerProfile, SelectedMeal, ScheduleViolation, WeekSchedule, WeekScheduleResult } from "./types.ts";
+import { practicalIngredientViolations } from "./practical-ingredients.ts";
 
 const MIN_PORTION_MULTIPLIER = 0.7;
 const MAX_PORTION_MULTIPLIER = 1.5;
@@ -32,6 +33,17 @@ const violationFor = (day: number, totals: { calories: number; protein: number }
     ? [{ day, code: "protein_out_of_band" as const, message: `Protein ${totals.protein.toFixed(2)} is outside the configured daily band.` }]
     : []),
 ];
+
+const practicalQuantityViolations = (days: readonly WeekSchedule["days"][number][], profile: PlannerProfile): ScheduleViolation[] =>
+  practicalIngredientViolations(days.flatMap((day) => day.meals)).flatMap((limit) =>
+    limit.grams > limit.maxGrams
+      ? [{
+          day: 0,
+          code: "practical_quantity_exceeded" as const,
+          message: `${limit.label} would total ${Math.round(limit.grams)}g for the week, above the practical ${limit.maxGrams}g limit.`,
+        }]
+      : []
+  );
 
 const portionFactor = (totals: { calories: number; protein: number }, profile: PlannerProfile) => {
   if (totals.calories <= 0 || totals.protein <= 0) return null;
@@ -76,5 +88,6 @@ export const validateAndRepairWeek = (profile: PlannerProfile, schedule: WeekSch
     }
     return { ...day, meals };
   });
+  violations.push(...practicalQuantityViolations(repairedDays, profile));
   return violations.length ? { ok: false, error: { code: "invalid_week", violations } } : { ok: true, value: { days: repairedDays } };
 };

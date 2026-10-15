@@ -28,7 +28,12 @@ const toObservation = (row: Record<string, unknown>): RetailerObservation | null
   };
 };
 
-const shoppingListResponse = async (items: ShoppingListItem[], supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"], userId: string) => {
+const shoppingListResponse = async (
+  items: ShoppingListItem[],
+  supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"],
+  userId: string,
+  planId?: string
+) => {
   const [observationResponse, preferenceResponse] = await Promise.all([
     supabase.from("retailer_price_observations").select("retailer_id, retailer_name, ingredient_key, pack_size, pack_unit, unit_price, currency, estimated, source_reference, provenance_status, observed_at"),
     supabase.from("user_preferences").select("weekly_budget").eq("user_id", userId).maybeSingle(),
@@ -38,6 +43,7 @@ const shoppingListResponse = async (items: ShoppingListItem[], supabase: Awaited
     : compareRetailerBaskets(items, (observationResponse.data ?? []).map((row) => toObservation(row as Record<string, unknown>)).filter((row): row is RetailerObservation => row !== null), Number(preferenceResponse.data?.weekly_budget));
   return NextResponse.json({
     items,
+    planId: planId ?? null,
     priceComparison: comparison,
   });
 };
@@ -67,7 +73,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase
     .from("plan_history")
-    .select("meals")
+    .select("meals, plan_id")
     .eq("user_id", user.id)
     .eq("week_start", weekStart)
     .eq("day_id", "shopping-list")
@@ -82,7 +88,7 @@ export async function GET(request: NextRequest) {
   const items =
     (data?.meals as { items?: ShoppingListItem[] } | null)?.items ?? [];
 
-  return shoppingListResponse(items, supabase, user.id);
+  return shoppingListResponse(items, supabase, user.id, data?.plan_id ?? undefined);
 }
 
 export async function POST(request: NextRequest) {
@@ -157,5 +163,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return shoppingListResponse(normalized, supabase, user.id);
+  return shoppingListResponse(normalized, supabase, user.id, plan.id ?? `plan-${effectiveWeekStart}`);
 }

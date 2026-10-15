@@ -117,7 +117,7 @@ export type ScheduledDay = Readonly<{
 
 export type ScheduleViolation = Readonly<{
   day: number;
-  code: "missing_slot" | "calories_out_of_band" | "protein_out_of_band" | "hard_constraint_violation" | "repair_exhausted" | "insufficient_candidates";
+  code: "missing_slot" | "calories_out_of_band" | "protein_out_of_band" | "hard_constraint_violation" | "repair_exhausted" | "insufficient_candidates" | "practical_quantity_exceeded";
   message: string;
 }>;
 

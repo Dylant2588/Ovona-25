@@ -70,7 +70,7 @@ alter table if exists public.user_meal_history
   drop constraint if exists user_meal_history_recipe_version_valid,
   add constraint user_meal_history_recipe_version_valid check (recipe_version is null or recipe_version > 0),
   drop constraint if exists user_meal_history_planning_state_valid,
-  add constraint user_meal_history_planning_state_valid check (planning_state is null or planning_state in ('accepted', 'eaten'));
+  add constraint user_meal_history_planning_state_valid check (planning_state is null or planning_state in ('accepted', 'eaten', 'rejected'));
 
 create index if not exists idx_user_meal_history_rotation
   on public.user_meal_history (user_id, date desc, recipe_id, recipe_version);

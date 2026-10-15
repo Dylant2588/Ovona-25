@@ -52,3 +52,17 @@ test("returns reason-coded invalidity when bounded repair cannot meet daily band
   assert.equal(unsafe.ok, false);
   if (!unsafe.ok) assert.equal(unsafe.error.code, "insufficient_candidates");
 });
+
+test("rejects a macro-valid week when exact selected ingredients create an impractical protein basket", () => {
+  const chickenHeavy = candidates(475, 29.4).map((candidate) => ({
+    ...candidate,
+    ingredients: [{ name: "Chicken breast", normalizedName: "chicken breast", quantity: 250, unit: "g", pantry: false }],
+  }));
+
+  const result = orchestrateWeek(profile(1), chickenHeavy, {});
+
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.ok(result.error.violations.some((violation) => violation.code === "practical_quantity_exceeded"));
+  }
+});

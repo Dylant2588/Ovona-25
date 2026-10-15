@@ -26,7 +26,16 @@ export async function buildDeterministicPlanningInput(userId: string,
     constraints.maxPrepMinutes = Math.min(constraints.maxPrepMinutes ?? context.maxPrepMinutes, context.maxPrepMinutes);
     const loaded = await loadReviewedRecipes(reader);
     if (!loaded.ok) return { ok: false, error: { statusCode: 503, code: loaded.code, reasons: loaded.reasons } };
-    const recipes = loaded.recipes.filter((recipe) => approveRecipe(recipe, constraints).approved);
+    const planning = context.planningInput;
+    const hardConstraints = planning ? {
+      allergies: [...planning.hardExclusions.allergies],
+      dietaryModes: [...planning.hardExclusions.dietaryRules],
+      neverFoods: [...planning.hardExclusions.neverFoods],
+      maxPrepMinutes: planning.mealConstraints.maxPrepMinutes,
+    } : constraints;
+    // Safety and practicality are admission rules. Soft dislikes remain available
+    // to the scheduler as ranking signals and never masquerade as allergies.
+    const recipes = loaded.recipes.filter((recipe) => approveRecipe(recipe, hardConstraints).approved);
     const candidates: VerifiedCandidateMeal[] = recipes.flatMap((recipe) => recipe.slots.map((slot) => ({
       id: `${recipe.id}:${slot}`, slot, title: recipe.title, verified: true as const,
       ingredients: recipe.ingredients.map((ingredient) => ({ name: ingredient.name, normalizedName: ingredient.canonicalId,
@@ -42,9 +51,17 @@ export async function buildDeterministicPlanningInput(userId: string,
     if (!candidates.length || reasons.length) return { ok: false, error: { statusCode: 422, code: "insufficient_reviewed_catalogue", reasons: reasons.length ? reasons : ["No reviewed recipes meet your saved restrictions."] } };
     // Shared approval applies dietary restrictions using reviewed ingredient evidence.
     const profile = normalizePlannerProfile({ calorieTarget: context.calorieTarget, proteinTarget: context.proteinTarget,
-      allergies: [], dislikes: constraints.dislikes, dietaryRules: [], maxPrepMinutes: constraints.maxPrepMinutes,
+      allergies: planning ? [...planning.hardExclusions.allergies] : constraints.allergies,
+      dislikes: planning ? [...planning.foodPreferences.dislikes] : constraints.dislikes,
+      dietaryRules: planning ? [...planning.hardExclusions.dietaryRules] : constraints.dietaryModes,
+      maxPrepMinutes: planning?.mealConstraints.maxPrepMinutes ?? constraints.maxPrepMinutes,
       householdSize: 1, preferredMealTypes: context.cuisinePreferences, requiredSlots });
-    return { ok: true, value: { context, profile, candidates, recipes, constraints, history: context.rotationHistory ?? { recentCandidateIds: [], recentSimilarityKeys: context.recentMealNames.map((name) => name.toLowerCase()), recentProteinTypes: context.recentProteinTypes } } };
+    const baseHistory = context.rotationHistory ?? { recentCandidateIds: [], recentSimilarityKeys: context.recentMealNames.map((name) => name.toLowerCase()), recentProteinTypes: context.recentProteinTypes };
+    const history = planning ? { ...baseHistory,
+      recentCandidateIds: [...new Set([...baseHistory.recentCandidateIds, ...planning.memory.rejectedRecipeIds])],
+      recentSimilarityKeys: [...new Set([...(baseHistory.recentSimilarityKeys ?? []), ...planning.memory.rejectedSimilarityKeys])],
+    } : baseHistory;
+    return { ok: true, value: { context, profile, candidates, recipes, constraints: hardConstraints, history } };
   } catch (error) {
     const failure = error as Error & { statusCode?: number; code?: string };
     return { ok: false, error: { statusCode: failure.statusCode ?? 503, code: failure.code ?? "recipe_library_unavailable", reasons: [failure.message] } };

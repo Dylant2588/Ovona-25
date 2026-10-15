@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { MacroBreakdown, WeeklyMealPlan } from "@/lib/meal-generator";
 import type { RotationHistory } from "./rotation-history";
+import type { PlanningInput } from "@/lib/planning-input";
 
 export type MicroTargets = {
   iron_mg?: number;
@@ -36,6 +37,7 @@ export type GenerationContext = {
   recentMealNames: string[];
   recentProteinTypes: string[];
   rotationHistory?: RotationHistory;
+  planningInput?: PlanningInput;
   slotBudgets: SlotBudget[];
 };
 

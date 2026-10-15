@@ -14,7 +14,7 @@ export type RecipeRecord = {
 };
 export type ApprovalConstraints = {
   allergies?: string[]; dislikes?: string[]; dietaryMode?: string | null;
-  dietaryModes?: string[]; maxPrepMinutes?: number;
+  dietaryModes?: string[]; neverFoods?: string[]; maxPrepMinutes?: number;
 };
 export type RecipeConstraints = ApprovalConstraints;
 export type ApprovalReason = { code: string; message: string };

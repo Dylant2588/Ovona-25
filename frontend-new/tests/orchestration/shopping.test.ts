@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { buildOrchestrationShoppingList } from "../../lib/orchestration/shopping.ts";
 import type { SelectedMeal, WeekSchedule } from "../../lib/orchestration/types.ts";
+import { buildFinalIngredientLedger } from "../../lib/ingredient-ledger.ts";
 
 const selected = (id: string, householdMultiplier = 2, nutritionMultiplier = 1, recipeServings = 1): SelectedMeal => ({
   candidateId: id,
@@ -21,7 +22,7 @@ const selected = (id: string, householdMultiplier = 2, nutritionMultiplier = 1, 
   nutritionPortionMultiplier: nutritionMultiplier,
   householdPortionMultiplier: householdMultiplier,
   servings: recipeServings * nutritionMultiplier * householdMultiplier,
-  score: { candidate: {} as never, components: { nutrition: 1, preference: 0, reuse: 0, prep: 0, cost: 0, repetition: 0 }, total: 1, facts: ["target contribution"] },
+  score: { candidate: {} as never, components: { nutrition: 1, preference: 0, reuse: 0, prep: 0, cost: 0, repetition: 0, diversity: 0 }, total: 1, facts: ["target contribution"] },
   explanation: "Selected for target contribution.",
 });
 
@@ -66,4 +67,19 @@ test("uses the already materialized household servings exactly once", () => {
   assert.equal(largerHousehold.days[0]!.meals[0]!.servings, 15);
   assert.equal(largerLine.quantity, 150);
   assert.equal(largerLine.quantity, smallLine.quantity * 2);
+});
+
+test("uses final meal ingredients as the shopping ledger without substituting base ingredients", () => {
+  const finalChicken = { name: "Chicken breast", amount: 150, unit: "g", category: "Protein" };
+  const list = buildFinalIngredientLedger(Array.from({ length: 4 }, () => ({ ingredients: [finalChicken] })));
+
+  assert.deepEqual(list, [{
+    name: "Chicken breast",
+    displayName: "Chicken breast",
+    unit: "g",
+    category: "Protein",
+    quantity: 600,
+    amountNeeded: 600,
+  }]);
+  assert.equal(list.some((item) => item.name.toLowerCase().includes("turkey")), false);
 });

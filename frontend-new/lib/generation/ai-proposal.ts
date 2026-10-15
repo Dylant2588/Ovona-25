@@ -1,10 +1,24 @@
 import type { RecipeRecord } from "../recipes/types.ts";
+import type { PlanningInput } from "../planning-input.ts";
+import { planningBrief } from "../planning-input.ts";
 
 export type AiMealChoice = Readonly<{ slot: string; recipeId: string; recipeVersion: number }>;
 export type AiMealProposal = Readonly<{ choices: readonly AiMealChoice[] }>;
 export type ResolvedAiMealChoice = Readonly<{ slot: string; recipe: RecipeRecord }>;
 export type AiProposalFailure = Readonly<{ code: "ai_proposal_malformed" | "ai_proposal_refused" | "ai_proposal_timeout" | "ai_proposal_unavailable" | "ai_proposal_unreviewed"; reason: string }>;
 export type AiProposalResolution = { ok: true; value: readonly ResolvedAiMealChoice[] } | { ok: false; error: AiProposalFailure };
+
+export function buildReviewedProposalRequest(
+  choices: readonly Readonly<{ slot: string; recipeId: string; recipeVersion: number; title: string }>[],
+  input?: PlanningInput,
+) {
+  return {
+    candidates: choices,
+    planningBrief: input ? planningBrief(input) : undefined,
+    instruction: "Rank only the supplied reviewed recipe IDs. Hard exclusions and preparation limits are non-negotiable. Food preferences and recent/rejected meals are ranking guidance. Return no recipe facts or prose.",
+    requiredOutput: { choices: [{ slot: "string", recipeId: "string", recipeVersion: 1 }] },
+  };
+}
 
 const failure = (code: AiProposalFailure["code"], reason: string): AiProposalResolution => ({ ok: false, error: { code, reason } });
 
@@ -66,6 +80,7 @@ const proposalSchema = {
 /** Optional Structured Outputs ranking. Callers must resolve its result before use. */
 export async function requestReviewedProposal(
   choices: readonly Readonly<{ slot: string; recipeId: string; recipeVersion: number; title: string }>[],
+  input?: PlanningInput,
   apiKey = process.env.OPENAI_API_KEY,
 ): Promise<{ ok: true; value: unknown } | { ok: false; error: AiProposalFailure }> {
   if (!apiKey) return { ok: false, error: { code: "ai_proposal_unavailable", reason: "OpenAI is not configured; using the reviewed deterministic schedule." } };
@@ -74,7 +89,7 @@ export async function requestReviewedProposal(
     const client = new OpenAI({ apiKey, timeout: 8_000, maxRetries: 0 });
     const completion = await client.chat.completions.create({
       model: process.env.OPENAI_MEAL_MODEL || "gpt-4o-mini",
-      messages: [{ role: "system", content: "Rank only the provided reviewed recipe IDs. Return no recipe facts or prose." }, { role: "user", content: JSON.stringify({ candidates: choices, requiredOutput: { choices: [{ slot: "string", recipeId: "string", recipeVersion: 1 }] } }) }],
+      messages: [{ role: "system", content: "Rank only the provided reviewed recipe IDs. Never invent ingredients, alter constraints, or return prose." }, { role: "user", content: JSON.stringify(buildReviewedProposalRequest(choices, input)) }],
       response_format: { type: "json_schema", json_schema: { name: "reviewed_recipe_choices", strict: true, schema: proposalSchema } },
     }) as OpenAiCompletion;
     const message = completion.choices?.[0]?.message;

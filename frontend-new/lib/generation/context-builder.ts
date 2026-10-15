@@ -8,6 +8,7 @@ import type {
   SlotBudget,
 } from "@/lib/generation/types";
 import { rotationHistoryFromRows } from "./rotation-history";
+import { buildPlanningInput } from "@/lib/planning-input";
 
 type PreferencesRow = Record<string, unknown> | null;
 type ProfileRow = Record<string, unknown> | null;
@@ -215,7 +216,11 @@ const resolveMaxPrepMinutes = (preferences: PreferencesRow, profile: ProfileRow)
   if (onboarding?.cookingTime === "under_10") return 10;
   if (onboarding?.cookingTime === "10_15") return 15;
   if (onboarding?.cookingTime === "15_30") return 30;
-  return 15;
+  // An unset preference is the product's standard plan, not an implicit
+  // fifteen-minute hard exclusion. The reviewed catalogue currently contains
+  // practical 18–30 minute lunches and dinners; 30 minutes preserves that
+  // coverage while users who need faster meals can still choose 10 or 15.
+  return 30;
 };
 
 const resolveSlotLabels = (mealsPerDay: number) =>
@@ -381,6 +386,31 @@ export async function buildContext(
 
   const weeklyBudgetRaw = parseNumber(preferences?.weekly_budget);
   const weeklyBudget = weeklyBudgetRaw && weeklyBudgetRaw > 0 ? weeklyBudgetRaw : 55;
+  const planningInput = buildPlanningInput({
+    saved: {
+      hardExclusions: {
+        allergies,
+        dietaryRules: dietaryMode === "mixed" ? [] : [dietaryMode],
+        neverFoods: toStringArray(preferences?.never_foods),
+      },
+      foodPreferences: {
+        likes: toStringArray(preferences?.food_likes),
+        dislikes,
+        cuisines,
+      },
+    },
+    // PreferencesInput is a legacy client shape. It can add allergies/dislikes but
+    // cannot remove server-owned exclusions assembled above.
+    requested: {
+      allergies: requestedProfile?.allergies,
+      dislikes: requestedProfile?.dislikes,
+      cuisines: requestedProfile?.cuisines,
+      mealsPerDay,
+    },
+    defaults: { maxPrepMinutes: resolveMaxPrepMinutes(preferences, profile), mealsPerDay, weeklyBudget,
+      macroTargets: { calories: targets.calories, protein: targets.protein, carbs: carbTarget, fat: targets.fat } },
+    history,
+  });
 
   return {
     calorieTarget: targets.calories,
@@ -391,7 +421,7 @@ export async function buildContext(
     allergies,
     dislikes,
     cuisinePreferences: cuisines,
-    maxPrepMinutes: resolveMaxPrepMinutes(preferences, profile),
+    maxPrepMinutes: planningInput.mealConstraints.maxPrepMinutes,
     healthConditions,
     microTargets,
     mealsPerDay,
@@ -400,6 +430,7 @@ export async function buildContext(
     recentMealNames: [...history.recentMealNames],
     recentProteinTypes: [...history.recentProteinTypes],
     rotationHistory: history,
+    planningInput,
     slotBudgets,
   };
 }

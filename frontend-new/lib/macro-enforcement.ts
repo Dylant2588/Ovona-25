@@ -149,6 +149,11 @@ const weightForSlots = (day: DayPlan) => {
 
 const enforceDay = (day: DayPlan, targets: DailyTarget): DailyEnforcementResult => {
   const before = { ...day.totals };
+  // A partial result is an infeasibility signal, not permission to return an
+  // aggressively scaled plan. Keep a rollback point before trying portions.
+  const original = JSON.parse(
+    JSON.stringify({ meals: day.meals, totals: day.totals })
+  ) as Pick<DayPlan, "meals" | "totals">;
   let corrected = false;
   if (!day.meals.length) {
     const passed = passForDay(day.totals, targets);
@@ -239,8 +244,14 @@ const enforceDay = (day: DayPlan, targets: DailyTarget): DailyEnforcementResult 
     }
   }
 
-  const after = { ...day.totals };
+  let after = { ...day.totals };
   const passed = passForDay(after, targets);
+  if (!passed) {
+    day.meals = original.meals;
+    day.totals = original.totals;
+    after = { ...day.totals };
+    corrected = false;
+  }
   const status = !passed ? "partial" : corrected ? "adjusted" : "verified";
   return {
     label: day.label,

@@ -18,9 +18,9 @@ export function approveRecipe(recipe: RecipeRecord, constraints: ApprovalConstra
   const diets = [...new Set([...(constraints.dietaryModes ?? []), ...(constraints.dietaryMode ? [constraints.dietaryMode] : [])].map(normalizeIngredient))];
   const dietAliases: Record<string, string> = { vegan: "vegan", vegetarian: "vegetarian", pescatarian: "pescatarian", pescetarian: "pescatarian", "low carb": "low_carb", "high protein": "high_protein", omnivore: "omnivore", mixed: "omnivore", none: "omnivore" };
   for (const diet of diets) if (!dietAliases[diet]) deny(r, "unknown_diet", `Unrecognized dietary restriction: ${diet}`);
-  const dislikes = (constraints.dislikes ?? []).map(normalizeIngredient);
-  for (const dislike of dislikes) {
-    if (!dislike) deny(r, "unknown_dislike", "Empty disliked ingredient cannot be checked");
+  const neverFoods = (constraints.neverFoods ?? []).map(normalizeIngredient);
+  for (const neverFood of neverFoods) {
+    if (!neverFood) deny(r, "unknown_never_food", "Empty never-include ingredient cannot be checked");
   }
   for (const ingredient of recipe.ingredients) {
     const taxon = findIngredientTaxon(ingredient.name);
@@ -28,7 +28,7 @@ export function approveRecipe(recipe: RecipeRecord, constraints: ApprovalConstra
     const declared = [...ingredient.allergens, ...(ingredient.mayContain ?? [])];
     if (declared.some(a => !ALLERGENS.includes(a as typeof ALLERGENS[number])) || taxon.allergens.some(a => !ingredient.allergens.includes(a)) || taxon.dietaryFlags.some(flag => !ingredient.dietaryFlags.includes(flag)) || ingredient.dietaryFlags.some(flag => !["meat", "fish", "animal_product"].includes(flag))) deny(r, "ingredient_evidence_conflict", `Ingredient evidence contradicts the taxonomy: ${ingredient.name}`);
     if (declared.some(a => allergies.has(a))) deny(r, "allergy_conflict", `Allergy conflicts with ${ingredient.name}`);
-    if (dislikes.some(dislike => !dislike || dislike === normalizeIngredient(ingredient.name) || dislike === normalizeIngredient(taxon.id) || taxon.aliases.includes(dislike) || normalizeIngredient(ingredient.name).split(" ").includes(dislike))) deny(r, "dislike_conflict", `Disliked ingredient: ${ingredient.name}`);
+    if (neverFoods.some(neverFood => !neverFood || neverFood === normalizeIngredient(ingredient.name) || neverFood === normalizeIngredient(taxon.id) || taxon.aliases.includes(neverFood) || normalizeIngredient(ingredient.name).split(" ").includes(neverFood))) deny(r, "never_food_conflict", `Never-include ingredient: ${ingredient.name}`);
     const flags = new Set([...ingredient.dietaryFlags, ...taxon.dietaryFlags]);
     if (diets.some(d => (dietAliases[d] === "vegan" && (flags.has("animal_product") || flags.has("meat") || flags.has("fish"))) || (dietAliases[d] === "vegetarian" && (flags.has("meat") || flags.has("fish"))) || (dietAliases[d] === "pescatarian" && flags.has("meat")))) deny(r, "diet_conflict", `Diet conflicts with ${ingredient.name}`);
   }

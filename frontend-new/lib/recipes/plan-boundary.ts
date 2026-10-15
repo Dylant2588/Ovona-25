@@ -8,8 +8,13 @@ export class MealApprovalError extends Error {
   statusCode: number;
   code: string;
   reasons: readonly unknown[];
-  constructor(code: string, reasons: readonly unknown[], statusCode = 422) {
-    super("This plan couldn't pass recipe checks. Your existing plan is unchanged.");
+  constructor(
+    code: string,
+    reasons: readonly unknown[],
+    statusCode = 422,
+    message = "This plan couldn't pass recipe checks. Your existing plan is unchanged."
+  ) {
+    super(message);
     this.statusCode = statusCode; this.code = code; this.reasons = reasons;
   }
 }
@@ -49,17 +54,38 @@ export async function approvePlanForUser(database: RecipeReader, userId: string,
   const loaded = await (dependencies.recipes ?? loadReviewedRecipes)(database);
   if (!loaded.ok) throw new MealApprovalError(loaded.code, loaded.reasons, 503);
   const result = validatePlanAgainstRecipes(plan.days, loaded.recipes as RecipeRecord[], constraints);
-  if (!result.approved) throw new MealApprovalError("meal_approval_failed", result.reasons);
+  if (!result.approved) {
+    const firstReason = result.reasons[0]?.message;
+    throw new MealApprovalError(
+      "meal_approval_failed",
+      result.reasons,
+      422,
+      firstReason
+        ? `A checked plan was blocked: ${firstReason} Update the relevant preference or review another suitable recipe, then try again.`
+        : undefined
+    );
+  }
   const days = result.days;
-  if (days.some((day) => day.meals.length !== context.mealsPerDay ||
-      day.meals.filter((meal) => meal.mealSlot === "breakfast").length !== 1 ||
-      day.meals.filter((meal) => meal.mealSlot === "lunch").length !== 1 ||
-      day.meals.filter((meal) => meal.mealSlot === "dinner").length !== 1 ||
-      day.meals.filter((meal) => meal.mealSlot === "snack").length !== context.mealsPerDay - 3 ||
-      (!day.meals.some((meal) => meal.mealKind === "social") &&
-        (day.totals.calories < context.calorieTarget * 0.95 || day.totals.calories > context.calorieTarget * 1.08 ||
-        day.totals.protein < context.proteinTarget * 0.98 || day.totals.protein > context.proteinTarget * 1.1)))) {
-    throw new MealApprovalError("meal_approval_failed", ["Daily meal slots or nutrition do not meet saved targets."]);
+  const dayFailures = days.flatMap((day) => {
+    const slotSummary = {
+      breakfast: day.meals.filter((meal) => meal.mealSlot === "breakfast").length,
+      lunch: day.meals.filter((meal) => meal.mealSlot === "lunch").length,
+      dinner: day.meals.filter((meal) => meal.mealSlot === "dinner").length,
+      snack: day.meals.filter((meal) => meal.mealSlot === "snack").length,
+    };
+    const slotsAreValid = day.meals.length === context.mealsPerDay &&
+      slotSummary.breakfast === 1 && slotSummary.lunch === 1 && slotSummary.dinner === 1 &&
+      slotSummary.snack === context.mealsPerDay - 3;
+    const nutritionIsValid = day.meals.some((meal) => meal.mealKind === "social") ||
+      (day.totals.calories >= context.calorieTarget * 0.95 && day.totals.calories <= context.calorieTarget * 1.08 &&
+        day.totals.protein >= context.proteinTarget * 0.98 && day.totals.protein <= context.proteinTarget * 1.1);
+    const failures: string[] = [];
+    if (!slotsAreValid) failures.push(`${day.label}: expected ${context.mealsPerDay} meals (1 breakfast, 1 lunch, 1 dinner, ${context.mealsPerDay - 3} snacks); received ${day.meals.length} (${slotSummary.breakfast}/${slotSummary.lunch}/${slotSummary.dinner}/${slotSummary.snack}).`);
+    if (!nutritionIsValid) failures.push(`${day.label}: ${Math.round(day.totals.calories)} kcal and ${Math.round(day.totals.protein)}g protein; required ${Math.ceil(context.calorieTarget * 0.95)}-${Math.floor(context.calorieTarget * 1.08)} kcal and ${Math.ceil(context.proteinTarget * 0.98)}-${Math.floor(context.proteinTarget * 1.1)}g protein.`);
+    return failures;
+  });
+  if (dayFailures.length) {
+    throw new MealApprovalError("meal_approval_failed", dayFailures);
   }
   const weeklyTotals = days.reduce((total, day) => ({ calories: total.calories + day.totals.calories,
     protein: total.protein + day.totals.protein, carbs: total.carbs + day.totals.carbs, fat: total.fat + day.totals.fat }),

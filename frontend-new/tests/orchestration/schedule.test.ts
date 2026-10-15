@@ -8,6 +8,10 @@ import { validateAndRepairWeek } from "../../lib/orchestration/validate.ts";
 import type { VerifiedCandidateMeal } from "../../lib/orchestration/types.ts";
 import { validRawProfile } from "./fixtures.ts";
 
+const proteinFor = (id: string) => ["chicken", "turkey", "fish", "beef", "tofu", "eggs"][
+  Number.parseInt(id.match(/(\d+)/)?.[1] ?? "0", 10) % 6
+];
+
 const candidate = (id: string, slot: VerifiedCandidateMeal["slot"], extra: Partial<VerifiedCandidateMeal> = {}): VerifiedCandidateMeal => ({
   id,
   slot,
@@ -20,6 +24,7 @@ const candidate = (id: string, slot: VerifiedCandidateMeal["slot"], extra: Parti
   cost: 2,
   prepMinutes: 15,
   servings: 2,
+  proteinType: proteinFor(id),
   ...extra,
 });
 
@@ -67,6 +72,71 @@ test("five-meal profiles retain two distinct snacks and reject a missing snack",
   }
   const incomplete = { days: result.value.days.map((day, index) => index === 0 ? { ...day, meals: day.meals.filter((_, mealIndex) => mealIndex !== 1) } : day) };
   assert.equal(validateAndRepairWeek(fiveMealProfile, incomplete).ok, false);
+});
+
+test("never schedules a protein source more than twice in one day", () => {
+  const fiveMealProfile = normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2500, proteinTarget: 150,
+    requiredSlots: ["breakfast", "snack", "lunch", "snack", "dinner"] });
+  const candidates = (['breakfast', 'snack', 'lunch', 'dinner'] as const).flatMap((slot) =>
+    Array.from({ length: 14 }, (_, index) => candidate(`${slot}-varied-${index + 1}`, slot)));
+  const result = orchestrateWeek(fiveMealProfile, candidates);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  for (const day of result.value.days) {
+    const countByProtein = new Map<string, number>();
+    day.meals.forEach((meal) => {
+      const protein = meal.proteinType?.trim().toLowerCase() || "other";
+      countByProtein.set(protein, (countByProtein.get(protein) ?? 0) + 1);
+    });
+    assert.ok([...countByProtein.values()].every((count) => count <= 2));
+  }
+});
+
+test("fails safely when the only macro-feasible day would use one protein three times", () => {
+  const fiveMealProfile = normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2500, proteinTarget: 150,
+    requiredSlots: ["breakfast", "snack", "lunch", "snack", "dinner"] });
+  const turkeyOnly = [
+    candidate("turkey-breakfast", "breakfast", { proteinType: "Turkey" }),
+    candidate("turkey-snack-one", "snack", { proteinType: " turkey " }),
+    candidate("turkey-snack-two", "snack", { proteinType: "TURKEY" }),
+    candidate("turkey-lunch", "lunch", { proteinType: "turkey" }),
+    candidate("turkey-dinner", "dinner", { proteinType: "turkey" }),
+  ];
+  const result = orchestrateWeek(fiveMealProfile, turkeyOnly);
+  assert.equal(result.ok, false);
+  if (!result.ok) assert.equal(result.error.code, "insufficient_candidates");
+});
+
+test("treats a missing protein type as one capped fallback category", () => {
+  const fiveMealProfile = normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2500, proteinTarget: 150,
+    requiredSlots: ["breakfast", "snack", "lunch", "snack", "dinner"] });
+  const unknownProteinOnly = [
+    candidate("unknown-breakfast", "breakfast", { proteinType: undefined }),
+    candidate("unknown-snack-one", "snack", { proteinType: undefined }),
+    candidate("unknown-snack-two", "snack", { proteinType: undefined }),
+    candidate("unknown-lunch", "lunch", { proteinType: undefined }),
+    candidate("unknown-dinner", "dinner", { proteinType: undefined }),
+  ];
+  assert.equal(orchestrateWeek(fiveMealProfile, unknownProteinOnly).ok, false);
+});
+
+test("uses one bounded extra repeat when a reviewed snack catalogue is scarce", () => {
+  const fiveMealProfile = normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2500, proteinTarget: 150,
+    requiredSlots: ["breakfast", "snack", "lunch", "snack", "dinner"] });
+  // Six recipes cover twelve of fourteen snack placements under the standard
+  // two-use policy, so the final day must exercise the bounded third use.
+  const snacks = Array.from({ length: 6 }, (_, index) => candidate(`scarce-snack-${index + 1}`, "snack"));
+  const result = orchestrateWeek(fiveMealProfile, [...completeCandidates().filter((item) => item.slot !== "snack"), ...snacks]);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const selectedSnacks = result.value.days.flatMap((day) => day.meals.filter((meal) => meal.slot === "snack"));
+  assert.equal(selectedSnacks.length, 14);
+  assert.ok(selectedSnacks.every((meal) => selectedSnacks.filter((other) => other.candidateId === meal.candidateId).length <= 3));
+  assert.ok(result.value.days.every((day) => {
+    const snackIds = day.meals.filter((meal) => meal.slot === "snack").map((meal) => meal.candidateId);
+    return new Set(snackIds).size === snackIds.length;
+  }));
+  assert.ok(selectedSnacks.some((meal) => meal.explanation.includes("catalogue for this slot is limited")));
 });
 
 test("rejects excess identical or similar meals but permits an explicitly linked leftover", () => {

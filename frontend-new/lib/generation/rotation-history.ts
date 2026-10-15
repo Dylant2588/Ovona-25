@@ -5,6 +5,8 @@ export type RotationHistory = Readonly<{
   recentCuisines: readonly string[];
   recentFormats: readonly string[];
   recentMealNames: readonly string[];
+  rejectedRecipeIds: readonly string[];
+  rejectedSimilarityKeys: readonly string[];
 }>;
 
 export type RotationHistoryRow = Readonly<Record<string, unknown>>;
@@ -13,7 +15,7 @@ const text = (value: unknown) => typeof value === "string" ? value.trim() : "";
 const dateOnly = (date: Date) => date.toISOString().slice(0, 10);
 const unique = (values: readonly string[]) => [...new Set(values.filter(Boolean))];
 
-/** Server-clock calendar window: [today - 14 days, today), accepted/eaten only. */
+/** Server-clock calendar window: [today - 14 days, today), with rejection feedback kept distinct from eaten history. */
 export function rotationHistoryFromRows(rows: readonly RotationHistoryRow[], now = new Date()): RotationHistory {
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const start = new Date(today); start.setUTCDate(start.getUTCDate() - 14);
@@ -22,6 +24,11 @@ export function rotationHistoryFromRows(rows: readonly RotationHistoryRow[], now
     const state = text(row.planning_state);
     const date = text(row.date);
     return (state === "accepted" || state === "eaten") && date >= startDate && date < endDate;
+  });
+  const rejected = rows.filter((row) => {
+    const state = text(row.planning_state);
+    const date = text(row.date);
+    return state === "rejected" && date >= startDate && date < endDate;
   });
   const values = (key: string) => unique(included.map((row) => text(row[key]).toLowerCase()));
   return {
@@ -34,7 +41,21 @@ export function rotationHistoryFromRows(rows: readonly RotationHistoryRow[], now
     recentCuisines: values("cuisine"),
     recentFormats: values("format"),
     recentMealNames: values("meal_name"),
+    rejectedRecipeIds: unique(rejected.map((row) => {
+      const id = text(row.recipe_id); const version = row.recipe_version;
+      return id && Number.isInteger(version) ? `${id}:${version}` : "";
+    })),
+    rejectedSimilarityKeys: unique(rejected.map((row) => text(row.similarity_key).toLowerCase())),
   };
+}
+
+const REJECTION_REASONS = new Set(["not_interested", "too_time_consuming", "ingredient_dislike", "other"]);
+/** The caller must resolve the reviewed recipe before constructing this record. */
+export function rejectedHistoryRecord(userId: string, date: string, meal: HistoryMeal, reason: string) {
+  if (!REJECTION_REASONS.has(reason) || !meal.baseId || !Number.isInteger(meal.recipeVersion)) return null;
+  return { user_id: userId, date: dateOnly(new Date(date)), recipe_id: meal.baseId, recipe_version: meal.recipeVersion,
+    similarity_key: meal.baseId, meal_name: meal.title ?? meal.baseId, protein_type: meal.proteinType ?? "mixed",
+    meal_slot: meal.mealSlot ?? "unknown", planning_state: "rejected", rejection_reason: reason };
 }
 
 type HistoryMeal = Readonly<{ baseId?: string; recipeVersion?: number; mealKind?: string; nutritionStatus?: string; title?: string; proteinType?: string; mealSlot?: string; tags?: readonly string[] }>;

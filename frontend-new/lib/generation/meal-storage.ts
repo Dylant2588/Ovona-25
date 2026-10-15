@@ -1,7 +1,7 @@
 import { generateFallbackMealPlan, type PreferencesInput, type WeeklyMealPlan } from "@/lib/meal-generator";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { MealConcept, PortionedMeal } from "@/lib/generation/types";
-import { approvedHistoryRecords, eatenHistoryRecord } from "./rotation-history";
+import { approvedHistoryRecords, eatenHistoryRecord, rejectedHistoryRecord } from "./rotation-history";
 
 export { approvedHistoryRecords } from "./rotation-history";
 
@@ -121,6 +121,14 @@ export async function recordEatenMealHistory(userId: string, date: string, meal:
   if (!record) return;
   const { error } = await supabase.from("user_meal_history").insert(record);
   if (error) throw new Error(`Eaten meal history could not be saved: ${error.message}`);
+}
+
+/** Persist only a server-resolved reviewed meal as negative planning feedback. */
+export async function recordRejectedMealHistory(userId: string, date: string, meal: unknown, reason: string, supabase: SupabaseClient): Promise<void> {
+  const record = rejectedHistoryRecord(userId, date, meal as Parameters<typeof rejectedHistoryRecord>[2], reason);
+  if (!record) throw new Error("This meal cannot be recorded as a reviewed recipe rejection.");
+  const { error } = await supabase.from("user_meal_history").insert(record);
+  if (error) throw new Error(`Rejected meal history could not be saved: ${error.message}`);
 }
 
 export async function getRecentHistory(

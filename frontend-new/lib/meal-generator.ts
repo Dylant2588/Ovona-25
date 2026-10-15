@@ -1,4 +1,5 @@
 import { priceBasket } from "@/lib/tesco-prices";
+import { buildFinalIngredientLedger } from "./ingredient-ledger";
 import { VARIED_MEALS } from "./varied-meal-catalogue";
 import { imageForMeal } from "./meal-images";
 
@@ -100,7 +101,12 @@ export type UserProfileInput = {
   trainingSchedule?: string[];
   allergies?: string[];
   dislikes?: string[];
+  /** Strong ingredient exclusion chosen by the user; distinct from a soft dislike. */
+  neverFoods?: string[];
+  /** Ingredients and foods the planner should favour when candidates are otherwise safe. */
+  foodLikes?: string[];
   cuisines?: string[];
+  maxPrepMinutes?: number | null;
   pantryStaples?: string[];
   household?: string[];
   deliveryPreferences?: string[];
@@ -468,12 +474,121 @@ const MEAL_LIBRARY: BaseMeal[] = [
     ],
     proteinType: "mixed",
   },
+  {
+    id: "turkey-rice-breakfast-bowl",
+    name: "Turkey Rice Breakfast Bowl",
+    description: "Lean turkey slices with brown rice, spinach, and tomatoes.",
+    steps: [
+      "Rinse the measured dry brown rice. Add to a saucepan with plenty of boiling water and simmer for 25–30 minutes, until tender. Drain any remaining water.",
+      "While the rice cooks, wash the spinach and halve the cherry tomatoes. Slice the ready-to-eat roast turkey slices into strips.",
+      "Stir the spinach into the hot drained rice until wilted, then add the tomatoes and cooked turkey slices. Serve immediately.",
+    ],
+    mealTypes: ["breakfast"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 35,
+    image: "",
+    macros: { calories: 307, protein: 46, carbs: 23, fat: 4 },
+    ingredients: [
+      { name: "Roast turkey slices", amount: 180, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Spinach", amount: 30, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 60, unit: "g", category: "Produce" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "chicken-crunch-snack-box",
+    name: "Chicken & Cucumber Snack Box",
+    description: "Cooked chicken breast with cucumber, tomatoes, and an olive oil dressing.",
+    steps: [
+      "Cut the chicken breast into strips and cook in a pan with half the olive oil until cooked through, with no pink centre.",
+      "Slice the cucumber and halve the tomatoes. Toss with the remaining olive oil.",
+      "Serve with the cooked chicken. If preparing ahead, cool promptly and keep refrigerated until ready to eat.",
+    ],
+    mealTypes: ["snack"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 20,
+    image: "",
+    macros: { calories: 325, protein: 51, carbs: 7, fat: 16 },
+    ingredients: [
+      { name: "Chicken breast", amount: 160, unit: "g", category: "Protein" },
+      { name: "Cucumber", amount: 100, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 80, unit: "g", category: "Produce" },
+      { name: "Olive oil", amount: 10, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "turkey-tomato-snack-box",
+    name: "Turkey Tomato Snack Box",
+    description: "Lean turkey with tomatoes, cucumber, oats, and olive oil.",
+    steps: [
+      "Put the rolled oats in a small saucepan with enough water to cover. Simmer gently for 5 minutes, stirring and adding a little water as needed, until soft.",
+      "Wash and slice the cucumber and cherry tomatoes. Cut the ready-to-eat roast turkey slices into strips.",
+      "Stir the olive oil into the savoury oats and serve alongside the turkey, cucumber, and tomatoes. If packing ahead, cool promptly and refrigerate until ready to eat.",
+    ],
+    mealTypes: ["snack"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 10,
+    image: "",
+    macros: { calories: 330, protein: 42, carbs: 19, fat: 8 },
+    ingredients: [
+      { name: "Roast turkey slices", amount: 160, unit: "g", category: "Protein" },
+      { name: "Rolled oats", amount: 20, unit: "g", category: "Pantry" },
+      { name: "Cucumber", amount: 100, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 80, unit: "g", category: "Produce" },
+      { name: "Olive oil", amount: 5, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "herbed-chicken-rice-plate",
+    name: "Herbed Chicken Rice Plate",
+    description: "Chicken breast, brown rice, spinach, and tomatoes with herbs.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 20,
+    image: "",
+    macros: { calories: 403, protein: 45, carbs: 35, fat: 7 },
+    ingredients: [
+      { name: "Chicken breast", amount: 130, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 35, unit: "g", category: "Pantry" },
+      { name: "Spinach", amount: 60, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 100, unit: "g", category: "Produce" },
+      { name: "Olive oil", amount: 5, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
+  {
+    id: "lemon-chicken-rice-skillet",
+    name: "Lemon Chicken Rice Skillet",
+    description: "Chicken breast, brown rice, spinach, and tomatoes with lemon.",
+    mealTypes: ["lunch", "dinner"],
+    tastes: ["high-protein", "quick-minimal", "meal-prep"],
+    complexity: "simple",
+    goalFit: ["lose_weight", "recomp", "maintain"],
+    readyInMinutes: 20,
+    image: "",
+    macros: { calories: 403, protein: 45, carbs: 35, fat: 7 },
+    ingredients: [
+      { name: "Chicken breast", amount: 130, unit: "g", category: "Protein" },
+      { name: "Brown rice", amount: 35, unit: "g", category: "Pantry" },
+      { name: "Spinach", amount: 60, unit: "g", category: "Produce" },
+      { name: "Cherry tomatoes", amount: 100, unit: "g", category: "Produce" },
+      { name: "Lime", amount: 1, unit: "each", category: "Produce" },
+      { name: "Olive oil", amount: 5, unit: "g", category: "Pantry" },
+    ],
+    proteinType: "poultry",
+  },
 ];
-
-/** Complete deterministic catalogue export; these records are unreviewed internal drafts. */
-export function exportStaticRecipeCatalogue() {
-  return MEAL_LIBRARY.map(meal => ({ ...meal, macros: mealMacrosFromIngredients(meal), ingredients: meal.ingredients.map(i => ({ ...i })), steps: [...(meal.steps ?? [])] }));
-}
 
 const GOAL_MULTIPLIERS: Record<string, number> = {
   lose_weight: 0.92,
@@ -505,6 +620,20 @@ const COMPLEXITY_MULTIPLIERS: Record<ComplexityKey, number> = {
   adventurous: 1.08,
 };
 
+/** Complete deterministic catalogue export; these records are unreviewed internal drafts. */
+export function exportStaticRecipeCatalogue() {
+  return MEAL_LIBRARY.map(meal => ({
+    ...meal,
+    macros: mealMacrosFromIngredients(meal),
+    ingredients: meal.ingredients.map(i => ({ ...i })),
+    // Legacy catalogue rows without a method remain unreviewed drafts, but
+    // must have a concrete method for a human reviewer to inspect.
+    steps: meal.steps?.length
+      ? [...meal.steps]
+      : buildRecipeSteps({ mealSlot: meal.mealTypes[0] ?? "dinner", title: meal.name, description: meal.description, readyInMinutes: meal.readyInMinutes, ingredients: meal.ingredients }),
+  }));
+}
+
 export const WORKDAY_COUNT = 7;
 export const WORKDAY_MEAL_SLOTS: MealSlot[] = [
   "breakfast",
@@ -516,8 +645,20 @@ export const WORKDAY_MEAL_SLOTS: MealSlot[] = [
 const BASE_MEAL_SLOTS: MealSlot[] = [...WORKDAY_MEAL_SLOTS];
 const MACRO_RECONCILE_TOLERANCE = 0.3;
 const MACRO_DEBUG_LOGS = process.env.NODE_ENV !== "production";
-const MAX_PROTEIN_SOURCES_PER_WEEK = 3;
 const MAX_MEAL_USES_PER_WEEK = 2;
+const MAX_PROTEIN_SOURCE_USES_PER_WEEK: Record<string, number> = {
+  eggs: 3,
+  chicken: 4,
+  turkey: 4,
+  pea: 10,
+  tofu: 8,
+  default: 7,
+};
+const PRACTICAL_WEEKLY_INGREDIENT_LIMITS = [
+  { label: "Chicken breast", pattern: /\bchicken breast\b/i, maxGrams: 1400 },
+  { label: "Roast turkey slices", pattern: /\broast turkey slices\b/i, maxGrams: 1200 },
+  { label: "Egg whites", pattern: /\begg whites?\b/i, maxGrams: 1000 },
+] as const;
 const WEEK_REUSE_PENALTY = 100;
 const CONSECUTIVE_DAY_REUSE_PENALTY = 55;
 const NEAR_DAY_REUSE_PENALTY = 20;
@@ -667,6 +808,11 @@ const DEFAULT_MACROS_BY_CATEGORY: Record<string, MacroBreakdown> = {
 };
 
 const NUTRITION_DB: NutritionEntry[] = [
+  { aliases: ["water"], unit: "ml", servingSize: 100, macros: { calories: 0, protein: 0, carbs: 0, fat: 0 } },
+  { aliases: ["apple"], unit: "g", servingSize: 100, macros: { calories: 52, protein: 0.3, carbs: 14, fat: 0.2 } },
+  { aliases: ["broccoli"], unit: "g", servingSize: 100, macros: { calories: 34, protein: 2.8, carbs: 7, fat: 0.4 } },
+  { aliases: ["cinnamon"], unit: "g", servingSize: 100, macros: { calories: 247, protein: 4, carbs: 81, fat: 1.2 } },
+  { aliases: ["cocoa powder"], unit: "g", servingSize: 100, macros: { calories: 228, protein: 20, carbs: 58, fat: 14 } },
   { aliases: ["egg whites"], unit: "g", servingSize: 100, macros: { calories: 52, protein: 10.9, carbs: 0.7, fat: 0.2 } },
   { aliases: ["banana"], unit: "g", servingSize: 100, macros: { calories: 89, protein: 1.1, carbs: 22.8, fat: 0.3 } },
   { aliases: ["wholewheat pasta"], unit: "g", servingSize: 100, macros: { calories: 350, protein: 13, carbs: 67, fat: 2.5 } },
@@ -706,6 +852,7 @@ const NUTRITION_DB: NutritionEntry[] = [
   { aliases: ["pickled vegetables", "pickles"], unit: "g", servingSize: 100, macros: { calories: 22, protein: 0.8, carbs: 4.5, fat: 0.2 } },
   { aliases: ["cucumber"], unit: "g", servingSize: 100, macros: { calories: 15, protein: 0.7, carbs: 3.6, fat: 0.1 } },
   { aliases: ["whey protein", "protein powder"], unit: "g", servingSize: 30, macros: { calories: 120, protein: 24, carbs: 3, fat: 1.5 } },
+  { aliases: ["pea protein", "pea-protein powder"], unit: "g", servingSize: 30, macros: { calories: 120, protein: 24, carbs: 3, fat: 1.5 } },
   { aliases: ["mixed berries"], unit: "g", servingSize: 100, macros: { calories: 50, protein: 0.8, carbs: 12, fat: 0.3 } },
   { aliases: ["pumpkin seeds"], unit: "g", servingSize: 100, macros: { calories: 559, protein: 30, carbs: 11, fat: 49 } },
   { aliases: ["roast turkey slices", "turkey slices"], unit: "g", servingSize: 100, macros: { calories: 120, protein: 24, carbs: 2, fat: 2 } },
@@ -1740,7 +1887,9 @@ const mealSlotsForPreferences = (prefs?: PreferencesInput): MealSlot[] => {
 
 const calorieWeightsForSlots = (slots: MealSlot[]): number[] => {
   if (slots.length === 5) {
-    return [0.9, 0.6, 1.05, 1.2, 0.55];
+    // The five-meal order is breakfast, snack, lunch, snack, dinner.
+    // Keep both snacks light and reserve the largest allocation for dinner.
+    return [0.9, 0.55, 1.05, 0.55, 1.2];
   }
   return slots.map((slot) => SLOT_CALORIE_WEIGHTS[slot] ?? 1);
 };
@@ -1874,7 +2023,8 @@ const fatTargetForDay = (
 const findLowerFatAlternative = (
   day: DayPlan,
   targetMealIndex: number,
-  prefs: PreferencesInput
+  prefs: PreferencesInput,
+  selectionState?: WeeklySelectionState
 ) => {
   const currentMeal = day.meals[targetMealIndex];
   if (!currentMeal) return null;
@@ -1889,7 +2039,13 @@ const findLowerFatAlternative = (
       meal.mealTypes.includes(currentMeal.mealSlot) &&
       !usedBaseIds.has(meal.id)
   );
-  const preferenceFiltered = filterMealsByPreferences(slotCandidates, prefs);
+  const preferenceFiltered = filterMealsByPreferences(slotCandidates, prefs).filter((candidate) => {
+    if (!selectionState) return true;
+    const currentSource = primaryProteinSourceForMeal(toBaseMealFromInstance(currentMeal));
+    const candidateSource = primaryProteinSourceForMeal(candidate);
+    return candidateSource === currentSource ||
+      proteinSourceUseCount(selectionState.selectedMeals, candidateSource) < proteinSourceUsageLimit(candidateSource);
+  });
   const pool = preferenceFiltered;
   const ranked = pool
     .map((meal) => {
@@ -1934,6 +2090,7 @@ const PRIMARY_PROTEIN_HINTS: Array<{ source: string; terms: string[] }> = [
   { source: "shrimp", terms: ["shrimp", "prawn"] },
   { source: "tuna", terms: ["tuna"] },
   { source: "beans", terms: ["bean", "hummus", "edamame"] },
+  { source: "pea", terms: ["pea protein", "pea-protein"] },
   { source: "dairy", terms: ["yogurt", "cottage", "whey"] },
 ];
 
@@ -1947,6 +2104,24 @@ const primaryProteinSourceForMeal = (meal: BaseMeal): string => {
   if (matched) return matched.source;
   return meal.proteinType ?? "mixed";
 };
+
+const proteinSourceUsageLimit = (source: string) =>
+  MAX_PROTEIN_SOURCE_USES_PER_WEEK[source] ?? MAX_PROTEIN_SOURCE_USES_PER_WEEK.default;
+
+const proteinSourceUseCount = (meals: BaseMeal[], source: string) =>
+  meals.filter((meal) => primaryProteinSourceForMeal(meal) === source).length;
+
+const staysWithinPracticalIngredientLimits = (
+  candidate: BaseMeal,
+  selectedMeals: BaseMeal[]
+) => PRACTICAL_WEEKLY_INGREDIENT_LIMITS.every((limit) => {
+  const projectedGrams = [...selectedMeals, candidate].reduce((total, meal) =>
+    total + meal.ingredients.reduce((mealTotal, ingredient) =>
+      ingredient.unit.toLowerCase() === "g" && limit.pattern.test(ingredient.name)
+        ? mealTotal + ingredient.amount * MAX_PORTION
+        : mealTotal, 0), 0);
+  return projectedGrams <= limit.maxGrams;
+});
 
 const macroFitScore = (
   meal: BaseMeal,
@@ -2069,20 +2244,6 @@ const isCandidateStrictlyVaried = (
   return true;
 };
 
-const applyProteinSourceConstraint = (
-  pool: BaseMeal[],
-  state?: WeeklySelectionState
-) => {
-  if (!state) return pool;
-  if (state.usedProteinSources.size < MAX_PROTEIN_SOURCES_PER_WEEK) {
-    return pool;
-  }
-  const constrained = pool.filter((meal) =>
-    state.usedProteinSources.has(primaryProteinSourceForMeal(meal))
-  );
-  return constrained.length ? constrained : pool;
-};
-
 const scoreMealForWeekSelection = (
   candidateMeal: BaseMeal,
   slot: MealSlot,
@@ -2093,6 +2254,9 @@ const scoreMealForWeekSelection = (
   const overlapScore = ingredientOverlapScore(candidateMeal, state.selectedMeals);
   const { timesUsed } = mealUsageStats(candidateMeal, state);
   const repeatPenalty = repeatPenaltyScore(candidateMeal, state);
+  const proteinSourceUses = state.selectedMeals.filter(
+    (meal) => primaryProteinSourceForMeal(meal) === primaryProteinSourceForMeal(candidateMeal)
+  ).length;
   const varietyBoost = timesUsed === 0 ? 1 : timesUsed === 1 ? 0.2 : 0;
   const jitter = Math.random() * 0.03;
 
@@ -2101,7 +2265,8 @@ const scoreMealForWeekSelection = (
     overlapScore * 0.35 +
     varietyBoost * 0.2 +
     jitter -
-    repeatPenalty / 100
+    repeatPenalty / 100 -
+    proteinSourceUses * 0.18
   );
 };
 
@@ -2125,23 +2290,45 @@ const selectBaseMeal = (
   const filtered = uniquePreferenceSafe.length
     ? uniquePreferenceSafe
     : filterMealsByPreferences(candidates, prefs);
-  const proteinConstrained = applyProteinSourceConstraint(filtered, selectionState);
-  const pool = proteinConstrained.length ? proteinConstrained : filtered;
+  const pool = filtered;
   if (!pool.length) {
     throw new Error(
       `No preference-safe meals are available for slot "${slot}". Update preferences to continue.`
     );
   }
 
-  if (!selectionState || selectionState.dayIndex === 0) {
-    const randomIndex = Math.floor(Math.random() * pool.length);
-    return pool[randomIndex] ?? slotPool[0] ?? MEAL_LIBRARY[0];
+  // Keep the macro-aware shortlist, while source caps below prevent it from
+  // concentrating the entire week in the same protein ingredient.
+  const proteinTarget = targets?.protein ? targets.protein / (selectionState?.slots.length ?? 1) : 0;
+  const proteinViable = proteinTarget
+    ? pool.filter((meal) => mealMacrosFromIngredients(meal).protein * MAX_PORTION >= proteinTarget)
+    : [];
+  const macroViablePool = proteinViable.length ? proteinViable : pool;
+
+  if (!selectionState) {
+    return macroViablePool[0] ?? slotPool[0] ?? MEAL_LIBRARY[0];
   }
 
-  const strictPool = pool.filter((meal) =>
-    isCandidateStrictlyVaried(meal, selectionState)
+  const sourceCappedPool = macroViablePool.filter(
+    (meal) =>
+      proteinSourceUseCount(selectionState.selectedMeals, primaryProteinSourceForMeal(meal)) < proteinSourceUsageLimit(primaryProteinSourceForMeal(meal)) &&
+      staysWithinPracticalIngredientLimits(meal, selectionState.selectedMeals)
   );
-  const cappedPool = pool.filter((meal) => {
+  if (!sourceCappedPool.length) {
+    throw new Error(
+      "No practical weekly protein rotation is available for these preferences and targets. Update the constraints or choose a different target."
+    );
+  }
+  const diversityPool = sourceCappedPool;
+  const hasUnusedProteinSource = diversityPool.some(
+    (meal) => !selectionState.usedProteinSources.has(primaryProteinSourceForMeal(meal))
+  );
+  const strictPool = diversityPool.filter((meal) =>
+    mealUsageStats(meal, selectionState).timesUsed < MAX_MEAL_USES_PER_WEEK &&
+    isCandidateStrictlyVaried(meal, selectionState) &&
+    (!hasUnusedProteinSource || !selectionState.usedProteinSources.has(primaryProteinSourceForMeal(meal)))
+  );
+  const cappedPool = diversityPool.filter((meal) => {
     const { timesUsed } = mealUsageStats(meal, selectionState);
     return timesUsed < MAX_MEAL_USES_PER_WEEK;
   });
@@ -2149,7 +2336,7 @@ const selectBaseMeal = (
     ? strictPool
     : cappedPool.length
     ? cappedPool
-    : pool;
+    : diversityPool;
 
   const ranked = effectivePool
     .map((meal) => ({
@@ -2158,13 +2345,10 @@ const selectBaseMeal = (
     }))
     .sort((a, b) => b.score - a.score);
 
-  const topWindow = ranked.slice(0, Math.min(3, ranked.length));
-  const randomTop = topWindow[Math.floor(Math.random() * topWindow.length)];
   return (
-    randomTop?.meal ??
     ranked[0]?.meal ??
     effectivePool[0] ??
-    pool[0] ??
+    macroViablePool[0] ??
     slotPool[0] ??
     MEAL_LIBRARY[0]
   );
@@ -2255,10 +2439,16 @@ const optimizeDayForTargets = (
   day: DayPlan,
   slots: MealSlot[],
   prefs: PreferencesInput,
-  macroTargets: MacroTargets | null
+  macroTargets: MacroTargets | null,
+  selectionState?: WeeklySelectionState
 ) => {
   alignDayToTargets(day, macroTargets, slots);
   recalcDay(day);
+
+  // The weekly selection state has already admitted these meals against the
+  // ingredient-source caps. A local fat swap has no full-week visibility and
+  // previously reintroduced chicken/turkey after those caps were met.
+  if (selectionState) return;
 
   const targetFat = fatTargetForDay(macroTargets, day.meals.length);
   if (!targetFat) return;
@@ -2270,7 +2460,7 @@ const optimizeDayForTargets = (
     return currentFat > bestFat ? index : acc;
   }, 0);
 
-  const replacementBase = findLowerFatAlternative(day, fattestMealIndex, prefs);
+  const replacementBase = findLowerFatAlternative(day, fattestMealIndex, prefs, selectionState);
   if (!replacementBase) return;
 
   const currentMeal = day.meals[fattestMealIndex];
@@ -2294,6 +2484,27 @@ const recalcWeek = (plan: WeeklyMealPlan) => {
   plan.days = clampDaysToWorkweek(plan.days);
   plan.weeklyTotals = sumMacros(plan.days.map((day) => day.totals));
   plan.generatedAt = new Date().toISOString();
+};
+
+export const practicalBasketViolations = (plan: WeeklyMealPlan): string[] => {
+  const ingredients = buildShoppingList(plan);
+  return PRACTICAL_WEEKLY_INGREDIENT_LIMITS.flatMap((limit) => {
+    const grams = ingredients
+      .filter((item) => item.unit === "g" && limit.pattern.test(item.name))
+      .reduce((total, item) => total + item.quantity, 0);
+    return grams > limit.maxGrams
+      ? [`${limit.label} would total ${Math.round(grams)}g, above the ${limit.maxGrams}g weekly limit.`]
+      : [];
+  });
+};
+
+const assertPracticalFallbackBasket = (plan: WeeklyMealPlan) => {
+  const violations = practicalBasketViolations(plan);
+  if (violations.length) {
+    throw new Error(
+      `No practical weekly plan is available for these preferences and targets: ${violations.join(" ")}`
+    );
+  }
 };
 
 const clonePlan = (plan: WeeklyMealPlan): WeeklyMealPlan =>
@@ -2465,24 +2676,30 @@ const optimizePlanCost = (
         !usedBaseIds.has(meal.id)
     );
     const preferenceFiltered = filterMealsByPreferences(baseCandidates, prefs);
-    const candidatePool = preferenceFiltered;
+    const proteinTarget = macroTargets?.protein
+      ? macroTargets.protein / slots.length
+      : 0;
+    const proteinViable = proteinTarget
+      ? preferenceFiltered.filter(
+          (candidate) =>
+            mealMacrosFromIngredients(candidate).protein * MAX_PORTION >= proteinTarget
+        )
+      : [];
+    const candidatePool = proteinViable.length ? proteinViable : preferenceFiltered;
     if (!candidatePool.length) continue;
 
-    const proteinSources = collectProteinSourcesFromPlan(plan, {
-      dayIndex: entry.dayIndex,
-      mealIndex: entry.mealIndex,
-    });
-    const proteinLimitedPool =
-      proteinSources.size >= MAX_PROTEIN_SOURCES_PER_WEEK
-        ? candidatePool.filter((candidate) =>
-            proteinSources.has(primaryProteinSourceForMeal(candidate))
-          )
-        : candidatePool;
-    const pool = proteinLimitedPool.length ? proteinLimitedPool : candidatePool;
     const selectedMeals = collectBaseMealsFromPlan(plan, {
       dayIndex: entry.dayIndex,
       mealIndex: entry.mealIndex,
     });
+    const sourceCappedPool = candidatePool.filter((candidate) => {
+      const source = primaryProteinSourceForMeal(candidate);
+      return proteinSourceUseCount(selectedMeals, source) < proteinSourceUsageLimit(source);
+    });
+    // Cost optimization must never undo the practical variety selected for
+    // the weekly basket. If all alternatives exceed a source cap, keep the
+    // preference-safe candidates so allergy safety remains absolute.
+    const pool = sourceCappedPool.length ? sourceCappedPool : candidatePool;
 
     const currentCost = estimateMealCost(currentMeal);
     const replacement = pool
@@ -2555,7 +2772,9 @@ export const generateFallbackMealPlan = (prefs: PreferencesInput): WeeklyMealPla
     days: fullDays,
     weeklyTotals: sumMacros(fullDays.map((day) => day.totals)),
   };
-  optimizePlanCost(plan, prefs, macroTargets, slots);
+  // Retailer evidence is evaluated after the plan is built. Do not mutate a
+  // nutrition- and variety-safe week using the legacy static price estimate.
+  // That mutation could re-concentrate ingredients and invalidate daily fit.
   recalcWeek(plan);
   return plan;
 };
@@ -2705,23 +2924,6 @@ export type ShoppingListItem = {
 };
 
 const COUNTABLE_SHOPPING_UNITS = new Set(["large", "each", "piece", "slice", "unit"]);
-const SHOPPING_NAME_ALIASES: Record<string, string> = {
-  "turkey mince": "ground turkey",
-  "tinned tuna": "tuna",
-  tuna: "tuna",
-  "tuna canned": "tuna",
-  "extra firm tofu": "tofu",
-  "firm tofu": "tofu",
-  scallions: "spring onions",
-  "spring onion": "spring onions",
-  "whole grain wrap": "whole-grain wrap",
-  "whole grain wraps": "whole-grain wraps",
-  "whole wheat wrap": "whole-grain wrap",
-  "whole wheat wraps": "whole-grain wraps",
-  "bell pepper": "bell peppers",
-  peppers: "bell peppers",
-  "chopped tomatoes": "diced tomatoes",
-};
 
 const canonicalShoppingUnit = (unit: string) => {
   const normalized = normalizeLookupText(unit);
@@ -2729,11 +2931,6 @@ const canonicalShoppingUnit = (unit: string) => {
     return "piece";
   }
   return normalized || unit;
-};
-
-const canonicalShoppingName = (name: string) => {
-  const normalized = normalizeLookupText(name);
-  return SHOPPING_NAME_ALIASES[normalized] ?? normalized;
 };
 
 const roundMetricQuantity = (value: number) => {
@@ -2768,63 +2965,15 @@ const normalizeShoppingItem = (item: ShoppingListItem): ShoppingListItem => {
 };
 
 export const buildShoppingList = (plan: WeeklyMealPlan): ShoppingListItem[] => {
-  const map = new Map<string, ShoppingListItem>();
-  plan.days.forEach((day) => {
-    day.meals.forEach((meal) => {
-      // A meal out has no ingredient list to buy. It is kept in the plan so the
-      // user sees the exception, but must never inflate the shopping basket.
-      if (meal.mealKind === "social") return;
-      const useBaseIngredients = Boolean(meal.baseIngredients?.length);
-      const sourceIngredients = useBaseIngredients
-        ? meal.baseIngredients
-        : meal.ingredients ?? [];
-      sourceIngredients.forEach((ingredient) => {
-        const unit = canonicalShoppingUnit(ingredient.unit);
-        const canonicalName = canonicalShoppingName(ingredient.name);
-        const key = `${canonicalName}|${unit}`;
-        const existing = map.get(key);
-        const rawAmount = Number.isFinite(ingredient.amount) ? ingredient.amount : 0;
-        const multiplier = Number.isFinite(meal.portionMultiplier)
-          ? meal.portionMultiplier
-          : 1;
-        const adjustedAmount = useBaseIngredients
-          ? rawAmount * multiplier
-          : rawAmount;
-        const quantity = Number(adjustedAmount.toFixed(4));
-        if (existing) {
-          existing.quantity = Number((existing.quantity + quantity).toFixed(4));
-          existing.amountNeeded = existing.quantity;
-          if (!existing.category && ingredient.category) {
-            existing.category = ingredient.category;
-          }
-        } else {
-          map.set(key, {
-            name: ingredient.name,
-            displayName: ingredient.name,
-            unit,
-            category: ingredient.category,
-            quantity,
-            amountNeeded: quantity,
-          });
-        }
-      });
-    });
-  });
-
-  return Array.from(map.values())
+  // The shopping list is a pure ledger over the exact final ingredient JSON
+  // saved on approved meals. No base recipe, inferred substitute, or portion
+  // multiplier is consulted at this stage.
+  return buildFinalIngredientLedger(plan.days.flatMap((day) => day.meals))
     .map((item) => ({
       ...item,
       quantity: Number(item.quantity.toFixed(4)),
       amountNeeded: Number((item.amountNeeded ?? item.quantity).toFixed(4)),
-    }))
-    .sort((a, b) => {
-    const categoryA = a.category ?? "Pantry";
-    const categoryB = b.category ?? "Pantry";
-    if (categoryA !== categoryB) {
-      return categoryA.localeCompare(categoryB);
-    }
-    return a.name.localeCompare(b.name);
-    });
+    }));
 };
 
 export const normalizeShoppingList = async (

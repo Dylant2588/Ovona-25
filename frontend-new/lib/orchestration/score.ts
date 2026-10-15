@@ -17,15 +17,19 @@ const finite = (value: number) => Number.isFinite(value) ? value : 0;
 
 const diversityPenalty = (candidate: VerifiedCandidateMeal, context: ScoreContext) => {
   const used = context.selected;
-  const repeats = [
-    candidate.proteinType && used.some((meal) => meal.proteinType === candidate.proteinType),
-    candidate.cuisine && used.some((meal) => meal.cuisine === candidate.cuisine),
-    candidate.format && used.some((meal) => meal.format === candidate.format),
-    candidate.proteinType && (context.recentProteinTypes ?? []).includes(candidate.proteinType),
-    candidate.cuisine && (context.recentCuisines ?? []).includes(candidate.cuisine),
-    candidate.format && (context.recentFormats ?? []).includes(candidate.format),
-  ].filter(Boolean).length;
-  return repeats ? -repeats * 0.05 : 0;
+  const proteinRepeats = candidate.proteinType
+    ? used.filter((meal) => meal.proteinType === candidate.proteinType).length +
+      (context.recentProteinTypes ?? []).filter((protein) => protein === candidate.proteinType).length
+    : 0;
+  const cuisineRepeats = candidate.cuisine
+    ? used.filter((meal) => meal.cuisine === candidate.cuisine).length +
+      (context.recentCuisines ?? []).filter((cuisine) => cuisine === candidate.cuisine).length
+    : 0;
+  // Ingredient consolidation helps the basket, but it must never dominate
+  // protein rotation. This is deliberately material: otherwise the greedy
+  // scheduler keeps selecting chicken until the practicality guard rejects
+  // the whole week.
+  return -(proteinRepeats * 10 + cuisineRepeats * 0.25);
 };
 
 export const scoreCandidate = (profile: PlannerProfile, candidate: VerifiedCandidateMeal, context: ScoreContext): CandidateScore => {
@@ -37,7 +41,7 @@ export const scoreCandidate = (profile: PlannerProfile, candidate: VerifiedCandi
   const components = {
     nutrition: finite(profile.policy.scoreWeights.nutrition * Math.max(0, 1 - (calorieDistance + proteinDistance) / 2)),
     preference: preferred ? profile.policy.scoreWeights.preference : 0,
-    reuse: finite(profile.policy.scoreWeights.reuse * Math.min(1, overlapCount(candidate, context.selected) / Math.max(1, candidate.ingredients.length))),
+    reuse: finite(Math.min(4, profile.policy.scoreWeights.reuse * Math.min(1, overlapCount(candidate, context.selected) / Math.max(1, candidate.ingredients.length)))),
     prep: finite(profile.policy.scoreWeights.prep * Math.max(0, 1 - candidate.prepMinutes / Math.max(1, profile.hardConstraints.maxPrepMinutes))),
     cost: finite(profile.policy.scoreWeights.cost * Math.max(0, 1 - candidate.cost / 20)),
     repetition: context.recentCandidateIds.includes(candidate.id) ? -profile.policy.scoreWeights.repetition : 0,
