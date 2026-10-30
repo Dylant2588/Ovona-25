@@ -35,12 +35,14 @@ const violationFor = (day: number, totals: { calories: number; protein: number }
 ];
 
 const practicalQuantityViolations = (days: readonly WeekSchedule["days"][number][], profile: PlannerProfile): ScheduleViolation[] =>
-  practicalIngredientViolations(days.flatMap((day) => day.meals)).flatMap((limit) =>
-    limit.grams > limit.maxGrams
+  practicalIngredientViolations(days.flatMap((day) => day.meals), profile.householdSize).flatMap((limit) =>
+    limit.grams === null || limit.grams > limit.maxGrams
       ? [{
           day: 0,
           code: "practical_quantity_exceeded" as const,
-          message: `${limit.label} would total ${Math.round(limit.grams)}g for the week, above the practical ${limit.maxGrams}g limit.`,
+          message: limit.grams === null
+            ? `${limit.label} has no checked mass conversion for ${limit.unsupportedUnit}; its weekly quantity cannot be verified.`
+            : `${limit.label} would total ${Math.round(limit.grams)}g for the week, above the practical ${limit.maxGrams}g limit.`,
         }]
       : []
   );

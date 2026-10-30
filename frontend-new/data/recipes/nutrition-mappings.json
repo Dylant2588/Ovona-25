@@ -1,0 +1,35 @@
+{
+  "purpose": "Explicit source-backed pending demonstrator. Mappings are proposals, not reviewer attestations.",
+  "drafts": [
+    {
+      "id": "ovona-brown-rice-spinach-chickpea-bowl",
+      "version": 1,
+      "title": "Brown Rice, Spinach and Chickpea Bowl",
+      "description": "Original pending two-serving bowl draft. Measured rice is raw wholegrain brown rice, spinach is raw baby spinach, and chickpeas are canned, re-heated and drained. Method, timing, rights and allergy information await accountable review.",
+      "slots": ["lunch", "dinner"],
+      "ingredients": [
+        {"name": "Brown rice", "canonicalId": "rice", "amount": 100, "unit": "g", "allergens": [], "mayContain": [], "dietaryFlags": [], "reviewed": false},
+        {"name": "Spinach", "canonicalId": "spinach", "amount": 160, "unit": "g", "allergens": [], "mayContain": [], "dietaryFlags": [], "reviewed": false},
+        {"name": "Chickpeas", "canonicalId": "chickpea", "amount": 300, "unit": "g", "allergens": [], "mayContain": [], "dietaryFlags": [], "reviewed": false}
+      ],
+      "steps": [
+        "Weigh 100g dry wholegrain brown rice and cook according to its packet directions.",
+        "Re-heat canned chickpeas according to their packet directions, then drain and weigh 300g of the re-heated drained chickpeas.",
+        "Wash and weigh 160g raw baby spinach. Divide the cooked rice, measured chickpeas and spinach between two bowls. Review the method and timing in a real cook-through before approval."
+      ],
+      "servings": 2,
+      "readyInMinutes": 35,
+      "macros": {"calories": 1, "protein": 0, "carbs": 0, "fat": 0},
+      "proteinType": "plant",
+      "image": "/images/meals/bowl.svg",
+      "source": {"kind": "internal", "reference": "ovona-original-draft:brown-rice-spinach-chickpea-bowl:2026-10-29", "rights": "Original composition prepared for Ovona; ownership and usage rights have not been independently confirmed and require reviewer verification.", "reviewed": false},
+      "nutrition": {"method": "pending_calculation", "reference": "Placeholder values are not nutrition evidence; run the explicit CoFID mapping preparation.", "reviewed": false},
+      "review": {"status": "pending_review", "reviewedBy": null, "reviewedAt": null}
+    }
+  ],
+  "ingredients": [
+    {"recipeId": "ovona-brown-rice-spinach-chickpea-bowl", "recipeVersion": 1, "recipeServings": 2, "ingredientIndex": 0, "expected": {"name": "Brown rice", "canonicalId": "rice", "amount": 100, "unit": "g"}, "foodCode": "11-868", "datasetVersion": "2021", "workbookSha256": "436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d", "quantityState": "raw", "mappingReference": "Explicit pending mapping: dry wholegrain brown rice batch weight to CoFID 2021 11-868 Rice, brown, wholegrain, raw. Product/state match requires reviewer verification."},
+    {"recipeId": "ovona-brown-rice-spinach-chickpea-bowl", "recipeVersion": 1, "recipeServings": 2, "ingredientIndex": 1, "expected": {"name": "Spinach", "canonicalId": "spinach", "amount": 160, "unit": "g"}, "foodCode": "13-521", "datasetVersion": "2021", "workbookSha256": "436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d", "quantityState": "raw", "mappingReference": "Explicit pending mapping: raw baby spinach batch weight to CoFID 2021 13-521 Spinach, baby, raw; not mature or cooked spinach. Product/state match requires reviewer verification."},
+    {"recipeId": "ovona-brown-rice-spinach-chickpea-bowl", "recipeVersion": 1, "recipeServings": 2, "ingredientIndex": 2, "expected": {"name": "Chickpeas", "canonicalId": "chickpea", "amount": 300, "unit": "g"}, "foodCode": "13-670", "datasetVersion": "2021", "workbookSha256": "436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d", "quantityState": "cooked_drained", "mappingReference": "Explicit pending mapping: canned chickpeas weighed after reheating and draining to CoFID 2021 13-670 Beans, chick peas, canned, re-heated, drained; not dry or undrained chickpeas. Product/state match requires reviewer verification."}
+  ]
+}

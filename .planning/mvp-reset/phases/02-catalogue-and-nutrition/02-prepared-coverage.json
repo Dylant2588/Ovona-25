@@ -1,0 +1,601 @@
+{
+  "reportVersion": "catalogue-coverage-v1",
+  "approvalPolicyVersion": "2026-10-12.1",
+  "nutritionPolicyVersion": "ingredient-v1",
+  "schedulerPolicy": {
+    "calorieBand": {
+      "min": 0.95,
+      "max": 1.08
+    },
+    "proteinBand": {
+      "min": 0.98,
+      "max": 1.1
+    },
+    "scoreWeights": {
+      "nutrition": 40,
+      "preference": 20,
+      "reuse": 15,
+      "prep": 10,
+      "cost": 10,
+      "repetition": 5
+    },
+    "repair": {
+      "maxAttempts": 3
+    },
+    "repetition": {
+      "maxUsesPerWeek": 2
+    },
+    "calorieTargetRange": {
+      "min": 800,
+      "max": 6000
+    },
+    "proteinTargetRange": {
+      "min": 20,
+      "max": 400
+    },
+    "maxPrepMinutes": 240,
+    "maxHouseholdSize": 20
+  },
+  "guarantees": {
+    "legacyCompatible": "Includes existing reviewed legacy nutrition attestations; not necessarily ingredient calculated.",
+    "calculatedOnly": "Only reviewed recipes with reproducible ingredient calculations."
+  },
+  "catalogue": {
+    "records": 1,
+    "uniqueRecipeIds": 1,
+    "pending": 1,
+    "rejected": 0,
+    "malformed": 0,
+    "malformedApproved": 0,
+    "approvedLegacy": 0,
+    "approvedCalculated": 0,
+    "multipleApprovedVersions": []
+  },
+  "issues": [],
+  "cohorts": [
+    {
+      "id": "mixed-three",
+      "cohort": {
+        "id": "mixed-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 1,
+        "unknown_ingredient": 1,
+        "prep_time_conflict": 1
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mixed-five",
+      "cohort": {
+        "id": "mixed-five",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "snack",
+          "lunch",
+          "snack",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 1,
+        "unknown_ingredient": 1,
+        "prep_time_conflict": 1
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vegetarian-three",
+      "cohort": {
+        "id": "vegetarian-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "vegetarian",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 1,
+        "unknown_ingredient": 1,
+        "prep_time_conflict": 1
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vegan-three",
+      "cohort": {
+        "id": "vegan-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "vegan",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 1,
+        "unknown_ingredient": 1,
+        "prep_time_conflict": 1
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [
+        "Existing scheduler permits at most two meals per broad plant protein type each day. Complete vegan days with three or five meals require an explicit future variety-policy decision; catalogue counts alone cannot resolve this."
+      ],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "pescatarian-three",
+      "cohort": {
+        "id": "pescatarian-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "pescatarian",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 1,
+        "unknown_ingredient": 1,
+        "prep_time_conflict": 1
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mixed-three-15min",
+      "cohort": {
+        "id": "mixed-three-15min",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 15,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 1,
+        "unknown_ingredient": 1,
+        "prep_time_conflict": 1
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "restrictive-five",
+      "cohort": {
+        "id": "restrictive-five",
+        "calorieTarget": 1830,
+        "proteinTarget": 216,
+        "dietaryMode": "mixed",
+        "allergies": [
+          "Dairy",
+          "Nuts",
+          "Fish",
+          "Shellfish",
+          "Sesame"
+        ],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "snack",
+          "lunch",
+          "snack",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 1,
+        "unknown_ingredient": 1,
+        "prep_time_conflict": 1
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    }
+  ]
+}

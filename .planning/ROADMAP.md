@@ -131,8 +131,21 @@ Plans:
 **Plans:** 5 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Establish test harness, canonical profile contracts, and verified candidate admission
-- [ ] 07-02-PLAN.md — Build deterministic seven-day scoring, scheduling, validation, and repair
-- [ ] 07-03-PLAN.md — Add immutable single-meal replacement and scaled shopping aggregation
+- [x] 07-01-PLAN.md — Establish test harness, canonical profile contracts, and verified candidate admission
+- [x] 07-02-PLAN.md — Build deterministic seven-day scoring, scheduling, validation, and repair
+- [x] 07-03-PLAN.md — Add immutable single-meal replacement and scaled shopping aggregation
 - [ ] 07-04-PLAN.md — Adapt legacy generation/fallback paths to the deterministic seven-day core
 - [ ] 07-05-PLAN.md — Wire authenticated routes, persistence, shopping, and existing planner presentation
+
+### Phase 8: Build trusted AI meal generation, rotation memory, and budget-aware retailer planning
+
+**Goal:** Generate a varied, trusted individual meal week from reviewed recipes, retain 14-day rotation memory, and qualify retailer/budget guidance with complete fresh price evidence.
+**Requirements**: TBD
+**Depends on:** Phase 7
+**Plans:** 4 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Establish trusted recipe-import, rotation-history, and price-observation evidence contracts
+- [ ] 08-02-PLAN.md — Bound AI to reviewed recipe selection and enforce 14-day rotation memory
+- [ ] 08-03-PLAN.md — Compute and serve evidence-qualified retailer comparisons
+- [ ] 08-04-PLAN.md — Present general budget and qualified retailer guidance in the planner

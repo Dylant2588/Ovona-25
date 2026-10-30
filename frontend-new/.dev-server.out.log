@@ -1,4 +1,13 @@
 
 > ovona@0.1.0 dev
-> next dev --webpack
+> next dev --webpack --port 3002
 
+   ▲ Next.js 16.0.1 (webpack)
+   - Local:        http://localhost:3002
+   - Network:      http://192.168.1.61:3002
+   - Environments: .env.local
+
+ ✓ Starting...
+   Suggestion: If y ○ Compiling /meals ...
+ GET /meals 200 in 7.7s (compile: 7.4s, render: 352ms)
+ GET /meals 200 in 31ms (compile: 6ms, render: 25ms)

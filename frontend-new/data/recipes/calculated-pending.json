@@ -1,0 +1,219 @@
+[
+  {
+    "id": "ovona-brown-rice-spinach-chickpea-bowl",
+    "version": 1,
+    "title": "Brown Rice, Spinach and Chickpea Bowl",
+    "description": "Original pending two-serving bowl draft. Measured rice is raw wholegrain brown rice, spinach is raw baby spinach, and chickpeas are canned, re-heated and drained. Method, timing, rights and allergy information await accountable review.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "ingredients": [
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false,
+        "nutrition": {
+          "food": {
+            "id": "CoFID:2021:11-868",
+            "revision": "2021-sha256:436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+            "name": "Rice, brown, wholegrain, raw",
+            "state": "raw",
+            "basis": {
+              "amount": 100,
+              "unit": "g"
+            },
+            "macros": {
+              "calories": 333,
+              "protein": 7.7,
+              "carbs": 77,
+              "fat": 1.5
+            },
+            "source": {
+              "publisher": "Public Health England",
+              "dataset": "CoFID",
+              "version": "2021",
+              "reference": "https://assets.publishing.service.gov.uk/media/60538b91e90e07527df82ae4/McCance_Widdowsons_Composition_of_Foods_Integrated_Dataset_2021..xlsx#food-code=11-868",
+              "retrievedAt": "2026-10-29",
+              "licence": "Contains public sector information licensed under the Open Government Licence v3.0. CoFID 2021, Public Health England.",
+              "foodCode": "11-868"
+            }
+          },
+          "quantityState": "raw",
+          "mappingReference": "Explicit pending mapping: dry wholegrain brown rice batch weight to CoFID 2021 11-868 Rice, brown, wholegrain, raw. Product/state match requires reviewer verification."
+        }
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 160,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false,
+        "nutrition": {
+          "food": {
+            "id": "CoFID:2021:13-521",
+            "revision": "2021-sha256:436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+            "name": "Spinach, baby, raw",
+            "state": "raw",
+            "basis": {
+              "amount": 100,
+              "unit": "g"
+            },
+            "macros": {
+              "calories": 16,
+              "protein": 2.6,
+              "carbs": 0.2,
+              "fat": 0.6
+            },
+            "source": {
+              "publisher": "Public Health England",
+              "dataset": "CoFID",
+              "version": "2021",
+              "reference": "https://assets.publishing.service.gov.uk/media/60538b91e90e07527df82ae4/McCance_Widdowsons_Composition_of_Foods_Integrated_Dataset_2021..xlsx#food-code=13-521",
+              "retrievedAt": "2026-10-29",
+              "licence": "Contains public sector information licensed under the Open Government Licence v3.0. CoFID 2021, Public Health England.",
+              "foodCode": "13-521"
+            }
+          },
+          "quantityState": "raw",
+          "mappingReference": "Explicit pending mapping: raw baby spinach batch weight to CoFID 2021 13-521 Spinach, baby, raw; not mature or cooked spinach. Product/state match requires reviewer verification."
+        }
+      },
+      {
+        "name": "Chickpeas",
+        "canonicalId": "chickpea",
+        "amount": 300,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false,
+        "nutrition": {
+          "food": {
+            "id": "CoFID:2021:13-670",
+            "revision": "2021-sha256:436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+            "name": "Beans, chick peas, canned, re-heated, drained",
+            "state": "cooked_drained",
+            "basis": {
+              "amount": 100,
+              "unit": "g"
+            },
+            "macros": {
+              "calories": 129,
+              "protein": 8.4,
+              "carbs": 18.3,
+              "fat": 3
+            },
+            "source": {
+              "publisher": "Public Health England",
+              "dataset": "CoFID",
+              "version": "2021",
+              "reference": "https://assets.publishing.service.gov.uk/media/60538b91e90e07527df82ae4/McCance_Widdowsons_Composition_of_Foods_Integrated_Dataset_2021..xlsx#food-code=13-670",
+              "retrievedAt": "2026-10-29",
+              "licence": "Contains public sector information licensed under the Open Government Licence v3.0. CoFID 2021, Public Health England.",
+              "foodCode": "13-670"
+            }
+          },
+          "quantityState": "cooked_drained",
+          "mappingReference": "Explicit pending mapping: canned chickpeas weighed after reheating and draining to CoFID 2021 13-670 Beans, chick peas, canned, re-heated, drained; not dry or undrained chickpeas. Product/state match requires reviewer verification."
+        }
+      }
+    ],
+    "steps": [
+      "Weigh 100g dry wholegrain brown rice and cook according to its packet directions.",
+      "Re-heat canned chickpeas according to their packet directions, then drain and weigh 300g of the re-heated drained chickpeas.",
+      "Wash and weigh 160g raw baby spinach. Divide the cooked rice, measured chickpeas and spinach between two bowls. Review the method and timing in a real cook-through before approval."
+    ],
+    "servings": 2,
+    "readyInMinutes": 35,
+    "macros": {
+      "calories": 373,
+      "protein": 19,
+      "carbs": 66,
+      "fat": 6
+    },
+    "proteinType": "plant",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "ovona-original-draft:brown-rice-spinach-chickpea-bowl:2026-10-29",
+      "rights": "Original composition prepared for Ovona; ownership and usage rights have not been independently confirmed and require reviewer verification.",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "ingredient_calculated_v1",
+      "reference": "Local exact mappings; CoFID 2021; workbook sha256:436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+      "reviewed": false,
+      "calculation": {
+        "policyVersion": "ingredient-v1",
+        "servings": 2,
+        "batchMacros": {
+          "calories": 745.6,
+          "protein": 37.06,
+          "carbs": 132.22,
+          "fat": 11.46
+        },
+        "perServingMacros": {
+          "calories": 373,
+          "protein": 19,
+          "carbs": 66,
+          "fat": 6
+        },
+        "lines": [
+          {
+            "ingredientIndex": 0,
+            "foodId": "CoFID:2021:11-868",
+            "foodRevision": "2021-sha256:436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+            "sourceAmount": 100,
+            "sourceUnit": "g",
+            "macros": {
+              "calories": 333,
+              "protein": 7.7,
+              "carbs": 77,
+              "fat": 1.5
+            }
+          },
+          {
+            "ingredientIndex": 1,
+            "foodId": "CoFID:2021:13-521",
+            "foodRevision": "2021-sha256:436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+            "sourceAmount": 160,
+            "sourceUnit": "g",
+            "macros": {
+              "calories": 25.6,
+              "protein": 4.16,
+              "carbs": 0.32,
+              "fat": 0.96
+            }
+          },
+          {
+            "ingredientIndex": 2,
+            "foodId": "CoFID:2021:13-670",
+            "foodRevision": "2021-sha256:436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+            "sourceAmount": 300,
+            "sourceUnit": "g",
+            "macros": {
+              "calories": 387,
+              "protein": 25.2,
+              "carbs": 54.9,
+              "fat": 9
+            }
+          }
+        ]
+      }
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  }
+]

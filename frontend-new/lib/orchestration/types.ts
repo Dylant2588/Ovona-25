@@ -23,6 +23,7 @@ export type HardPlannerConstraints = {
 
 export type SoftPlannerPreferences = {
   dislikes: readonly string[];
+  foodLikes?: readonly string[];
   tastes: readonly string[];
   budgetSensitivity: "low" | "medium" | "high";
   preferredMealTypes: readonly string[];
@@ -47,6 +48,8 @@ export type VerifiedIngredient = {
 
 export type VerifiedCandidateMeal = {
   id: string;
+  recipeId?: string;
+  recipeVersion?: number;
   slot: PlannerMealSlot;
   title: string;
   verified: true;
@@ -64,6 +67,7 @@ export type VerifiedCandidateMeal = {
   /** A bounded AI ordering hint after server-side recipe/version resolution. */
   aiPriority?: number;
   proteinType?: string;
+  proteinFamilies?: readonly string[];
   cuisine?: string;
   format?: string;
 };
@@ -76,6 +80,7 @@ export type SelectedMealServing = {
 };
 
 export type ScoreComponents = Readonly<{
+  practical?: number;
   nutrition: number;
   preference: number;
   reuse: number;
@@ -102,6 +107,7 @@ export type SelectedMeal = Readonly<{
   cost: number;
   prepMinutes: number;
   proteinType?: string;
+  proteinFamilies?: readonly string[];
   cuisine?: string;
   format?: string;
   isLeftover: boolean;

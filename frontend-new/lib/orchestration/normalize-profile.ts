@@ -34,6 +34,7 @@ const freezeProfile = (profile: PlannerProfile): PlannerProfile => Object.freeze
   softPreferences: Object.freeze({
     ...profile.softPreferences,
     dislikes: Object.freeze([...profile.softPreferences.dislikes]),
+    foodLikes: Object.freeze([...(profile.softPreferences.foodLikes ?? [])]),
     tastes: Object.freeze([...profile.softPreferences.tastes]),
     preferredMealTypes: Object.freeze([...profile.softPreferences.preferredMealTypes]),
   }),
@@ -69,6 +70,7 @@ export const normalizePlannerProfile = (raw: unknown, policy: PlannerPolicy = DE
     },
     softPreferences: {
       dislikes: normalizedStrings(input.dislikes ?? legacyProfile.dislikes),
+      foodLikes: normalizedStrings(input.foodLikes ?? legacyProfile.foodLikes),
       tastes: normalizedStrings(input.tastes),
       budgetSensitivity,
       preferredMealTypes: normalizedStrings(input.preferredMealTypes ?? legacyProfile.cuisines),

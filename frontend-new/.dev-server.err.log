@@ -1,13 +1,10 @@
-Error: spawn EPERM
-    at ChildProcess.spawn (node:internal/child_process:421:11)
-    at spawn (node:child_process:796:9)
-    at fork (node:child_process:174:10)
-    at C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\node_modules\next\dist\cli\next-dev.js:236:45
-    at new Promise (<anonymous>)
-    at startServer (C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\node_modules\next\dist\cli\next-dev.js:212:16)
-    at runDevServer (C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\node_modules\next\dist\cli\next-dev.js:327:23)
-    at Module.nextDev (C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\node_modules\next\dist\cli\next-dev.js:335:11) {
-  errno: -4048,
-  code: 'EPERM',
-  syscall: 'spawn'
-}
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\u1434\OneDrive\Documents\Ovona 25\package-lock.json as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package-lock.json
+
+ ⨯ Unable to acquire lock at C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\.next\dev\lock, is another instance of next dev running?
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`

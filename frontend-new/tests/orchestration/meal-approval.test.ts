@@ -18,7 +18,8 @@ test("all allergies map conservatively; unknown allergies and dietary modes reje
   assert.equal(approveRecipe(r, { dietaryMode: "vegan" }).approved, false);
   assert.equal(approveRecipe(r, { dietaryModes: ["omnivore", "vegetarian"] }).approved, false);
   assert.equal(approveRecipe(r, { dietaryMode: "invented" }).approved, false);
-  assert.equal(approveRecipe(r, { dislikes: ["chicken"] }).approved, false);
+  assert.equal(approveRecipe(r, { dislikes: ["chicken"] }).approved, true);
+  assert.equal(approveRecipe(r, { neverFoods: ["chicken"] }).approved, false);
   assert.equal(approveRecipe(r, { maxPrepMinutes: 10 }).approved, false);
 });
 test("milk, egg and wheat cannot hide allergen evidence behind reviewed flags", () => {

@@ -57,6 +57,58 @@ test("breaks equal score ties by candidate ID", () => {
   assert.deepEqual(ranked.map((entry) => entry.candidate.id), ["alpha", "zeta"]);
 });
 
+test("revisits earlier days instead of exhausting the week's ingredient allowance greedily", () => {
+  const p = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 60, requiredSlots: ["breakfast"], householdSize: 1, maxPrepMinutes: 30 });
+  const options = [
+    candidate("a-concentrated", "breakfast", { proteinType: "mixed", ingredients: [{ name: "Egg whites", normalizedName: "egg", quantity: 450, unit: "g", pantry: false }] }),
+    candidate("b-lighter", "breakfast", { proteinType: "mixed", ingredients: [{ name: "Egg whites", normalizedName: "egg", quantity: 100, unit: "g", pantry: false }] }),
+    candidate("c-alternative", "breakfast", { proteinType: "mixed", ingredients: [{ name: "Chickpeas", normalizedName: "chickpea", quantity: 100, unit: "g", pantry: false }] }),
+  ].map(c => ({ ...c, servings: 1, nutrition: { calories: 800, protein: 60, carbs: 60, fat: 10 }, dietaryTags: [] }));
+  const result = orchestrateWeek(p, options);
+  assert.equal(result.ok, true, JSON.stringify(result));
+  if (result.ok) {
+    const meals = result.value.days.flatMap(day => day.meals);
+    assert.equal(meals.length, 7);
+    assert.equal(meals.filter(meal => meal.candidateId === "a-concentrated").length, 1);
+    assert.ok(meals.flatMap(meal => meal.ingredients.map(i => i.normalizedName === "egg" ? i.quantity * meal.nutritionPortionMultiplier : 0)).reduce((a, b) => a + b, 0) <= 1000);
+  }
+});
+
+test("recent safe meals remain available when fresh choices cannot meet daily targets", () => {
+  const safe = completeCandidates();
+  const recentBreakfasts = safe.filter((meal) => meal.slot === "breakfast");
+  const history = {
+    recentCandidateIds: recentBreakfasts.map((meal) => meal.id),
+    recentSimilarityKeys: recentBreakfasts.map((meal) => meal.id),
+  };
+  // At any allowed shared portion, this fresh breakfast makes the day's
+  // calorie/protein intervals incompatible. Safe recent breakfasts still fit.
+  const fresh = candidate("fresh-breakfast", "breakfast", {
+    nutrition: { calories: 1000, protein: 1, carbs: 200, fat: 20 },
+    proteinType: "plant",
+  });
+  const result = orchestrateWeek(profile(), [...safe, fresh], history);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.value.days.length, 7);
+  for (const day of result.value.days) {
+    assert.equal(day.meals.length, 4);
+    assert.ok(day.meals.some((meal) => history.recentCandidateIds.includes(meal.candidateId)));
+    assert.ok(day.meals.every((meal) => meal.candidateId !== fresh.id));
+    const totals = day.meals.reduce((sum, meal) => ({
+      calories: sum.calories + meal.nutrition.calories * meal.nutritionPortionMultiplier,
+      protein: sum.protein + meal.nutrition.protein * meal.nutritionPortionMultiplier,
+    }), { calories: 0, protein: 0 });
+    assert.ok(totals.calories >= 1900 && totals.calories <= 2160);
+    assert.ok(totals.protein >= 117.6 && totals.protein <= 132);
+    assert.ok(day.meals.every((meal) => meal.nutritionPortionMultiplier >= 0.7 && meal.nutritionPortionMultiplier <= 1.5));
+  }
+  const unsafeRecent = safe.map((meal) => meal.slot === "breakfast"
+    ? { ...meal, allergens: ["peanut"] }
+    : meal);
+  assert.equal(orchestrateWeek(profile(), [...unsafeRecent, fresh], history).ok, false);
+});
+
 test("five-meal profiles retain two distinct snacks and reject a missing snack", () => {
   const fiveMealProfile = normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2500, proteinTarget: 150,
     requiredSlots: ["breakfast", "snack", "lunch", "snack", "dinner"] });

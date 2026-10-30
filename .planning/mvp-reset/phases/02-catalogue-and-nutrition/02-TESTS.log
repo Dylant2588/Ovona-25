@@ -1,0 +1,297 @@
+
+> ovona@0.1.0 test:orchestration
+> node --test tests/orchestration/*.test.ts
+
+(node:47356) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/ai-proposal.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ AI choices resolve only to server-loaded reviewed recipe IDs and versions (1.7275ms)
+✔ forged versions, unknown IDs, duplicate slots, and missing slots fail closed (0.3148ms)
+✔ AI brief receives structured constraints without identity or free-form notes (1.5713ms)
+(node:9968) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/calculated-planning.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ actual adapter and final validator scale calculated two-serving recipe exactly once (3.9581ms)
+✔ actual adapter rejects stale source nutrition and honours saved ingredient exclusions (0.9241ms)
+(node:59052) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/catalogue-coverage.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ shared mapping preserves batch division, allergens, tags and metadata exactly (1.4702ms)
+✔ actual seven-day scheduling succeeds in compatibility mode without claiming calculated coverage (29.9305ms)
+✔ slot counts never claim macro feasibility and repeated snack demand counts twice (1.5777ms)
+✔ classifies pending, calculated, malformed and duplicate versions without inflated identities (1.5457ms)
+✔ hard restrictions remain exclusions and vegan structural policy is explicit (0.7313ms)
+✔ invalid cohorts are rejected rather than normalized into different probes (0.4229ms)
+✔ bounded diagnostic never calls a search-budget rejection proven infeasible (0.9044ms)
+✔ malformed approved rows block readiness just as the production loader does (0.3373ms)
+✔ file-only CLI is deterministic, rejects bad input and never overwrites inputs (1136.4807ms)
+(node:18660) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/database-target-guard.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ missing or implicit default environment is blocked before clients exist (1.6815ms)
+✔ an explicit isolated loopback API and SQL pair is accepted without reading files (0.2129ms)
+✔ unsafe URLs, SQL target mismatches and missing confirmation are rejected (0.256ms)
+✔ remote targets require exact project approval and production denylist agreement (0.3509ms)
+[context-builder] profiles query failed: unavailable
+(node:26588) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/dietary-generation.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ reviewed mixed recipes survive actual adapter and eligibility with honest scheduling outcome (26.2689ms)
+✔ reviewed vegetarian recipes survive actual adapter and eligibility with honest scheduling outcome (2.1653ms)
+✔ reviewed vegan recipes survive actual adapter and eligibility with honest scheduling outcome (1.1896ms)
+✔ reviewed pescatarian recipes survive actual adapter and eligibility with honest scheduling outcome (1.3111ms)
+✔ reviewed pescetarian recipes survive actual adapter and eligibility with honest scheduling outcome (2.7062ms)
+✔ reviewed low_carb recipes survive actual adapter and eligibility with honest scheduling outcome (1.2959ms)
+✔ reviewed high_protein recipes survive actual adapter and eligibility with honest scheduling outcome (1.7607ms)
+✔ saved exclusions override an injected/requested weaker planning brief and retain cross-contact evidence (1.2847ms)
+✔ combined saved and requested diets both remain required (0.7053ms)
+✔ an unrestricted feasible five-meal profile retains two distinct snacks (2.4536ms)
+✔ context uses the strict saved union instead of a client dietary-mode replacement (3.3753ms)
+✔ unknown rules and missing safety sources cannot admit synthetic fallback candidates (1.3319ms)
+(node:43440) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/eligibility.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ admits only complete, explicitly verified candidates (0.7578ms)
+✔ filters allergy, dietary, unverified, and slow candidates before scheduling (1.3131ms)
+✔ returns a typed insufficiency result rather than relaxing safety constraints (0.2205ms)
+(node:47028) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/fixtures.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ planner fixtures expose complete deterministic safety variants (1.3826ms)
+(node:42764) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/generation-adapter.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ adapter admits only reviewed database recipes and preserves duplicate snack slots (2.8442ms)
+✔ pending, missing-schema, restrictions and preference-read failures cannot use synthetic meals (0.7817ms)
+(node:59492) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/meal-approval-integration.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ actual persistence boundary writes a reviewed fixture with recomputed totals (6.4943ms)
+✔ a deliberate meal out persists as nutrition-unknown without weakening recipe approval (0.8461ms)
+✔ forged approval, changed ingredient, version, owner, nutrition and incomplete days produce zero writes (3.0952ms)
+✔ missing review and unavailable saved preferences reject before mutation (1.1919ms)
+✔ client restrictions never erase saved allergies, dietary modes or dislikes (0.3357ms)
+(node:21400) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/meal-approval.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ approved evidence admits safe two-serving recipe once and scales trusted portions (1.5887ms)
+✔ all allergies map conservatively; unknown allergies and dietary modes reject (0.5623ms)
+✔ milk, egg and wheat cannot hide allergen evidence behind reviewed flags (0.343ms)
+✔ unreviewed, unknown and cross-contact ingredients reject (0.2055ms)
+✔ changed ingredients, methods, macros, versions and unsafe portions never retain approval (0.4395ms)
+✔ final portion dietary thresholds and malformed untrusted plans fail closed (0.4203ms)
+✔ a meal out is a narrow nutrition-unknown exception, never an unchecked recipe (0.1842ms)
+(node:36832) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/meal-images.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ dish families resolve to distinct illustrated artwork (0.9529ms)
+✔ missing and unsuitable images use relevant local illustrations (0.2817ms)
+✔ image load errors fall back once, then stop (0.1469ms)
+fallback regression probe: PASS
+(node:10048) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/meal-variety.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ legacy fallback and swaps preserve allergies and variety, with fail-closed nutrition validation (1068.96ms)
+(node:52344) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/normalize-profile.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ normalizes a legacy profile into frozen hard constraints and soft preferences (3.3271ms)
+✔ rejects non-finite and out-of-policy hard values with a 400-mappable input error (1.0908ms)
+✔ accepts explicit policy overrides without silently clamping restrictions (0.1174ms)
+(node:57492) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/nutrition-preparation.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ official source preparation is deterministic, hand-computed and unreviewed (7.1879ms)
+✔ stale ingredient bindings, source identity/state, missing and trace nutrients remain gaps (14.7189ms)
+✔ approved recipes are refused, missing mappings do not invent data, and reviews are cleared (12.8922ms)
+✔ file-only CLI refuses overwrite and requires separate gap output; source values stay intact (16.206ms)
+(node:56472) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/onboarding-preferences.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ onboarding sends the verified bearer identity and precise chosen preparation limit (36.73ms)
+✔ onboarding does not write when session identity is missing, unverified or changes before sending (0.5289ms)
+✔ an in-flight account switch cannot report onboarding success for the new account (0.2778ms)
+✔ onboarding preserves non-success responses for caller feedback and propagates network failure (1.0883ms)
+✔ saved lowercase and canonical allergies stay selected without broadening precise restrictions (1.8809ms)
+✔ preference form feedback retains actionable schema failures while hiding unexpected error details (0.2721ms)
+(node:21460) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/ovona-original-seeds.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ Ovona original recipe seeds are complete, internal, and pending review (1.597ms)
+(node:60244) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/pending-import.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ pending batch parser rejects invalid, pre-attested, legacy and duplicate identities (3.4673ms)
+✔ import endpoint restricts origin scheme and exact path without credential forwarding (0.338ms)
+✔ actual import route uses verified actor and one atomic RPC after complete validation (471.9645ms)
+✔ actual byte bound cancels chunked body without trusting a content-length header (20.905ms)
+(node:48764) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/planning-input.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ saved wheat allergy cannot be cleared by an empty client request (2.3236ms)
+✔ mushrooms are a soft dislike unless explicitly marked never include (0.254ms)
+✔ quick meals has a durable explicit time limit and invalid terms fail closed (0.4057ms)
+✔ server restrictions union every saved source and requested additions using canonical aliases (0.9804ms)
+✔ unavailable or malformed restrictions cannot become an unrestricted profile (0.4379ms)
+(node:25172) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/preferences-route.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ preference patches preserve omission and distinguish explicit empty replacements (6.3301ms)
+✔ preference patches reject malformed lists, unsafe keys and invalid preparation values (0.455ms)
+✔ onboarding profile, macros and taste fields survive normalisation without filling omitted fields (0.203ms)
+✔ actual POST rejects invalid bodies and unverified identity before any RPC (184.4901ms)
+✔ actual POST uses exactly one owner RPC and reports success only after complete persistence (16.724ms)
+✔ bearer fallback is verified with its explicit access token without a stored session (8.9664ms)
+✔ the panel's standard limit saves as 30 minutes while explicit stricter limits survive (15.4702ms)
+✔ missing RPC/schema fails explicitly without retrying reduced safety payloads (13.6682ms)
+✔ permission and transaction failures cannot report partial success or use direct writes (11.5064ms)
+(node:54196) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/recipe-cli-boundaries.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ review CLI checks calculated evidence but can never perform direct approval writes (1743.0471ms)
+✔ import CLI never prints malformed bearer token values (242.813ms)
+✔ import CLI refuses redirects without forwarding bearer credentials or recipe payload (273.768ms)
+✔ import CLI validates entire pending batch with shared evidence and never opens old unaudited apply path (1448.6849ms)
+(node:32888) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/recipe-imports.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ trusted imports fail closed when evidence or measured ingredients are absent (1.7681ms)
+✔ approval creates a new immutable reviewed version with reviewer attribution (1.0489ms)
+✔ legacy imports remain inspectable but direct converter cannot newly approve them (0.2737ms)
+✔ claimed calculations fail import and structural loading when stale (0.2673ms)
+✔ operator price adapters reject missing provenance and never accept a fetch implementation (0.2828ms)
+(node:10084) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/recipe-library.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ reviewed recipes retain batch measurements, source and nutrition evidence (10.182ms)
+✔ missing schema, malformed recipe and forged row approval fail closed (0.4331ms)
+✔ catalogue export is complete deterministic and never certifies internal drafts (542.0412ms)
+(node:53600) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/recipe-nutrition.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ hand-computed batch is divided by servings once, without input mutation (2.9199ms)
+✔ mass, volume and explicitly evidenced density/count/spoon conversions (0.7545ms)
+✔ unknown nutrients, states, sources and invalid quantities fail closed with line diagnostics (0.8945ms)
+✔ stored calculation rejects stale quantities, revisions, lines, servings and output macros (0.5012ms)
+✔ distinct foods under the same allergy taxonomy remain independent and precision is stable (0.4255ms)
+✔ cooked and drained source state is retained exactly rather than collapsed (0.1739ms)
+✔ malformed JSON unit and state objects return diagnostics instead of throwing (0.3783ms)
+(node:60692) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/replace.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ replaces exactly one target slot immutably with a score-derived explanation (36.4208ms)
+✔ rejects unsafe, repeated, or malformed replacement candidates without relaxing the existing week (2.1161ms)
+(node:50896) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/retailer-comparison.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ compares fully sourced, fresh retailer baskets and evaluates budget after meal selection (1.1462ms)
+✔ never exposes a price claim from stale, estimated, partial, or single-retailer evidence (0.3041ms)
+(node:46060) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/review-lifecycle.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ approval requests require each of five explicit true attestations (1.0574ms)
+✔ review requests reject malformed identities/actions and client-owned recipe/actor fields (1.9414ms)
+✔ pending conversion is immutable and validates the proposed reviewed version (27.4386ms)
+✔ unknown taxonomy, nonpending state and malformed evidence cannot be proposed (0.941ms)
+✔ new review approval cannot bypass calculation by using a legacy method (0.2409ms)
+(node:17852) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/review-queue.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ mixed valid and malformed saved drafts retain usable entries without unsafe display fields (2.2457ms)
+✔ hostile enum JSON returns structural errors without object-to-string coercion (0.5219ms)
+✔ legacy optional calculation/source objects never become renderable trusted evidence (0.2331ms)
+✔ queue selection distinguishes pending versions and colon-containing recipe identities (0.4378ms)
+(node:57740) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/review-route.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ actual approval POST converts pending evidence and calls the atomic RPC once (275.116ms)
+✔ review route verifies identity and role before any privileged reads (86.3579ms)
+✔ actual POST rejects malformed JSON, unsupported actions and every missing attestation with zero writes (20.4311ms)
+✔ unknown ingredients cannot reach persistence and rejection needs no false approval (27.8374ms)
+✔ stale versions and unavailable persistence return safe non-success responses (72.9759ms)
+✔ actual GET returns pending review validation after verified access (7.4457ms)
+✔ unprepared legacy and stale calculated drafts never reach approval persistence (24.5136ms)
+(node:39096) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/rotation-history.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ rotation history includes exactly the preceding fourteen calendar days and accepted/eaten states (5.0015ms)
+✔ recent exact and similarity matches are avoided when a safe alternative exists (11.335ms)
+✔ approved history writes exact reviewed identity and excludes meal out (0.7185ms)
+(node:56356) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/schedule.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ schedules byte-equivalent seven-day required slots with factual explanations (54.5742ms)
+✔ breaks equal score ties by candidate ID (0.2553ms)
+✔ recent safe meals remain available when fresh choices cannot meet daily targets (11.9958ms)
+✔ five-meal profiles retain two distinct snacks and reject a missing snack (2.7214ms)
+✔ never schedules a protein source more than twice in one day (4.2365ms)
+✔ fails safely when the only macro-feasible day would use one protein three times (0.3488ms)
+✔ treats a missing protein type as one capped fallback category (0.2402ms)
+✔ uses one bounded extra repeat when a reviewed snack catalogue is scarce (2.0967ms)
+✔ rejects excess identical or similar meals but permits an explicitly linked leftover (3.7887ms)
+(node:47260) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/shopping.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ aggregates all seven days, merges canonical duplicates, and separates pantry items with provenance (2.042ms)
+✔ uses the already materialized household servings exactly once (0.2471ms)
+✔ uses final meal ingredients as the shopping ledger without substituting base ingredients (1.3468ms)
+(node:53052) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/structured-planning-schema.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ structured planning migration is safe before trusted-evidence migration (0.7095ms)
+✔ trusted evidence migration preserves rejected feedback support (1.2833ms)
+(node:46072) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/trusted-planning-schema.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ trusted planning migration preserves evidence, rotation identity, and service-only operational writes (0.9472ms)
+✔ migration keeps the existing immutable approved recipe-version trigger (0.1563ms)
+(node:51368) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/u1434/OneDrive/Documents/Ovona%2025/frontend-new/tests/orchestration/validate.test.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ accepts inclusive calorie and protein tolerance boundaries for every one of seven days (17.5174ms)
+✔ repairs individual nutrition portions deterministically and materializes household servings exactly once (2.8174ms)
+✔ returns reason-coded invalidity when bounded repair cannot meet daily bands or use an unsafe candidate (11.2344ms)
+✔ rejects a macro-valid week when exact selected ingredients create an impractical protein basket (62.5806ms)
+✔ missing protein metadata cannot evade the daily repetition cap (1.0442ms)
+ℹ tests 147
+ℹ suites 0
+ℹ pass 147
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4186.9034

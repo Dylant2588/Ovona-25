@@ -31,7 +31,7 @@ test("trusted planning migration preserves evidence, rotation identity, and serv
     "add column if not exists cuisine text",
     "add column if not exists format text",
     "add column if not exists planning_state text",
-    "planning_state in ('accepted', 'eaten')",
+    "planning_state in ('accepted', 'eaten', 'rejected')",
     "idx_user_meal_history_rotation",
     "recipe_imports_review_status_idx",
     "retailer_price_observations_freshness_idx",

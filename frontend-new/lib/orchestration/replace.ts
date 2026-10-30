@@ -21,6 +21,8 @@ const selectedMeal = (candidate: VerifiedCandidateMeal, score: ReturnType<typeof
     nutrition: { ...candidate.nutrition },
     cost: candidate.cost,
     prepMinutes: candidate.prepMinutes,
+    proteinType: candidate.proteinType,
+    proteinFamilies: candidate.proteinFamilies,
     isLeftover: candidate.isLeftover === true,
     ...(candidate.leftoverFromCandidateId ? { leftoverFromCandidateId: candidate.leftoverFromCandidateId } : {}),
     recipeServings,

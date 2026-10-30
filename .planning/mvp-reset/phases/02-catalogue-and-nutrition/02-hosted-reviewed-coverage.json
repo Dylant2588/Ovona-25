@@ -1,0 +1,3929 @@
+{
+  "reportVersion": "catalogue-coverage-v1",
+  "approvalPolicyVersion": "2026-10-12.1",
+  "nutritionPolicyVersion": "ingredient-v1",
+  "schedulerPolicy": {
+    "calorieBand": {
+      "min": 0.95,
+      "max": 1.08
+    },
+    "proteinBand": {
+      "min": 0.98,
+      "max": 1.1
+    },
+    "scoreWeights": {
+      "nutrition": 40,
+      "preference": 20,
+      "reuse": 15,
+      "prep": 10,
+      "cost": 10,
+      "repetition": 5
+    },
+    "repair": {
+      "maxAttempts": 3
+    },
+    "repetition": {
+      "maxUsesPerWeek": 2
+    },
+    "calorieTargetRange": {
+      "min": 800,
+      "max": 6000
+    },
+    "proteinTargetRange": {
+      "min": 20,
+      "max": 400
+    },
+    "maxPrepMinutes": 240,
+    "maxHouseholdSize": 20
+  },
+  "guarantees": {
+    "legacyCompatible": "Includes existing reviewed legacy nutrition attestations; not necessarily ingredient calculated.",
+    "calculatedOnly": "Only reviewed recipes with reproducible ingredient calculations."
+  },
+  "catalogue": {
+    "records": 38,
+    "uniqueRecipeIds": 38,
+    "pending": 0,
+    "rejected": 0,
+    "malformed": 0,
+    "malformedApproved": 0,
+    "approvedLegacy": 38,
+    "approvedCalculated": 0,
+    "multipleApprovedVersions": []
+  },
+  "issues": [
+    {
+      "index": 0,
+      "recipeId": "apple-cinnamon-pea-oats",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Apple) has no exact nutrition mapping.",
+        "Ingredient 4 (Cinnamon) has no exact nutrition mapping.",
+        "Ingredient 5 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 1,
+      "recipeId": "berry-pea-protein-oats",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 4 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 2,
+      "recipeId": "chicken-cabbage-noodles",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Soba noodles) has no exact nutrition mapping.",
+        "Ingredient 3 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 4 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 5 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 3,
+      "recipeId": "chicken-crunch-snack-box",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 3 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 4,
+      "recipeId": "chicken-pepper-skewers",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 3 (Olive oil) has no exact nutrition mapping.",
+        "Ingredient 4 (Lime) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 5,
+      "recipeId": "chicken-tomato-pasta",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Wholewheat pasta) has no exact nutrition mapping.",
+        "Ingredient 3 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 6,
+      "recipeId": "chicken-vegetable-soup",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 3 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 4 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 5 (Scallions) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 7,
+      "recipeId": "cocoa-banana-pea-pot",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Banana) has no exact nutrition mapping.",
+        "Ingredient 3 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 4 (Cocoa powder) has no exact nutrition mapping.",
+        "Ingredient 5 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 8,
+      "recipeId": "egg-white-oat-pancakes",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Banana) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 9,
+      "recipeId": "egg-white-pepper-muffins",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 3 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 10,
+      "recipeId": "smoky-bean-pea-bowl",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Black beans) has no exact nutrition mapping.",
+        "Ingredient 3 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 4 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 11,
+      "recipeId": "spinach-egg-white-scramble",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 12,
+      "recipeId": "sunrise-egg-wrap",
+      "errors": [
+        "Ingredient 1 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 2 (Whole-grain wrap) has no exact nutrition mapping.",
+        "Ingredient 3 (Avocado) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 13,
+      "recipeId": "turkey-bean-lettuce-wraps",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Black beans) has no exact nutrition mapping.",
+        "Ingredient 3 (Tortillas) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 14,
+      "recipeId": "tofu-broccoli-rice-bowl",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Broccoli) has no exact nutrition mapping.",
+        "Ingredient 3 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 15,
+      "recipeId": "tofu-noodle-stir-fry",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 3 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 16,
+      "recipeId": "tofu-tomato-pasta",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 17,
+      "recipeId": "turkey-rice-breakfast-bowl",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 18,
+      "recipeId": "turkey-pepper-omelette",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 3 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 4 (Scallions) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 19,
+      "recipeId": "turkey-cucumber-rolls",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 3 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 4 (Olives) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 20,
+      "recipeId": "turkey-tomato-snack-box",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 21,
+      "recipeId": "vanilla-berry-pea-shake",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 3 (Banana) has no exact nutrition mapping.",
+        "Ingredient 4 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 22,
+      "recipeId": "blueberry-protein-oats",
+      "errors": [
+        "Ingredient 1 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 2 (Chia seeds) has no exact nutrition mapping.",
+        "Ingredient 3 (Water) has no exact nutrition mapping.",
+        "Ingredient 4 (Blueberries) has no exact nutrition mapping.",
+        "Ingredient 5 (Maple syrup) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 23,
+      "recipeId": "chipotle-turkey-chili",
+      "errors": [
+        "Ingredient 1 (Ground turkey) has no exact nutrition mapping.",
+        "Ingredient 2 (Black beans) has no exact nutrition mapping.",
+        "Ingredient 3 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Chipotle peppers) has no exact nutrition mapping.",
+        "Ingredient 5 (Corn kernels) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 24,
+      "recipeId": "coconut-lime-salmon",
+      "errors": [
+        "Ingredient 1 (Salmon fillet) has no exact nutrition mapping.",
+        "Ingredient 2 (Coconut milk) has no exact nutrition mapping.",
+        "Ingredient 3 (Jasmine rice) has no exact nutrition mapping.",
+        "Ingredient 4 (Lime) has no exact nutrition mapping.",
+        "Ingredient 5 (Snap peas) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 25,
+      "recipeId": "dark-chocolate-bites",
+      "errors": [
+        "Ingredient 1 (Walnuts) has no exact nutrition mapping.",
+        "Ingredient 2 (Dark chocolate) has no exact nutrition mapping.",
+        "Ingredient 3 (Dates) has no exact nutrition mapping.",
+        "Ingredient 4 (Espresso powder) has no exact nutrition mapping.",
+        "Ingredient 5 (Sea salt) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 26,
+      "recipeId": "greek-yogurt-protein-pot",
+      "errors": [
+        "Ingredient 1 (Greek yogurt) has no exact nutrition mapping.",
+        "Ingredient 2 (Whey protein) has no exact nutrition mapping.",
+        "Ingredient 3 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 4 (Pumpkin seeds) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 27,
+      "recipeId": "kimchi-fried-rice",
+      "errors": [
+        "Ingredient 1 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 2 (Mixed vegetables) has no exact nutrition mapping.",
+        "Ingredient 3 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Scallions) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 28,
+      "recipeId": "harissa-chicken-bowl",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Greek yogurt) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 29,
+      "recipeId": "matcha-energizer",
+      "errors": [
+        "Ingredient 1 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 2 (Chia seeds) has no exact nutrition mapping.",
+        "Ingredient 3 (Almond milk) has no exact nutrition mapping.",
+        "Ingredient 4 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 5 (Honey) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 30,
+      "recipeId": "white-bean-snack-box",
+      "errors": [
+        "Ingredient 1 (Mashed white beans) has no exact nutrition mapping.",
+        "Ingredient 2 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 3 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Olives) has no exact nutrition mapping.",
+        "Ingredient 5 (Whole-grain wrap) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 31,
+      "recipeId": "herbed-chicken-rice-plate",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 32,
+      "recipeId": "miso-soba-salad",
+      "errors": [
+        "Ingredient 1 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 2 (Tofu) has no exact nutrition mapping.",
+        "Ingredient 3 (Mixed vegetables) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Rice vinegar) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 33,
+      "recipeId": "lemon-chicken-rice-skillet",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Lime) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 34,
+      "recipeId": "thai-crunch-salad",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 3 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 4 (Peanut butter) has no exact nutrition mapping.",
+        "Ingredient 5 (Brown rice) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 35,
+      "recipeId": "lemongrass-tofu-bowl",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 4 (Mixed vegetables) has no exact nutrition mapping.",
+        "Ingredient 5 (Cucumber) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 36,
+      "recipeId": "turkey-cottage-snack-plate",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Cottage cheese) has no exact nutrition mapping.",
+        "Ingredient 3 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 37,
+      "recipeId": "sheet-pan-fajitas",
+      "errors": [
+        "Ingredient 1 (Chicken thighs) has no exact nutrition mapping.",
+        "Ingredient 2 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 3 (Red onion) has no exact nutrition mapping.",
+        "Ingredient 4 (Tortillas) has no exact nutrition mapping.",
+        "Ingredient 5 (Greek yogurt) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    }
+  ],
+  "cohorts": [
+    {
+      "id": "mixed-three",
+      "cohort": {
+        "id": "mixed-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "ingredient_evidence_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 10,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 12,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 11,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 13,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 28,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 28,
+        "status": "feasible",
+        "plan": {
+          "days": [
+            {
+              "day": 1,
+              "meals": [
+                {
+                  "candidateId": "vanilla-berry-pea-shake:breakfast",
+                  "slot": "breakfast",
+                  "title": "Vanilla Berry Pea Protein Shake",
+                  "similarityKey": "vanilla-berry-pea-shake",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Mixed berries",
+                      "normalizedName": "unreviewed_mixed_berries",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Banana",
+                      "normalizedName": "banana",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 300,
+                      "unit": "ml",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 4,
+                    "carbs": 39,
+                    "protein": 50,
+                    "calories": 371
+                  },
+                  "cost": 0,
+                  "prepMinutes": 5,
+                  "proteinType": "plant",
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4604150653343582,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4604150653343582,
+                  "score": {
+                    "candidate": {
+                      "id": "vanilla-berry-pea-shake:breakfast",
+                      "slot": "breakfast",
+                      "title": "Vanilla Berry Pea Protein Shake",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Mixed berries",
+                          "normalizedName": "unreviewed_mixed_berries",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Banana",
+                          "normalizedName": "banana",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 300,
+                          "unit": "ml",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 4,
+                        "carbs": 39,
+                        "protein": 50,
+                        "calories": 371
+                      },
+                      "cost": 0,
+                      "prepMinutes": 5,
+                      "servings": 1,
+                      "similarityKey": "vanilla-berry-pea-shake",
+                      "proteinType": "plant",
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 31.13,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 8.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0
+                    },
+                    "total": 49.46333333333333,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "white-bean-snack-box:lunch",
+                  "slot": "lunch",
+                  "title": "White Bean Snack Box",
+                  "similarityKey": "white-bean-snack-box",
+                  "ingredients": [
+                    {
+                      "name": "Mashed white beans",
+                      "normalizedName": "unreviewed_mashed_white_beans",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cucumber",
+                      "normalizedName": "cucumber",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 70,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olives",
+                      "normalizedName": "unreviewed_olives",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whole-grain wrap",
+                      "normalizedName": "wheat",
+                      "quantity": 0.5,
+                      "unit": "piece",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 16,
+                    "carbs": 32,
+                    "protein": 12,
+                    "calories": 320
+                  },
+                  "cost": 0,
+                  "prepMinutes": 8,
+                  "proteinType": "plant",
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4604150653343582,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4604150653343582,
+                  "score": {
+                    "candidate": {
+                      "id": "white-bean-snack-box:lunch",
+                      "slot": "lunch",
+                      "title": "White Bean Snack Box",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Mashed white beans",
+                          "normalizedName": "unreviewed_mashed_white_beans",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cucumber",
+                          "normalizedName": "cucumber",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 70,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olives",
+                          "normalizedName": "unreviewed_olives",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whole-grain wrap",
+                          "normalizedName": "wheat",
+                          "quantity": 0.5,
+                          "unit": "piece",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 16,
+                        "carbs": 32,
+                        "protein": 12,
+                        "calories": 320
+                      },
+                      "cost": 0,
+                      "prepMinutes": 8,
+                      "servings": 1,
+                      "similarityKey": "white-bean-snack-box",
+                      "proteinType": "plant",
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 14.399999999999999,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 7.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10
+                    },
+                    "total": 21.733333333333334,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "coconut-lime-salmon:dinner",
+                  "slot": "dinner",
+                  "title": "Coconut Lime Salmon",
+                  "similarityKey": "coconut-lime-salmon",
+                  "ingredients": [
+                    {
+                      "name": "Salmon fillet",
+                      "normalizedName": "salmon",
+                      "quantity": 200,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Coconut milk",
+                      "normalizedName": "coconut_milk",
+                      "quantity": 160,
+                      "unit": "ml",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Jasmine rice",
+                      "normalizedName": "rice",
+                      "quantity": 90,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Lime",
+                      "normalizedName": "lime",
+                      "quantity": 1,
+                      "unit": "each",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Snap peas",
+                      "normalizedName": "snap_peas",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 26,
+                    "carbs": 52,
+                    "protein": 40,
+                    "calories": 610
+                  },
+                  "cost": 0,
+                  "prepMinutes": 28,
+                  "proteinType": "fish",
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4604150653343582,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4604150653343582,
+                  "score": {
+                    "candidate": {
+                      "id": "coconut-lime-salmon:dinner",
+                      "slot": "dinner",
+                      "title": "Coconut Lime Salmon",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Salmon fillet",
+                          "normalizedName": "salmon",
+                          "quantity": 200,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Coconut milk",
+                          "normalizedName": "coconut_milk",
+                          "quantity": 160,
+                          "unit": "ml",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Jasmine rice",
+                          "normalizedName": "rice",
+                          "quantity": 90,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Lime",
+                          "normalizedName": "lime",
+                          "quantity": 1,
+                          "unit": "each",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Snap peas",
+                          "normalizedName": "snap_peas",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "fish"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 26,
+                        "carbs": 52,
+                        "protein": 40,
+                        "calories": 610
+                      },
+                      "cost": 0,
+                      "prepMinutes": 28,
+                      "servings": 1,
+                      "similarityKey": "coconut-lime-salmon",
+                      "proteinType": "fish",
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 34.300000000000004,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 0.6666666666666665,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0
+                    },
+                    "total": 44.96666666666667,
+                    "facts": [
+                      "target contribution",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, cost."
+                }
+              ]
+            },
+            {
+              "day": 2,
+              "meals": [
+                {
+                  "candidateId": "greek-yogurt-protein-pot:breakfast",
+                  "slot": "breakfast",
+                  "title": "Greek Yogurt Protein Pot",
+                  "similarityKey": "greek-yogurt-protein-pot",
+                  "ingredients": [
+                    {
+                      "name": "Greek yogurt",
+                      "normalizedName": "milk",
+                      "quantity": 220,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whey protein",
+                      "normalizedName": "milk",
+                      "quantity": 25,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Mixed berries",
+                      "normalizedName": "unreviewed_mixed_berries",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Pumpkin seeds",
+                      "normalizedName": "pumpkin_seeds",
+                      "quantity": 12,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 8,
+                    "carbs": 22,
+                    "protein": 32,
+                    "calories": 280
+                  },
+                  "cost": 0,
+                  "prepMinutes": 4,
+                  "proteinType": "mixed",
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4393939393939394,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4393939393939394,
+                  "score": {
+                    "candidate": {
+                      "id": "greek-yogurt-protein-pot:breakfast",
+                      "slot": "breakfast",
+                      "title": "Greek Yogurt Protein Pot",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Greek yogurt",
+                          "normalizedName": "milk",
+                          "quantity": 220,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whey protein",
+                          "normalizedName": "milk",
+                          "quantity": 25,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Mixed berries",
+                          "normalizedName": "unreviewed_mixed_berries",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Pumpkin seeds",
+                          "normalizedName": "pumpkin_seeds",
+                          "quantity": 12,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "milk"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 8,
+                        "carbs": 22,
+                        "protein": 32,
+                        "calories": 280
+                      },
+                      "cost": 0,
+                      "prepMinutes": 4,
+                      "servings": 1,
+                      "similarityKey": "greek-yogurt-protein-pot",
+                      "proteinType": "mixed",
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 21.200000000000003,
+                      "preference": 0,
+                      "reuse": 3.75,
+                      "prep": 8.666666666666668,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0
+                    },
+                    "total": 43.616666666666674,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "thai-crunch-salad:lunch",
+                  "slot": "lunch",
+                  "title": "Crunch Chicken Salad",
+                  "similarityKey": "thai-crunch-salad",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cabbage",
+                      "normalizedName": "cabbage",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Carrots",
+                      "normalizedName": "carrots",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Peanut butter",
+                      "normalizedName": "peanut",
+                      "quantity": 20,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 22,
+                    "carbs": 24,
+                    "protein": 38,
+                    "calories": 430
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "poultry",
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4393939393939394,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4393939393939394,
+                  "score": {
+                    "candidate": {
+                      "id": "thai-crunch-salad:lunch",
+                      "slot": "lunch",
+                      "title": "Crunch Chicken Salad",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cabbage",
+                          "normalizedName": "cabbage",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Carrots",
+                          "normalizedName": "carrots",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Peanut butter",
+                          "normalizedName": "peanut",
+                          "quantity": 20,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "peanuts"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 22,
+                        "carbs": 24,
+                        "protein": 38,
+                        "calories": 430
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "thai-crunch-salad",
+                      "proteinType": "poultry",
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 28.1,
+                      "preference": 0,
+                      "reuse": 3,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0
+                    },
+                    "total": 45.1,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "coconut-lime-salmon:dinner",
+                  "slot": "dinner",
+                  "title": "Coconut Lime Salmon",
+                  "similarityKey": "coconut-lime-salmon",
+                  "ingredients": [
+                    {
+                      "name": "Salmon fillet",
+                      "normalizedName": "salmon",
+                      "quantity": 200,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Coconut milk",
+                      "normalizedName": "coconut_milk",
+                      "quantity": 160,
+                      "unit": "ml",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Jasmine rice",
+                      "normalizedName": "rice",
+                      "quantity": 90,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Lime",
+                      "normalizedName": "lime",
+                      "quantity": 1,
+                      "unit": "each",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Snap peas",
+                      "normalizedName": "snap_peas",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 26,
+                    "carbs": 52,
+                    "protein": 40,
+                    "calories": 610
+                  },
+                  "cost": 0,
+                  "prepMinutes": 28,
+                  "proteinType": "fish",
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4393939393939394,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4393939393939394,
+                  "score": {
+                    "candidate": {
+                      "id": "coconut-lime-salmon:dinner",
+                      "slot": "dinner",
+                      "title": "Coconut Lime Salmon",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Salmon fillet",
+                          "normalizedName": "salmon",
+                          "quantity": 200,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Coconut milk",
+                          "normalizedName": "coconut_milk",
+                          "quantity": 160,
+                          "unit": "ml",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Jasmine rice",
+                          "normalizedName": "rice",
+                          "quantity": 90,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Lime",
+                          "normalizedName": "lime",
+                          "quantity": 1,
+                          "unit": "each",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Snap peas",
+                          "normalizedName": "snap_peas",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "fish"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 26,
+                        "carbs": 52,
+                        "protein": 40,
+                        "calories": 610
+                      },
+                      "cost": 0,
+                      "prepMinutes": 28,
+                      "servings": 1,
+                      "similarityKey": "coconut-lime-salmon",
+                      "proteinType": "fish",
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 34.300000000000004,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 0.6666666666666665,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10
+                    },
+                    "total": 38.96666666666667,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, cost."
+                }
+              ]
+            },
+            {
+              "day": 3,
+              "meals": [
+                {
+                  "candidateId": "greek-yogurt-protein-pot:breakfast",
+                  "slot": "breakfast",
+                  "title": "Greek Yogurt Protein Pot",
+                  "similarityKey": "greek-yogurt-protein-pot",
+                  "ingredients": [
+                    {
+                      "name": "Greek yogurt",
+                      "normalizedName": "milk",
+                      "quantity": 220,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whey protein",
+                      "normalizedName": "milk",
+                      "quantity": 25,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Mixed berries",
+                      "normalizedName": "unreviewed_mixed_berries",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Pumpkin seeds",
+                      "normalizedName": "pumpkin_seeds",
+                      "quantity": 12,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 8,
+                    "carbs": 22,
+                    "protein": 32,
+                    "calories": 280
+                  },
+                  "cost": 0,
+                  "prepMinutes": 4,
+                  "proteinType": "mixed",
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4296463506395787,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4296463506395787,
+                  "score": {
+                    "candidate": {
+                      "id": "greek-yogurt-protein-pot:breakfast",
+                      "slot": "breakfast",
+                      "title": "Greek Yogurt Protein Pot",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Greek yogurt",
+                          "normalizedName": "milk",
+                          "quantity": 220,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whey protein",
+                          "normalizedName": "milk",
+                          "quantity": 25,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Mixed berries",
+                          "normalizedName": "unreviewed_mixed_berries",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Pumpkin seeds",
+                          "normalizedName": "pumpkin_seeds",
+                          "quantity": 12,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "milk"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 8,
+                        "carbs": 22,
+                        "protein": 32,
+                        "calories": 280
+                      },
+                      "cost": 0,
+                      "prepMinutes": 4,
+                      "servings": 1,
+                      "similarityKey": "greek-yogurt-protein-pot",
+                      "proteinType": "mixed",
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 21.200000000000003,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 8.666666666666668,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10
+                    },
+                    "total": 33.866666666666674,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "white-bean-snack-box:lunch",
+                  "slot": "lunch",
+                  "title": "White Bean Snack Box",
+                  "similarityKey": "white-bean-snack-box",
+                  "ingredients": [
+                    {
+                      "name": "Mashed white beans",
+                      "normalizedName": "unreviewed_mashed_white_beans",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cucumber",
+                      "normalizedName": "cucumber",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 70,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olives",
+                      "normalizedName": "unreviewed_olives",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whole-grain wrap",
+                      "normalizedName": "wheat",
+                      "quantity": 0.5,
+                      "unit": "piece",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 16,
+                    "carbs": 32,
+                    "protein": 12,
+                    "calories": 320
+                  },
+                  "cost": 0,
+                  "prepMinutes": 8,
+                  "proteinType": "plant",
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4296463506395787,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4296463506395787,
+                  "score": {
+                    "candidate": {
+                      "id": "white-bean-snack-box:lunch",
+                      "slot": "lunch",
+                      "title": "White Bean Snack Box",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Mashed white beans",
+                          "normalizedName": "unreviewed_mashed_white_beans",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cucumber",
+                          "normalizedName": "cucumber",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 70,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olives",
+                          "normalizedName": "unreviewed_olives",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whole-grain wrap",
+                          "normalizedName": "wheat",
+                          "quantity": 0.5,
+                          "unit": "piece",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 16,
+                        "carbs": 32,
+                        "protein": 12,
+                        "calories": 320
+                      },
+                      "cost": 0,
+                      "prepMinutes": 8,
+                      "servings": 1,
+                      "similarityKey": "white-bean-snack-box",
+                      "proteinType": "plant",
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 14.399999999999999,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 7.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -20
+                    },
+                    "total": 15.733333333333334,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "smoky-bean-pea-bowl:dinner",
+                  "slot": "dinner",
+                  "title": "Smoky Bean & Pea Protein Bowl",
+                  "similarityKey": "smoky-bean-pea-bowl",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 55,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Black beans",
+                      "normalizedName": "black_beans",
+                      "quantity": 170,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 45,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Diced tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Bell peppers",
+                      "normalizedName": "pepper",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 10,
+                    "carbs": 95,
+                    "protein": 65,
+                    "calories": 729
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "plant",
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4296463506395787,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4296463506395787,
+                  "score": {
+                    "candidate": {
+                      "id": "smoky-bean-pea-bowl:dinner",
+                      "slot": "dinner",
+                      "title": "Smoky Bean & Pea Protein Bowl",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 55,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Black beans",
+                          "normalizedName": "black_beans",
+                          "quantity": 170,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 45,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Diced tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Bell peppers",
+                          "normalizedName": "pepper",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 10,
+                        "carbs": 95,
+                        "protein": 65,
+                        "calories": 729
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "smoky-bean-pea-bowl",
+                      "proteinType": "plant",
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 32.13,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -30
+                    },
+                    "total": 20.130000000000003,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                }
+              ]
+            },
+            {
+              "day": 4,
+              "meals": [
+                {
+                  "candidateId": "sunrise-egg-wrap:breakfast",
+                  "slot": "breakfast",
+                  "title": "Sunrise Egg Wrap",
+                  "similarityKey": "sunrise-egg-wrap",
+                  "ingredients": [
+                    {
+                      "name": "Eggs",
+                      "normalizedName": "egg",
+                      "quantity": 3,
+                      "unit": "large",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whole-grain wrap",
+                      "normalizedName": "wheat",
+                      "quantity": 1,
+                      "unit": "piece",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Avocado",
+                      "normalizedName": "avocado",
+                      "quantity": 0.5,
+                      "unit": "each",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Spinach",
+                      "normalizedName": "spinach",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 19,
+                    "carbs": 36,
+                    "protein": 27,
+                    "calories": 422
+                  },
+                  "cost": 0,
+                  "prepMinutes": 12,
+                  "proteinType": "poultry",
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.1494252873563218,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.1494252873563218,
+                  "score": {
+                    "candidate": {
+                      "id": "sunrise-egg-wrap:breakfast",
+                      "slot": "breakfast",
+                      "title": "Sunrise Egg Wrap",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Eggs",
+                          "normalizedName": "egg",
+                          "quantity": 3,
+                          "unit": "large",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whole-grain wrap",
+                          "normalizedName": "wheat",
+                          "quantity": 1,
+                          "unit": "piece",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Avocado",
+                          "normalizedName": "avocado",
+                          "quantity": 0.5,
+                          "unit": "each",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Spinach",
+                          "normalizedName": "spinach",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "eggs",
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 19,
+                        "carbs": 36,
+                        "protein": 27,
+                        "calories": 422
+                      },
+                      "cost": 0,
+                      "prepMinutes": 12,
+                      "servings": 1,
+                      "similarityKey": "sunrise-egg-wrap",
+                      "proteinType": "poultry",
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 23.46,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 6,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10
+                    },
+                    "total": 33.46,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "chicken-vegetable-soup:lunch",
+                  "slot": "lunch",
+                  "title": "Chicken & Vegetable Soup",
+                  "similarityKey": "chicken-vegetable-soup",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 140,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Carrots",
+                      "normalizedName": "carrots",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cabbage",
+                      "normalizedName": "cabbage",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 35,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Scallions",
+                      "normalizedName": "scallions",
+                      "quantity": 20,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 8,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 14,
+                    "carbs": 44,
+                    "protein": 49,
+                    "calories": 502
+                  },
+                  "cost": 0,
+                  "prepMinutes": 30,
+                  "proteinType": "poultry",
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.1494252873563218,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.1494252873563218,
+                  "score": {
+                    "candidate": {
+                      "id": "chicken-vegetable-soup:lunch",
+                      "slot": "lunch",
+                      "title": "Chicken & Vegetable Soup",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 140,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Carrots",
+                          "normalizedName": "carrots",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cabbage",
+                          "normalizedName": "cabbage",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 35,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Scallions",
+                          "normalizedName": "scallions",
+                          "quantity": 20,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 8,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 14,
+                        "carbs": 44,
+                        "protein": 49,
+                        "calories": 502
+                      },
+                      "cost": 0,
+                      "prepMinutes": 30,
+                      "servings": 1,
+                      "similarityKey": "chicken-vegetable-soup",
+                      "proteinType": "poultry",
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 34.660000000000004,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 0,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -20
+                    },
+                    "total": 28.660000000000004,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, cost."
+                },
+                {
+                  "candidateId": "smoky-bean-pea-bowl:dinner",
+                  "slot": "dinner",
+                  "title": "Smoky Bean & Pea Protein Bowl",
+                  "similarityKey": "smoky-bean-pea-bowl",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 55,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Black beans",
+                      "normalizedName": "black_beans",
+                      "quantity": 170,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 45,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Diced tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Bell peppers",
+                      "normalizedName": "pepper",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 10,
+                    "carbs": 95,
+                    "protein": 65,
+                    "calories": 729
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "plant",
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.1494252873563218,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.1494252873563218,
+                  "score": {
+                    "candidate": {
+                      "id": "smoky-bean-pea-bowl:dinner",
+                      "slot": "dinner",
+                      "title": "Smoky Bean & Pea Protein Bowl",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 55,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Black beans",
+                          "normalizedName": "black_beans",
+                          "quantity": 170,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 45,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Diced tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Bell peppers",
+                          "normalizedName": "pepper",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 10,
+                        "carbs": 95,
+                        "protein": 65,
+                        "calories": 729
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "smoky-bean-pea-bowl",
+                      "proteinType": "plant",
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 32.13,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -40
+                    },
+                    "total": 10.130000000000003,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                }
+              ]
+            },
+            {
+              "day": 5,
+              "meals": [
+                {
+                  "candidateId": "sunrise-egg-wrap:breakfast",
+                  "slot": "breakfast",
+                  "title": "Sunrise Egg Wrap",
+                  "similarityKey": "sunrise-egg-wrap",
+                  "ingredients": [
+                    {
+                      "name": "Eggs",
+                      "normalizedName": "egg",
+                      "quantity": 3,
+                      "unit": "large",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whole-grain wrap",
+                      "normalizedName": "wheat",
+                      "quantity": 1,
+                      "unit": "piece",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Avocado",
+                      "normalizedName": "avocado",
+                      "quantity": 0.5,
+                      "unit": "each",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Spinach",
+                      "normalizedName": "spinach",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 19,
+                    "carbs": 36,
+                    "protein": 27,
+                    "calories": 422
+                  },
+                  "cost": 0,
+                  "prepMinutes": 12,
+                  "proteinType": "poultry",
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4042867701404287,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4042867701404287,
+                  "score": {
+                    "candidate": {
+                      "id": "sunrise-egg-wrap:breakfast",
+                      "slot": "breakfast",
+                      "title": "Sunrise Egg Wrap",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Eggs",
+                          "normalizedName": "egg",
+                          "quantity": 3,
+                          "unit": "large",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whole-grain wrap",
+                          "normalizedName": "wheat",
+                          "quantity": 1,
+                          "unit": "piece",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Avocado",
+                          "normalizedName": "avocado",
+                          "quantity": 0.5,
+                          "unit": "each",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Spinach",
+                          "normalizedName": "spinach",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "eggs",
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 19,
+                        "carbs": 36,
+                        "protein": 27,
+                        "calories": 422
+                      },
+                      "cost": 0,
+                      "prepMinutes": 12,
+                      "servings": 1,
+                      "similarityKey": "sunrise-egg-wrap",
+                      "proteinType": "poultry",
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 23.46,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 6,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -30
+                    },
+                    "total": 13.46,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "thai-crunch-salad:lunch",
+                  "slot": "lunch",
+                  "title": "Crunch Chicken Salad",
+                  "similarityKey": "thai-crunch-salad",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cabbage",
+                      "normalizedName": "cabbage",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Carrots",
+                      "normalizedName": "carrots",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Peanut butter",
+                      "normalizedName": "peanut",
+                      "quantity": 20,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 22,
+                    "carbs": 24,
+                    "protein": 38,
+                    "calories": 430
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "poultry",
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4042867701404287,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4042867701404287,
+                  "score": {
+                    "candidate": {
+                      "id": "thai-crunch-salad:lunch",
+                      "slot": "lunch",
+                      "title": "Crunch Chicken Salad",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cabbage",
+                          "normalizedName": "cabbage",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Carrots",
+                          "normalizedName": "carrots",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Peanut butter",
+                          "normalizedName": "peanut",
+                          "quantity": 20,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "peanuts"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 22,
+                        "carbs": 24,
+                        "protein": 38,
+                        "calories": 430
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "thai-crunch-salad",
+                      "proteinType": "poultry",
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 28.1,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -40
+                    },
+                    "total": 6.100000000000001,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "tofu-tomato-pasta:dinner",
+                  "slot": "dinner",
+                  "title": "Tofu Tomato Pasta",
+                  "similarityKey": "tofu-tomato-pasta",
+                  "ingredients": [
+                    {
+                      "name": "Extra-firm tofu",
+                      "normalizedName": "tofu",
+                      "quantity": 270,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Diced tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 180,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Spinach",
+                      "normalizedName": "spinach",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 27,
+                    "carbs": 21,
+                    "protein": 50,
+                    "calories": 501
+                  },
+                  "cost": 0,
+                  "prepMinutes": 25,
+                  "proteinType": "plant",
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4042867701404287,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4042867701404287,
+                  "score": {
+                    "candidate": {
+                      "id": "tofu-tomato-pasta:dinner",
+                      "slot": "dinner",
+                      "title": "Tofu Tomato Pasta",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Extra-firm tofu",
+                          "normalizedName": "tofu",
+                          "quantity": 270,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Diced tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 180,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Spinach",
+                          "normalizedName": "spinach",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "soy"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 27,
+                        "carbs": 21,
+                        "protein": 50,
+                        "calories": 501
+                      },
+                      "cost": 0,
+                      "prepMinutes": 25,
+                      "servings": 1,
+                      "similarityKey": "tofu-tomato-pasta",
+                      "proteinType": "plant",
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 35.03,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 1.6666666666666663,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -50
+                    },
+                    "total": 0.6966666666666654,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, cost."
+                }
+              ]
+            },
+            {
+              "day": 6,
+              "meals": [
+                {
+                  "candidateId": "greek-yogurt-protein-pot:breakfast",
+                  "slot": "breakfast",
+                  "title": "Greek Yogurt Protein Pot",
+                  "similarityKey": "greek-yogurt-protein-pot",
+                  "ingredients": [
+                    {
+                      "name": "Greek yogurt",
+                      "normalizedName": "milk",
+                      "quantity": 220,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whey protein",
+                      "normalizedName": "milk",
+                      "quantity": 25,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Mixed berries",
+                      "normalizedName": "unreviewed_mixed_berries",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Pumpkin seeds",
+                      "normalizedName": "pumpkin_seeds",
+                      "quantity": 12,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 8,
+                    "carbs": 22,
+                    "protein": 32,
+                    "calories": 280
+                  },
+                  "cost": 0,
+                  "prepMinutes": 4,
+                  "proteinType": "mixed",
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4393939393939394,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4393939393939394,
+                  "score": {
+                    "candidate": {
+                      "id": "greek-yogurt-protein-pot:breakfast",
+                      "slot": "breakfast",
+                      "title": "Greek Yogurt Protein Pot",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Greek yogurt",
+                          "normalizedName": "milk",
+                          "quantity": 220,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whey protein",
+                          "normalizedName": "milk",
+                          "quantity": 25,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Mixed berries",
+                          "normalizedName": "unreviewed_mixed_berries",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Pumpkin seeds",
+                          "normalizedName": "pumpkin_seeds",
+                          "quantity": 12,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "milk"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 8,
+                        "carbs": 22,
+                        "protein": 32,
+                        "calories": 280
+                      },
+                      "cost": 0,
+                      "prepMinutes": 4,
+                      "servings": 1,
+                      "similarityKey": "greek-yogurt-protein-pot",
+                      "proteinType": "mixed",
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 21.200000000000003,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 8.666666666666668,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -20
+                    },
+                    "total": 23.866666666666674,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost. Reused once more because the reviewed safe catalogue for this slot is limited."
+                },
+                {
+                  "candidateId": "coconut-lime-salmon:lunch",
+                  "slot": "lunch",
+                  "title": "Coconut Lime Salmon",
+                  "similarityKey": "coconut-lime-salmon",
+                  "ingredients": [
+                    {
+                      "name": "Salmon fillet",
+                      "normalizedName": "salmon",
+                      "quantity": 200,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Coconut milk",
+                      "normalizedName": "coconut_milk",
+                      "quantity": 160,
+                      "unit": "ml",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Jasmine rice",
+                      "normalizedName": "rice",
+                      "quantity": 90,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Lime",
+                      "normalizedName": "lime",
+                      "quantity": 1,
+                      "unit": "each",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Snap peas",
+                      "normalizedName": "snap_peas",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 26,
+                    "carbs": 52,
+                    "protein": 40,
+                    "calories": 610
+                  },
+                  "cost": 0,
+                  "prepMinutes": 28,
+                  "proteinType": "fish",
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4393939393939394,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4393939393939394,
+                  "score": {
+                    "candidate": {
+                      "id": "coconut-lime-salmon:lunch",
+                      "slot": "lunch",
+                      "title": "Coconut Lime Salmon",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Salmon fillet",
+                          "normalizedName": "salmon",
+                          "quantity": 200,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Coconut milk",
+                          "normalizedName": "coconut_milk",
+                          "quantity": 160,
+                          "unit": "ml",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Jasmine rice",
+                          "normalizedName": "rice",
+                          "quantity": 90,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Lime",
+                          "normalizedName": "lime",
+                          "quantity": 1,
+                          "unit": "each",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Snap peas",
+                          "normalizedName": "snap_peas",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "fish"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 26,
+                        "carbs": 52,
+                        "protein": 40,
+                        "calories": 610
+                      },
+                      "cost": 0,
+                      "prepMinutes": 28,
+                      "servings": 1,
+                      "similarityKey": "coconut-lime-salmon",
+                      "proteinType": "fish",
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 34.300000000000004,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 0.6666666666666665,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -20
+                    },
+                    "total": 28.96666666666667,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, cost. Reused once more because the reviewed safe catalogue for this slot is limited."
+                },
+                {
+                  "candidateId": "thai-crunch-salad:dinner",
+                  "slot": "dinner",
+                  "title": "Crunch Chicken Salad",
+                  "similarityKey": "thai-crunch-salad",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cabbage",
+                      "normalizedName": "cabbage",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Carrots",
+                      "normalizedName": "carrots",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Peanut butter",
+                      "normalizedName": "peanut",
+                      "quantity": 20,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 22,
+                    "carbs": 24,
+                    "protein": 38,
+                    "calories": 430
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "poultry",
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.4393939393939394,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.4393939393939394,
+                  "score": {
+                    "candidate": {
+                      "id": "thai-crunch-salad:dinner",
+                      "slot": "dinner",
+                      "title": "Crunch Chicken Salad",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cabbage",
+                          "normalizedName": "cabbage",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Carrots",
+                          "normalizedName": "carrots",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Peanut butter",
+                          "normalizedName": "peanut",
+                          "quantity": 20,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "peanuts"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 22,
+                        "carbs": 24,
+                        "protein": 38,
+                        "calories": 430
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "thai-crunch-salad",
+                      "proteinType": "poultry",
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 28.1,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -50
+                    },
+                    "total": -3.8999999999999986,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost. Reused once more because the reviewed safe catalogue for this slot is limited."
+                }
+              ]
+            },
+            {
+              "day": 7,
+              "meals": [
+                {
+                  "candidateId": "egg-white-oat-pancakes:breakfast",
+                  "slot": "breakfast",
+                  "title": "Banana Oat Pancakes",
+                  "similarityKey": "egg-white-oat-pancakes",
+                  "ingredients": [
+                    {
+                      "name": "Egg whites",
+                      "normalizedName": "egg",
+                      "quantity": 300,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Rolled oats",
+                      "normalizedName": "oats",
+                      "quantity": 25,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Banana",
+                      "normalizedName": "banana",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 3,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 6,
+                    "carbs": 32,
+                    "protein": 38,
+                    "calories": 333
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "mixed",
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.3748191027496381,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.3748191027496381,
+                  "score": {
+                    "candidate": {
+                      "id": "egg-white-oat-pancakes:breakfast",
+                      "slot": "breakfast",
+                      "title": "Banana Oat Pancakes",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Egg whites",
+                          "normalizedName": "egg",
+                          "quantity": 300,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Rolled oats",
+                          "normalizedName": "oats",
+                          "quantity": 25,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Banana",
+                          "normalizedName": "banana",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 3,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "eggs",
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 6,
+                        "carbs": 32,
+                        "protein": 38,
+                        "calories": 333
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "egg-white-oat-pancakes",
+                      "proteinType": "mixed",
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 25.19,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -30
+                    },
+                    "total": 13.189999999999998,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost. Reused once more because the reviewed safe catalogue for this slot is limited."
+                },
+                {
+                  "candidateId": "white-bean-snack-box:lunch",
+                  "slot": "lunch",
+                  "title": "White Bean Snack Box",
+                  "similarityKey": "white-bean-snack-box",
+                  "ingredients": [
+                    {
+                      "name": "Mashed white beans",
+                      "normalizedName": "unreviewed_mashed_white_beans",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cucumber",
+                      "normalizedName": "cucumber",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 70,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olives",
+                      "normalizedName": "unreviewed_olives",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whole-grain wrap",
+                      "normalizedName": "wheat",
+                      "quantity": 0.5,
+                      "unit": "piece",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 16,
+                    "carbs": 32,
+                    "protein": 12,
+                    "calories": 320
+                  },
+                  "cost": 0,
+                  "prepMinutes": 8,
+                  "proteinType": "plant",
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.3748191027496381,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.3748191027496381,
+                  "score": {
+                    "candidate": {
+                      "id": "white-bean-snack-box:lunch",
+                      "slot": "lunch",
+                      "title": "White Bean Snack Box",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Mashed white beans",
+                          "normalizedName": "unreviewed_mashed_white_beans",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cucumber",
+                          "normalizedName": "cucumber",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 70,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olives",
+                          "normalizedName": "unreviewed_olives",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whole-grain wrap",
+                          "normalizedName": "wheat",
+                          "quantity": 0.5,
+                          "unit": "piece",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 16,
+                        "carbs": 32,
+                        "protein": 12,
+                        "calories": 320
+                      },
+                      "cost": 0,
+                      "prepMinutes": 8,
+                      "servings": 1,
+                      "similarityKey": "white-bean-snack-box",
+                      "proteinType": "plant",
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 14.399999999999999,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 7.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -60
+                    },
+                    "total": -24.266666666666666,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost. Reused once more because the reviewed safe catalogue for this slot is limited."
+                },
+                {
+                  "candidateId": "smoky-bean-pea-bowl:dinner",
+                  "slot": "dinner",
+                  "title": "Smoky Bean & Pea Protein Bowl",
+                  "similarityKey": "smoky-bean-pea-bowl",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 55,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Black beans",
+                      "normalizedName": "black_beans",
+                      "quantity": 170,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 45,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Diced tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Bell peppers",
+                      "normalizedName": "pepper",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 10,
+                    "carbs": 95,
+                    "protein": 65,
+                    "calories": 729
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "plant",
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.3748191027496381,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.3748191027496381,
+                  "score": {
+                    "candidate": {
+                      "id": "smoky-bean-pea-bowl:dinner",
+                      "slot": "dinner",
+                      "title": "Smoky Bean & Pea Protein Bowl",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 55,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Black beans",
+                          "normalizedName": "black_beans",
+                          "quantity": 170,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 45,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Diced tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Bell peppers",
+                          "normalizedName": "pepper",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 10,
+                        "carbs": 95,
+                        "protein": 65,
+                        "calories": 729
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "smoky-bean-pea-bowl",
+                      "proteinType": "plant",
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 32.13,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -70
+                    },
+                    "total": -19.869999999999997,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost. Reused once more because the reviewed safe catalogue for this slot is limited."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mixed-five",
+      "cohort": {
+        "id": "mixed-five",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "snack",
+          "lunch",
+          "snack",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "ingredient_evidence_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 10,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 12,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 11,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "uniqueRecipes": 13,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 28,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 28,
+        "status": "indeterminate",
+        "reason": "Diagnostic search budget exceeded (223080 possible daily combinations; limit 20000). No feasibility claim made."
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vegetarian-three",
+      "cohort": {
+        "id": "vegetarian-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "vegetarian",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "diet_conflict": 17,
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "ingredient_evidence_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 9,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 5,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 4,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 8,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 15,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 15,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 4,
+            "code": "insufficient_candidates",
+            "message": "No safe, macro-feasible day 4 can be built from the reviewed catalogue."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vegan-three",
+      "cohort": {
+        "id": "vegan-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "vegan",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "diet_conflict": 25,
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "ingredient_evidence_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 5,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 5,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 4,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 6,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [
+        "Existing scheduler permits at most two meals per broad plant protein type each day. Complete vegan days with three or five meals require an explicit future variety-policy decision; catalogue counts alone cannot resolve this."
+      ],
+      "legacyCompatible": {
+        "admittedRecipes": 10,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 10,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No safe, macro-feasible day 1 can be built from the reviewed catalogue."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "pescatarian-three",
+      "cohort": {
+        "id": "pescatarian-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "pescatarian",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "diet_conflict": 16,
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "ingredient_evidence_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 9,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 6,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 5,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 8,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 16,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 16,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 5,
+            "code": "insufficient_candidates",
+            "message": "No safe, macro-feasible day 5 can be built from the reviewed catalogue."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mixed-three-15min",
+      "cohort": {
+        "id": "mixed-three-15min",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 15,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 22,
+        "ingredient_evidence_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 9,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 1,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 10,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 13,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 13,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No safe, macro-feasible day 1 can be built from the reviewed catalogue."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "restrictive-five",
+      "cohort": {
+        "id": "restrictive-five",
+        "calorieTarget": 1830,
+        "proteinTarget": 216,
+        "dietaryMode": "mixed",
+        "allergies": [
+          "Dairy",
+          "Nuts",
+          "Fish",
+          "Shellfish",
+          "Sesame"
+        ],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "snack",
+          "lunch",
+          "snack",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "allergy_conflict": 7,
+        "ingredient_evidence_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 9,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 9,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 8,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "uniqueRecipes": 11,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 23,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 23,
+        "status": "indeterminate",
+        "reason": "Diagnostic search budget exceeded (78408 possible daily combinations; limit 20000). No feasibility claim made."
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    }
+  ]
+}

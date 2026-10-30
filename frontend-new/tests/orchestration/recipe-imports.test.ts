@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { reviewedRecipe } from "./recipe-fixtures.ts";
+import { calculatedRecipe } from "./calculated-recipe-fixtures.ts";
+import { recipeRecordErrors } from "../../lib/recipes/repository.ts";
 import {
   createPendingRecipeImport,
   approveImportedRecipeVersion,
@@ -8,7 +10,7 @@ import {
 import { acceptOperatorObservationBatch } from "../../lib/retailer-observation-adapters.ts";
 
 const draft = () => {
-  const recipe = reviewedRecipe();
+  const recipe = calculatedRecipe();
   return {
     ...recipe,
     review: { status: "pending_review" as const, reviewedBy: null, reviewedAt: null },
@@ -38,6 +40,21 @@ test("approval creates a new immutable reviewed version with reviewer attributio
   assert.equal(approved.value.record.review.reviewedBy, "reviewer");
   assert.equal(pending.value.record.version, 1);
   assert.equal(pending.value.record.review.status, "pending_review");
+  assert.deepEqual(approved.value.record.nutrition.calculation, pending.value.record.nutrition.calculation);
+});
+
+test("legacy imports remain inspectable but direct converter cannot newly approve them", () => {
+  const legacy = draft(); legacy.nutrition = { ...reviewedRecipe().nutrition, reviewed: false };
+  const pending = createPendingRecipeImport({ record: legacy, payloadHash: "sha256:test", importedBy: "importer", sourceReference: legacy.source.reference });
+  assert.equal(pending.ok, true);
+  if (pending.ok) assert.equal(approveImportedRecipeVersion(pending.value, { reviewerId: "reviewer", reviewedAt: "2026-10-29T12:00:00Z" }).ok, false);
+  assert.deepEqual(recipeRecordErrors(reviewedRecipe()), []);
+});
+
+test("claimed calculations fail import and structural loading when stale", () => {
+  const stale = draft(); stale.macros.protein += 1;
+  assert.ok(recipeRecordErrors(stale).some(error => error.includes("calculated")));
+  assert.equal(createPendingRecipeImport({ record: stale, payloadHash: "sha256:test", importedBy: "importer", sourceReference: stale.source.reference }).ok, false);
 });
 
 test("operator price adapters reject missing provenance and never accept a fetch implementation", () => {

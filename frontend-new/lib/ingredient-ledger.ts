@@ -41,7 +41,8 @@ const normalize = (value: string) => value.trim().toLowerCase().replace(/\s+/g, 
 
 const canonicalUnit = (unit: string) => {
   const normalized = normalize(unit);
-  if (normalized === "each" || normalized === "unit" || normalized === "slice") return "piece";
+  // A slice is not interchangeable with a whole piece of the same named food.
+  if (normalized === "each" || normalized === "unit") return "piece";
   return normalized || unit;
 };
 

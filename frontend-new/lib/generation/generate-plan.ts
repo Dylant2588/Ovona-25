@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { imageForMeal } from "@/lib/meal-images";
-import type { MealInstance, PreferencesInput, WeeklyMealPlan } from "@/lib/meal-generator";
+import { preferenceSignatureFor, type MealInstance, type PreferencesInput, type WeeklyMealPlan } from "@/lib/meal-generator";
 import type { GenerationArtifacts, GenerationSupabase, PortionedMeal } from "./types";
 import { buildDeterministicPlanningInput } from "@/lib/orchestration/candidate-adapter";
 import { orchestrateWeek } from "@/lib/orchestration/schedule";
@@ -8,13 +8,15 @@ import { approvePlanForUser, MealApprovalError } from "@/lib/recipes/plan-bounda
 import type { ConstraintDatabase } from "@/lib/recipes/server-constraints";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { requestReviewedProposal, resolveReviewedProposal } from "./ai-proposal";
+import { loadPreviousPlanRotation, sameRecipeDays } from "./previous-plan.ts";
+import { practicalIngredientViolations } from "../orchestration/practical-ingredients.ts";
 
 const sum = (meals: MealInstance[]) => meals.reduce((total, meal) => ({ calories: total.calories + meal.macros.calories,
   protein: total.protein + meal.macros.protein, carbs: total.carbs + meal.macros.carbs, fat: total.fat + meal.macros.fat }),
 { calories: 0, protein: 0, carbs: 0, fat: 0 });
 
 export async function generateWeeklyPlanWithArtifacts(userId: string,
-  options?: { preferences?: PreferencesInput; supabase?: GenerationSupabase }): Promise<GenerationArtifacts> {
+  options?: { preferences?: PreferencesInput; supabase?: GenerationSupabase; requireDifferent?: boolean }): Promise<GenerationArtifacts> {
   const database = options?.supabase ?? await supabaseServer();
   const hydrated = await buildDeterministicPlanningInput(userId, { ...options, supabase: database });
   if (!hydrated.ok) {
@@ -24,6 +26,13 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
     throw new MealApprovalError(hydrated.error.code, hydrated.error.reasons, hydrated.error.statusCode, message);
   }
   const { context, recipes, profile, candidates, history } = hydrated.value;
+  const previous = await loadPreviousPlanRotation(database, userId, recipes);
+  const rotation = { ...history,
+    recentCandidateIds: [...new Set([...history.recentCandidateIds, ...previous.recentCandidateIds])],
+    recentSimilarityKeys: [...new Set([...(history.recentSimilarityKeys ?? []), ...previous.recentSimilarityKeys])],
+    previousDayRecipeIds: previous.previousDayRecipeIds,
+    differentFromDays: options?.requireDifferent ? previous.previousDayRecipeIds : undefined,
+  };
   let rankedCandidates = [...candidates];
   // Without credentials the deterministic reviewed catalogue remains usable.
   // With credentials, a failed/refused proposal is explicit and leaves any
@@ -53,8 +62,18 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
       }
     }
   }
-  const schedule = orchestrateWeek(profile, rankedCandidates, history);
+  let schedule = orchestrateWeek(profile, rankedCandidates, rotation);
+  // Recency and AI are ranking hints, not feasibility rules. A poor traversal
+  // must not hide a valid week. Retry with the identical hard-safe pool, all
+  // profile preferences and quantity limits, keeping the explicit new-week check.
   if (!schedule.ok) {
+    schedule = orchestrateWeek(profile, candidates, { differentFromDays: rotation.differentFromDays });
+  }
+  if (!schedule.ok) {
+    if (schedule.error.code === "planning_search_exhausted") {
+      throw new MealApprovalError("planning_search_exhausted", schedule.error.violations, 422,
+        "The planner could not find a complete practical week within its search limit. Your existing plan is unchanged. Try different meal targets or review more suitable recipes.");
+    }
     const practicalBasketFailure = schedule.error.violations.some(
       (violation) => violation.code === "practical_quantity_exceeded"
     );
@@ -77,15 +96,15 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
   weekStart.setHours(0, 0, 0, 0);
   let weeklyPlan: WeeklyMealPlan = {
     id: randomUUID(), userId, weekStart: weekStart.toISOString(), generatedAt: new Date().toISOString(),
-    preferenceSignature: JSON.stringify({ calories: context.calorieTarget, protein: context.proteinTarget }),
+    preferenceSignature: options?.preferences ? preferenceSignatureFor(options.preferences) : "",
     days: schedule.value.days.map((day) => {
       const date = new Date(weekStart); date.setDate(date.getDate() + day.day - 1);
-      const materializeMeals = (portionMultiplier: number) => day.meals.map((selected): MealInstance => {
+      const materializeMeals = (portionMultipliers: readonly number[]) => day.meals.map((selected, mealIndex): MealInstance => {
         const recipe = recipes.find((entry) => `${entry.id}:${selected.slot}` === selected.candidateId);
         if (!recipe) throw new MealApprovalError("meal_approval_failed", ["Reviewed recipe identity was lost during selection."]);
         const baseIngredients = recipe.ingredients.map((ingredient) => ({ name: ingredient.name,
           amount: ingredient.amount / recipe.servings, unit: ingredient.unit, category: "Produce" }));
-        const multiplier = portionMultiplier;
+        const multiplier = portionMultipliers[mealIndex];
         return { instanceId: randomUUID(), baseId: recipe.id, recipeVersion: recipe.version, mealSlot: selected.slot,
           title: recipe.title, description: recipe.description, steps: [...recipe.steps], recipeSteps: [...recipe.steps],
           tags: ["reviewed-recipe"], image: imageForMeal({ title: recipe.title, mealSlot: selected.slot, image: recipe.image }),
@@ -97,7 +116,7 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
       // The scheduler works with decimal nutrition values while the plan stores
       // whole-number meal macros. Reconcile the final, displayed portions here
       // so rounding cannot push a day one calorie above an approval boundary.
-      const initialMultiplier = day.meals[0]?.nutritionPortionMultiplier ?? 1;
+      const initialMultipliers = day.meals.map(meal => meal.nutritionPortionMultiplier);
       const calorieMin = profile.calorieTarget * profile.hardConstraints.calorieBand.min;
       const calorieMax = profile.calorieTarget * profile.hardConstraints.calorieBand.max;
       const proteinMin = profile.proteinTarget * profile.hardConstraints.proteinBand.min;
@@ -107,13 +126,13 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
         return totals.calories >= calorieMin && totals.calories <= calorieMax &&
           totals.protein >= proteinMin && totals.protein <= proteinMax;
       };
-      let meals = materializeMeals(initialMultiplier);
+      let meals = materializeMeals(initialMultipliers);
       if (!isWithinFinalBands(meals)) {
         for (let step = 1; step <= 100 && !isWithinFinalBands(meals); step += 1) {
           for (const direction of [-1, 1]) {
-            const candidate = Number((initialMultiplier + direction * step * 0.0005).toFixed(6));
-            if (candidate < 0.7 || candidate > 1.5) continue;
-            const candidateMeals = materializeMeals(candidate);
+            const candidates = initialMultipliers.map(multiplier => Number((multiplier + direction * step * 0.0005).toFixed(6)));
+            if (candidates.some(candidate => candidate < 0.7 || candidate > 1.5)) continue;
+            const candidateMeals = materializeMeals(candidates);
             if (isWithinFinalBands(candidateMeals)) {
               meals = candidateMeals;
               break;
@@ -125,6 +144,20 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
     }), weeklyTotals: { calories: 0, protein: 0, carbs: 0, fat: 0 },
   };
   weeklyPlan = await approvePlanForUser(database as unknown as ConstraintDatabase, userId, weeklyPlan, options?.preferences);
+  // Check the final stored amounts too: macro reconciliation may adjust the
+  // scheduler's portions, and shopping must not inherit an over-limit basket.
+  const practical = practicalIngredientViolations(weeklyPlan.days.flatMap(day => day.meals)
+    .filter(meal => meal.mealKind !== "social").map(meal => ({
+      nutritionPortionMultiplier: 1, householdPortionMultiplier: 1,
+      ingredients: meal.ingredients.map(ingredient => ({ name: ingredient.name, normalizedName: ingredient.name,
+        quantity: ingredient.amount, unit: ingredient.unit, pantry: false })),
+    })));
+  if (practical.length) throw new MealApprovalError("impractical_ingredient_basket", practical, 422,
+    "The final portions exceed a practical weekly ingredient quantity. Your existing plan is unchanged.");
+  if (options?.requireDifferent && sameRecipeDays(previous.previousDayRecipeIds, weeklyPlan.days)) {
+    throw new MealApprovalError("no_alternative_reviewed_plan", ["The available safe recipes produced the same meals."], 422,
+      "A different checked plan was not found with the available recipes and your restrictions. Your existing plan is unchanged.");
+  }
   // The reviewed catalogue has no retailer-price evidence yet. Routes omit this internal neutral value.
   const adjustedPlan: PortionedMeal[] = [];
   return { context, practical: { adjustedPlan, shoppingList: [], weeklyTotal: 0, substitutionsMade: [] },

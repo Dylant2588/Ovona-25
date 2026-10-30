@@ -1,0 +1,34 @@
+# Phase 1 implementation research
+
+Date: 2026-10-28. Source: Phase 0 audit and read-only source inspection. No runtime/database behaviour is claimed beyond the audit's recorded local checks.
+
+## Findings and implementation choices
+
+1. `app/api/recipe-review/route.ts` calls `approveRecipe()` on a pending draft before `approveImportedRecipeVersion()`. `approval.ts` intentionally requires approved review and ingredient evidence. Keep that safety rule. Validate pending shape and five explicit attestations, create the proposed approved version in memory using the existing converter, then run `approveRecipe()` against that proposed version before persistence.
+2. Review currently inserts the approved row and separately rejects the draft. Put that transition and audit linkage in one service-only PostgreSQL RPC. Lock the pending recipe row, require its expected version/state, reject duplicate target version, preserve source contents, record the actor/time, insert the new version and close the draft in the same transaction. Do not trust browser-supplied recipe content or reviewer identity. Rejections also use the locked transition. A concurrent second action returns 409.
+3. `recipe_imports` exists but the import CLI writes only `recipe_library`. Existing review synthesises `payloadHash: review:id:version` and assigns the reviewer as importer. Do not continue this invented provenance. For a matching real import row, preserve hash/importer/source. For legacy drafts without import metadata, compute SHA-256 of deterministic JSON for the server-loaded draft and explicitly record a legacy-review snapshot with unknown original importer (nullable attribution in a new append-only review event); do not relabel the reviewer as original importer. Link the snapshot/event to both versions. No bulk data repair is part of this phase.
+4. `candidate-adapter.ts` gives every candidate `dietaryTags: []`, while `eligibility.ts` requires dietary tags. The adapter also replaces stricter `loadServerConstraints()` output with `context.planningInput`. Merge saved restrictions and requested additions once, then carry that exact contract through context, recipe admission, scheduler and final approval. After a recipe passes `approveRecipe(recipe, effectiveConstraints)`, candidate dietary tags can contain the canonical required rules it has just passed; no client tag may grant eligibility. Preserve ingredient allergens plus `mayContain` evidence, canonicalise aliases consistently, and keep unknown rules fail-closed.
+5. `preferences/route.ts` treats omitted never-foods as empty and retries with safety columns removed. It writes preferences, profiles and allergy replacement separately; `syncUserAllergies()` deletes before insert and ignores delete failure. Replace safety persistence with one owner-scoped transaction, preserve omitted patches, union saved allergies from all three stores, and return `503 preferences_schema_unsupported` when the supported function/schema is absent. Never retry a safety-reduced payload. Compatibility aliases for non-safety enum/complexity representation may remain only as whole-transaction retries with every safety value retained.
+6. The cookie auth branch uses `getSession()` while bearer auth invokes `getUser()`. Review/service-role operations must verify the session/access token server-side with `getUser()` before privileged writes. Implement this at these operation boundaries; no general authentication rewrite.
+
+## Database contracts to add during execution
+
+- `20261028090000_baseline_review_transition.sql`: append-only review events, atomic service-role-only review transition RPC, reviewer-role checks, fixed search path and explicit grants/revokes. Keep existing immutable recipe/version model.
+- `20261028091000_baseline_safety_preferences.sql`: owner-scoped `save_safety_preferences(p_patch jsonb)` transaction, explicit allowlisted columns, ownership from `auth.uid()`, profile/preferences/allergy row locks, omitted-key preservation and restrictions union. No arbitrary JSON-to-SQL identifiers. Keep unsupported schema failures explicit.
+- These are proposed filenames and functions, not files created or database changes performed in this planning turn. Existing migration history must not be rewritten. Bootstrap tests should prove whether any further additive compatibility correction is required; report uncovered schema gaps before expanding implementation scope.
+
+## Current test baseline and classification
+
+The audit ran 64 tests: 55 pass, 9 fail. One approval assertion incorrectly treats dislikes as hard exclusion; one schema regex excludes the implemented rejected state. Six validation/replacement failures involve fixtures without protein metadata under a new two-of-one-protein/day cap, plus older expected failure codes. The fallback variety fixture requests a plan now refused by the practicality guard. Reproduce each failure and retain a matrix of old expectation, current intended behaviour, root cause, correction and regression proof. Do not infer all failures are stale or weaken practical/allergy guards to pass them.
+
+## Validation Architecture
+
+- Installed Node test runner and TypeScript transpilation patterns can exercise route exports with injected auth/database clients; test real production service functions, not reimplemented copies.
+- Unit tests prove conversion/constraints. Route tests prove status codes, identity verification and zero writes on invalid input. Disposable database tests prove transactions, race outcomes, grants, RLS and immutable versions. None substitutes for the others.
+- Local tooling probe by orchestrator: Node/npm and installed node_modules exist; `psql`, `supabase`, and `docker` were not found and no local Supabase config was found. Database verification is currently an external prerequisite. Do not install tools or provision remote resources silently.
+- Require an isolated Supabase-compatible database with Auth roles/schema, PostgREST/RPC support, two synthetic users and service credentials. Allow only loopback or an explicitly approved disposable project ref; compare expected target identity before any write. Never load `.env.local` automatically or invoke unqualified `supabase db push`.
+- Gate remains BLOCKED if this environment is unavailable. TypeScript, SQL text matching and mocked RPC tests cannot justify a database PASS.
+
+## Reuse and boundaries
+
+Reuse `approveImportedRecipeVersion`, `approveRecipe`, `recipeRecordErrors`, `loadServerConstraints`, `buildPlanningInput`, existing Node tests and Next route conventions. Do not rebuild scheduler, recipes, auth UI or nutrition. Atomic review/safety persistence is necessary to fulfil Phase 1 integrity; general plan/shopping transactions, pricing access, recipe nutrition recalculation, adaptation and catalogue expansion remain deferred.

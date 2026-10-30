@@ -246,17 +246,15 @@ The exact freshness threshold and confidence labels need a product decision befo
 | Prompt asks a model to return recipe facts | Structured outputs constrain response shape; application data still needs independent validation | Current OpenAI documentation accessed 2026-10-13 | Use schema for selection proposals, not as proof of nutrition/allergen/price facts. [CITED: https://developers.openai.com/api/docs/guides/structured-outputs] |
 | Static local price list yields a single total | Provenanced, timestamped product observations enable a qualified comparison | Phase 8 recommendation | Requires new persistence and UI confidence states. [VERIFIED: `lib/tesco-prices.ts`, `08-CONTEXT.md`] |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **What retailer data source has permission, coverage, and a stable product/price interface for the initial UK POC?**
-   - What we know: current pricing is a local static map with no retailer provenance. [VERIFIED: `lib/tesco-prices.ts`]
-   - What is unclear: the permitted collection/API/affiliate source and refresh cadence. [VERIFIED: codebase inspection 2026-10-13]
-   - Recommendation: select one compliant source before plan execution; do not ship retailer ranking until it can populate complete observations. [ASSUMED]
-2. **What observation age counts as stale for retail pricing?**
-   - What we know: the locked decision forbids “cheapest” or “within budget” claims for stale prices. [VERIFIED: `08-CONTEXT.md`]
-   - What is unclear: the threshold and whether promotions are included. [VERIFIED: `08-CONTEXT.md`]
-   - Recommendation: make it an explicit server policy constant and expose `observedAt` in the response. [ASSUMED]
-3. **Should accepted-but-not-eaten plans count equally with eaten meals for rotation?**
+1. **Retailer evidence source and ingestion**
+   - **Decision:** The initial source is an operator-imported, retailer-provenanced product-observation feed behind versioned adapters. Runtime scraping is prohibited.
+   - The adapter contract must retain the source reference, retailer identity, adapter version, import time, observation time, unit/pack evidence, and whether any conversion is estimated. A provider change creates a new adapter version; it does not silently reinterpret past observations.
+2. **Freshness, coverage, and permitted claims**
+   - **Decision:** An observation is fresh only when it is at most 24 hours old, measured against one injected server clock. “Best”, “cheapest”, and “within budget” are permitted only when every requested shopping line has a matched, non-estimated observation for every retailer in the comparison set and every such observation is fresh (<=24 hours).
+   - Any missing line, stale observation, estimated conversion, missing retailer provenance, invalid price evidence, or insufficient comparison set yields `price comparison unavailable`. The API/UI may explain the availability reason and list unmatched items, but must not return or render a ranked retailer, cheapest basket, partial subtotal, or budget-compliance claim.
+3. **Accepted versus eaten rotation weighting**
    - What we know: the requirement says accepted/eaten; existing history has one generic table. [VERIFIED: `08-CONTEXT.md`, `20260217_generation_pipeline.sql`]
    - Recommendation: write both states, exclude both from hard same-recipe repetition, and give eaten records a higher variety penalty. [ASSUMED]
 

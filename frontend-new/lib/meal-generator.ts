@@ -1910,7 +1910,19 @@ const buildPreferenceSignature = (prefs: PreferencesInput) =>
     profile: prefs.profile ? buildProfileSignature(prefs.profile) : null,
   });
 
-const buildProfileSignature = (profile: UserProfileInput) => ({
+const buildProfileSignature = (profile: UserProfileInput) => {
+  // Persisted food lists are case/whitespace normalized. Sign the same semantic
+  // values before save and after reload, without mutating the original inputs.
+  const foodList = (values: unknown) => {
+    // Historical profile columns can contain delimited text instead of text[].
+    // Never spread a string into characters or silently discard invalid evidence.
+    const list = values == null ? [] : typeof values === "string" ? values.split(/[,;/\n]/) : values;
+    if (!Array.isArray(list) || list.some(value => typeof value !== "string")) {
+      throw new TypeError("Preference food lists must be text arrays or legacy delimited text.");
+    }
+    return [...new Set(list.map(value => value.trim().replace(/\s+/g, " ").toLowerCase()).filter(Boolean))].sort();
+  };
+  return {
   locale: profile.locale ?? null,
   timezone: profile.timezone ?? null,
   bodyWeightKg: profile.bodyWeightKg ?? null,
@@ -1921,9 +1933,12 @@ const buildProfileSignature = (profile: UserProfileInput) => ({
   trainingSchedule: profile.trainingSchedule
     ? [...profile.trainingSchedule].sort()
     : null,
-  allergies: profile.allergies ? [...profile.allergies].sort() : null,
-  dislikes: profile.dislikes ? [...profile.dislikes].sort() : null,
-  cuisines: profile.cuisines ? [...profile.cuisines].sort() : null,
+  allergies: foodList(profile.allergies),
+  dislikes: foodList(profile.dislikes),
+  neverFoods: foodList(profile.neverFoods),
+  foodLikes: foodList(profile.foodLikes),
+  cuisines: foodList(profile.cuisines),
+  maxPrepMinutes: profile.maxPrepMinutes ?? 30,
   pantryStaples: profile.pantryStaples ? [...profile.pantryStaples].sort() : null,
   household: profile.household ? [...profile.household].sort() : null,
   deliveryPreferences: profile.deliveryPreferences
@@ -1932,7 +1947,8 @@ const buildProfileSignature = (profile: UserProfileInput) => ({
   sleepHours: profile.sleepHours ?? null,
   stressLevel: profile.stressLevel ?? null,
   mealsPerDay: profile.mealsPerDay ?? null,
-});
+  };
+};
 
 const getStartOfWeek = (date = new Date()) => {
   const d = new Date(date);

@@ -1,10 +1,11 @@
 import { filterEligibleCandidates } from "./eligibility.ts";
 import { rankCandidates } from "./score.ts";
 import { validateAndRepairWeek } from "./validate.ts";
-import { hasPracticalIngredientBasket } from "./practical-ingredients.ts";
+import { hasPracticalIngredientBasket, unavoidablePracticalViolations, remainingPortionLimits } from "./practical-ingredients.ts";
+import { solveMealPortions } from "./portions.ts";
 import type { PlannerProfile, SelectedMeal, VerifiedCandidateMeal, WeekScheduleResult } from "./types.ts";
 
-export type CandidateHistory = Readonly<{ recentCandidateIds?: readonly string[]; recentSimilarityKeys?: readonly string[]; recentProteinTypes?: readonly string[]; recentCuisines?: readonly string[]; recentFormats?: readonly string[] }>;
+export type CandidateHistory = Readonly<{ recentCandidateIds?: readonly string[]; recentSimilarityKeys?: readonly string[]; recentProteinTypes?: readonly string[]; recentCuisines?: readonly string[]; recentFormats?: readonly string[]; previousDayRecipeIds?: readonly (readonly string[])[]; differentFromDays?: readonly (readonly string[])[] }>;
 
 const similarity = (candidate: VerifiedCandidateMeal) => candidate.similarityKey?.trim().toLowerCase() || candidate.id;
 const MAX_SAME_PROTEIN_PER_DAY = 2;
@@ -14,6 +15,8 @@ const MAX_SAME_PROTEIN_PER_DAY = 2;
 // missing value cannot silently evade the cap.
 const proteinType = (meal: Pick<VerifiedCandidateMeal, "proteinType">) =>
   meal.proteinType?.trim().toLowerCase() || "other";
+const proteinFamilies = (meal: Pick<VerifiedCandidateMeal, "proteinType" | "proteinFamilies">) =>
+  meal.proteinFamilies?.length ? [...new Set(meal.proteinFamilies.map(v => v.trim().toLowerCase()).filter(Boolean))] : [proteinType(meal)];
 
 const canUseCandidate = (
   candidate: VerifiedCandidateMeal,
@@ -28,9 +31,6 @@ const canUseCandidate = (
   return candidate.isLeftover === true && !!candidate.leftoverFromCandidateId &&
     selected.some((meal) => meal.candidateId === candidate.leftoverFromCandidateId);
 };
-
-const isRecentMatch = (candidate: VerifiedCandidateMeal, history: CandidateHistory) =>
-  (history.recentCandidateIds ?? []).includes(candidate.id) || (history.recentSimilarityKeys ?? []).includes(similarity(candidate));
 
 const selectedMeal = (candidate: VerifiedCandidateMeal, score: ReturnType<typeof rankCandidates>[number], profile: PlannerProfile,
   scarcityFallback = false, nutritionPortionMultiplier = 1): SelectedMeal => {
@@ -47,6 +47,7 @@ const selectedMeal = (candidate: VerifiedCandidateMeal, score: ReturnType<typeof
     cost: candidate.cost,
     prepMinutes: candidate.prepMinutes,
     proteinType: candidate.proteinType,
+    proteinFamilies: candidate.proteinFamilies,
     cuisine: candidate.cuisine,
     format: candidate.format,
     isLeftover: candidate.isLeftover === true,
@@ -80,24 +81,44 @@ const selectDay = (
   selected: readonly SelectedMeal[],
   history: CandidateHistory,
   maximumUses: number,
+  dayIndex: number,
+  excludedDays: ReadonlySet<string>,
+  canSearch: () => boolean,
+  spreadBudgets: boolean,
 ): SelectedMeal[] | null => {
   const slots = profile.hardConstraints.requiredSlots;
   const result: { meals: SelectedMeal[] | null } = { meals: null };
   const visit = (index: number, choices: VerifiedCandidateMeal[]): boolean => {
+    if (!canSearch()) return false;
     if (index === slots.length) {
-      const multiplier = portionMultiplierFor(profile, choices);
-      if (multiplier === null) return false;
-      let running = [...selected];
-      const meals = choices.map((candidate) => {
+      if (excludedDays.has(JSON.stringify(choices.map(candidate => candidate.id).sort()))) return false;
+      const shared = portionMultiplierFor(profile, choices);
+      const limits = remainingPortionLimits(profile, selected, choices, spreadBudgets ? 7 - dayIndex : 1);
+      // The API and approval boundary store rounded macros for each meal.
+      // A shared portion can meet continuous bands yet fail those final totals.
+      const sharedCalories = shared === null ? 0 : choices.reduce((s, m) => s + Math.round(m.nutrition.calories * shared), 0);
+      const sharedProtein = shared === null ? 0 : choices.reduce((s, m) => s + Math.round(m.nutrition.protein * shared), 0);
+      const sharedFits = shared !== null &&
+        sharedCalories >= profile.calorieTarget * profile.hardConstraints.calorieBand.min &&
+        sharedCalories <= profile.calorieTarget * profile.hardConstraints.calorieBand.max &&
+        sharedProtein >= profile.proteinTarget * profile.hardConstraints.proteinBand.min &&
+        sharedProtein <= profile.proteinTarget * profile.hardConstraints.proteinBand.max &&
+        limits.every(l => l.amounts.reduce((s, v) => s + v * shared, 0) <= l.max);
+      const multipliers = sharedFits ? choices.map(() => shared!) : solveMealPortions(profile, choices, limits);
+      if (!multipliers) return false;
+      const running = [...selected];
+      const meals = choices.map((candidate, index) => {
         const score = rankCandidates(profile, [candidate], {
           selected: running,
           recentCandidateIds: history.recentCandidateIds ?? [],
+          recentSimilarityKeys: history.recentSimilarityKeys,
+          previousRecipeIds: history.previousDayRecipeIds?.[dayIndex],
           recentProteinTypes: history.recentProteinTypes,
           recentCuisines: history.recentCuisines,
           recentFormats: history.recentFormats,
         })[0]!;
         const meal = selectedMeal(candidate, score, profile,
-          maximumUses > profile.policy.repetition.maxUsesPerWeek, multiplier);
+          maximumUses > profile.policy.repetition.maxUsesPerWeek, multipliers[index]);
         running.push(meal);
         return meal;
       });
@@ -112,14 +133,16 @@ const selectDay = (
         !(candidate.isLeftover === true && candidate.leftoverFromCandidateId === chosen.id)) &&
       // Two uses can support leftovers and familiar staples; a third turns a
       // daily plan into a turkey/chicken-heavy repeat rather than variety.
-      choices.filter((chosen) => proteinType(chosen) === proteinType(candidate)).length < MAX_SAME_PROTEIN_PER_DAY &&
+      proteinFamilies(candidate).every(family => choices.filter(chosen => proteinFamilies(chosen).includes(family)).length < MAX_SAME_PROTEIN_PER_DAY) &&
       canUseCandidate(candidate, used, profile.policy, maximumUses));
-    const fresh = pool.filter((candidate) => !isRecentMatch(candidate, history));
     // Ranking here only controls traversal. Full scores are recalculated with the
-    // actual within-day context at the leaf above.
-    const ranked = rankCandidates(profile, fresh.length ? fresh : pool, {
+    // actual within-day context at the leaf above. Recency is ranking guidance,
+    // not an exclusion: fresh choices may not complete a macro-feasible day.
+    const ranked = rankCandidates(profile, pool, {
       selected,
       recentCandidateIds: history.recentCandidateIds ?? [],
+      recentSimilarityKeys: history.recentSimilarityKeys,
+      previousRecipeIds: history.previousDayRecipeIds?.[dayIndex],
       recentProteinTypes: history.recentProteinTypes,
       recentCuisines: history.recentCuisines,
       recentFormats: history.recentFormats,
@@ -129,14 +152,14 @@ const selectDay = (
     // each practical ingredient allowance for later days.
     const proteinUses = new Map<string, number>();
     selected.forEach((meal) => {
-      const type = proteinType(meal);
-      proteinUses.set(type, (proteinUses.get(type) ?? 0) + 1);
+      for (const family of proteinFamilies(meal)) proteinUses.set(family, (proteinUses.get(family) ?? 0) + 1);
     });
     const ordered = [...ranked].sort((left, right) => {
-      const leftProteinType = proteinType(left.candidate);
-      const rightProteinType = proteinType(right.candidate);
-      const difference = (proteinUses.get(leftProteinType) ?? 0) - (proteinUses.get(rightProteinType) ?? 0);
-      return difference || right.total - left.total;
+      const previous = history.previousDayRecipeIds?.[dayIndex] ?? [];
+      const repeatedDayRecipe = Number(previous.includes(left.candidate.recipeId ?? left.candidate.similarityKey ?? left.candidate.id)) -
+        Number(previous.includes(right.candidate.recipeId ?? right.candidate.similarityKey ?? right.candidate.id));
+      const difference = Math.max(...proteinFamilies(left.candidate).map(f => proteinUses.get(f) ?? 0)) - Math.max(...proteinFamilies(right.candidate).map(f => proteinUses.get(f) ?? 0));
+      return repeatedDayRecipe || difference || right.total - left.total;
     });
     for (const ranked of ordered) {
       if (visit(index + 1, [...choices, ranked.candidate])) return true;
@@ -156,19 +179,51 @@ export const orchestrateWeek = (
   if (!eligibility.eligible.length) {
     return { ok: false, error: { code: "insufficient_candidates", violations: [{ day: 1, code: "insufficient_candidates", message: "No hard-constraint-safe candidates are available." }] } };
   }
-  const selected: SelectedMeal[] = [];
-  const days = [];
-  for (let day = 1; day <= 7; day += 1) {
-    // Select a complete day before committing it. A greedy slot-by-slot choice
-    // can exhaust the protein/calorie intersection even when an approved,
-    // safe five-meal combination exists.
-    const meals = selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek)
-      ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek + 1);
-    if (!meals) {
-      return { ok: false, error: { code: "insufficient_candidates", violations: [{ day, code: "insufficient_candidates", message: `No safe, macro-feasible day ${day} can be built from the reviewed catalogue.` }] } };
+  const unavoidable = unavoidablePracticalViolations(profile, eligibility.eligible);
+  if (unavoidable.length) return { ok: false, error: { code: "insufficient_candidates", violations: unavoidable.map(limit => ({ day: 0, code: "practical_quantity_exceeded",
+    message: `${limit.label} would require at least ${Math.ceil(limit.grams!)}g per week even at the smallest portion, above the ${limit.maxGrams}g practical limit.` })) } };
+  // Weekly caps require revisiting earlier days. Committing the first feasible
+  // day forever can consume an ingredient or recipe needed later in the week.
+  const deadline = Date.now() + 5000;
+  let nodes = 150_000;
+  let truncated = false;
+  let deepestDay = 1;
+  const canSearch = () => {
+    if (--nodes < 0 || Date.now() > deadline) { truncated = true; return false; }
+    return true;
+  };
+  type Days = Array<{ day: number; meals: SelectedMeal[] }>;
+  const visitWeek = (days: Days, selected: SelectedMeal[]): WeekScheduleResult | null => {
+    if (!canSearch()) return null;
+    if (days.length === 7) {
+      if (history.differentFromDays?.length === 7 && history.differentFromDays.every((ids, index) =>
+        JSON.stringify([...ids].map(id => id.toLowerCase()).sort()) === JSON.stringify(days[index].meals.map(meal => meal.similarityKey.toLowerCase()).sort()))) return null;
+      const checked = validateAndRepairWeek(profile, { days });
+      return checked.ok ? checked : null;
     }
-    selected.push(...meals);
-    days.push({ day, meals });
-  }
-  return validateAndRepairWeek(profile, { days });
+    const day = days.length + 1;
+    deepestDay = Math.max(deepestDay, day);
+    const excluded = new Set<string>();
+    for (let attempt = 0; attempt < 16; attempt++) {
+      if (!canSearch()) return null;
+      // Search the full day pool under fair budgets first; falling back inside
+      // the first combination would spend future days' allowance too early.
+      const meals = selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek, day - 1, excluded, canSearch, true)
+        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek + 1, day - 1, excluded, canSearch, true)
+        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek, day - 1, excluded, canSearch, false)
+        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek + 1, day - 1, excluded, canSearch, false);
+      if (!meals) return null;
+      excluded.add(JSON.stringify(meals.map(meal => meal.candidateId).sort()));
+      const result = visitWeek([...days, { day, meals }], [...selected, ...meals]);
+      if (result) return result;
+    }
+    truncated = true;
+    return null;
+  };
+  const result = visitWeek([], []);
+  if (result) return result;
+  return { ok: false, error: { code: truncated ? "planning_search_exhausted" : "insufficient_candidates", violations: [{ day: deepestDay, code: "insufficient_candidates",
+    message: truncated
+      ? "A complete practical, macro-feasible week was not found within the bounded search."
+      : `No complete practical, macro-feasible week can be built from the reviewed catalogue (day ${deepestDay}).` }] } };
 };

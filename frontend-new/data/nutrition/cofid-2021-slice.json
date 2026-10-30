@@ -1,0 +1,376 @@
+{
+  "dataset": "CoFID",
+  "datasetVersion": "2021",
+  "publisher": "Public Health England",
+  "publicationUrl": "https://www.gov.uk/government/publications/composition-of-foods-integrated-dataset-cofid",
+  "workbookUrl": "https://assets.publishing.service.gov.uk/media/60538b91e90e07527df82ae4/McCance_Widdowsons_Composition_of_Foods_Integrated_Dataset_2021..xlsx",
+  "workbookSha256": "436e9445ef2adb2a75f3d7edd51302de3adad25385f9795fc94ba58bd030e97d",
+  "extractedAt": "2026-10-29",
+  "sheet": "1.3 Proximates",
+  "columns": {
+    "calories": {
+      "column": "M",
+      "header": "Energy (kcal) (kcal)",
+      "unit": "kcal"
+    },
+    "protein": {
+      "column": "J",
+      "header": "Protein (g)",
+      "unit": "g"
+    },
+    "carbs": {
+      "column": "L",
+      "header": "Carbohydrate (g)",
+      "unit": "g"
+    },
+    "fat": {
+      "column": "K",
+      "header": "Fat (g)",
+      "unit": "g"
+    }
+  },
+  "parsingPolicy": {
+    "numeric": "preserve literal source text and parse finite numeric value",
+    "trace": "retain qualifier; no numeric value supplied",
+    "missingOrN": "unknown, never zero"
+  },
+  "attribution": "Contains public sector information licensed under the Open Government Licence v3.0. CoFID 2021, Public Health England.",
+  "reviewStatus": "source extraction only; no recipe mapping, rights/cook-through or allergy attestations",
+  "foods": [
+    {
+      "foodCode": "11-788",
+      "foodName": "Porridge oats, unfortified",
+      "description": "18 samples, 10 products, Quaker and other/own brands",
+      "mainDataReferences": "LGC, Nutrient survey of breakfast cereals, 2004",
+      "footnote": "",
+      "sourceState": "as_sold",
+      "stateMappingStatus": "explicit proposal derived from exact source name; not recipe mapping approval",
+      "basis": {
+        "amount": 100,
+        "unit": "g",
+        "scope": "food as described"
+      },
+      "nutrients": {
+        "calories": {
+          "kind": "numeric",
+          "value": 381.0,
+          "raw": "381"
+        },
+        "protein": {
+          "kind": "numeric",
+          "value": 10.9,
+          "raw": "10.9"
+        },
+        "carbs": {
+          "kind": "numeric",
+          "value": 70.7,
+          "raw": "70.7"
+        },
+        "fat": {
+          "kind": "numeric",
+          "value": 8.1,
+          "raw": "8.1"
+        }
+      },
+      "rawCells": {
+        "A2178": "11-788",
+        "B2178": "Porridge oats, unfortified",
+        "C2178": "18 samples, 10 products, Quaker and other/own brands",
+        "D2178": "A",
+        "E2178": "11-017 ",
+        "F2178": "LGC, Nutrient survey of breakfast cereals, 2004",
+        "J2178": "10.9",
+        "K2178": "8.1",
+        "L2178": "70.7",
+        "M2178": "381"
+      }
+    },
+    {
+      "foodCode": "11-868",
+      "foodName": "Rice, brown, wholegrain, raw",
+      "description": "6 samples, 6 products",
+      "mainDataReferences": "LGC, Nutrient survey of flours and grains, 2005",
+      "footnote": "",
+      "sourceState": "raw",
+      "stateMappingStatus": "explicit proposal derived from exact source name; not recipe mapping approval",
+      "basis": {
+        "amount": 100,
+        "unit": "g",
+        "scope": "food as described"
+      },
+      "nutrients": {
+        "calories": {
+          "kind": "numeric",
+          "value": 333.0,
+          "raw": "333"
+        },
+        "protein": {
+          "kind": "numeric",
+          "value": 7.7,
+          "raw": "7.7"
+        },
+        "carbs": {
+          "kind": "numeric",
+          "value": 77.0,
+          "raw": "77.0"
+        },
+        "fat": {
+          "kind": "numeric",
+          "value": 1.5,
+          "raw": "1.5"
+        }
+      },
+      "rawCells": {
+        "A2341": "11-868",
+        "B2341": "Rice, brown, wholegrain, raw",
+        "C2341": "6 samples, 6 products",
+        "D2341": "AC",
+        "E2341": "11-442 ",
+        "F2341": "LGC, Nutrient survey of flours and grains, 2005",
+        "J2341": "7.7",
+        "K2341": "1.5",
+        "L2341": "77.0",
+        "M2341": "333"
+      }
+    },
+    {
+      "foodCode": "13-521",
+      "foodName": "Spinach, baby, raw",
+      "description": "16 samples, autumn and winter, UK grown and imported",
+      "mainDataReferences": "DH, Nutrient analysis of fruit and vegetables, 2013",
+      "footnote": "",
+      "sourceState": "raw",
+      "stateMappingStatus": "explicit proposal derived from exact source name; not recipe mapping approval",
+      "basis": {
+        "amount": 100,
+        "unit": "g",
+        "scope": "food as described"
+      },
+      "nutrients": {
+        "calories": {
+          "kind": "numeric",
+          "value": 16.0,
+          "raw": "16"
+        },
+        "protein": {
+          "kind": "numeric",
+          "value": 2.6,
+          "raw": "2.6"
+        },
+        "carbs": {
+          "kind": "numeric",
+          "value": 0.2,
+          "raw": "0.2"
+        },
+        "fat": {
+          "kind": "numeric",
+          "value": 0.6,
+          "raw": "0.6"
+        }
+      },
+      "rawCells": {
+        "A2586": "13-521",
+        "B2586": "Spinach, baby, raw",
+        "C2586": "16 samples, autumn and winter, UK grown and imported",
+        "D2586": "DG",
+        "F2586": "DH, Nutrient analysis of fruit and vegetables, 2013",
+        "J2586": "2.6",
+        "K2586": "0.6",
+        "L2586": "0.2",
+        "M2586": "16"
+      }
+    },
+    {
+      "foodCode": "13-572",
+      "foodName": "Spinach, mature, raw",
+      "description": "Ribs and stems removed",
+      "mainDataReferences": "Reviewed 2013. IFR, The nutritional composition of retail vegetables in the UK, 1984-1987; with new LGC folate and carotenoid values. Vitamin K1 from Bolton-Smith et al, Br.J. Nutr 83, 2000",
+      "footnote": "",
+      "sourceState": "raw",
+      "stateMappingStatus": "explicit proposal derived from exact source name; not recipe mapping approval",
+      "basis": {
+        "amount": 100,
+        "unit": "g",
+        "scope": "food as described"
+      },
+      "nutrients": {
+        "calories": {
+          "kind": "numeric",
+          "value": 25.0,
+          "raw": "25"
+        },
+        "protein": {
+          "kind": "numeric",
+          "value": 2.8,
+          "raw": "2.8"
+        },
+        "carbs": {
+          "kind": "numeric",
+          "value": 1.6,
+          "raw": "1.6"
+        },
+        "fat": {
+          "kind": "numeric",
+          "value": 0.8,
+          "raw": "0.8"
+        }
+      },
+      "rawCells": {
+        "A2590": "13-572",
+        "B2590": "Spinach, mature, raw",
+        "C2590": "Ribs and stems removed",
+        "D2590": "DG",
+        "E2590": "13-456 ",
+        "F2590": "Reviewed 2013. IFR, The nutritional composition of retail vegetables in the UK, 1984-1987; with new LGC folate and carotenoid values. Vitamin K1 from Bolton-Smith et al, Br.J. Nutr 83, 2000",
+        "J2590": "2.8",
+        "K2590": "0.8",
+        "L2590": "1.6",
+        "M2590": "25"
+      }
+    },
+    {
+      "foodCode": "13-670",
+      "foodName": "Beans, chick peas, canned, re-heated, drained",
+      "description": "Fibre only analysed. 10 samples, 7 products, whole peas, canned in water, no added salt. Heated for 3-5 minutes before draining",
+      "mainDataReferences": "PHE, Nutrient analysis of fresh and processed fruit and vegetables with respect to fibre, 2017",
+      "footnote": "",
+      "sourceState": "cooked_drained",
+      "stateMappingStatus": "explicit proposal derived from exact source name; not recipe mapping approval",
+      "basis": {
+        "amount": 100,
+        "unit": "g",
+        "scope": "food as described"
+      },
+      "nutrients": {
+        "calories": {
+          "kind": "numeric",
+          "value": 129.0,
+          "raw": "129"
+        },
+        "protein": {
+          "kind": "numeric",
+          "value": 8.4,
+          "raw": "8.4"
+        },
+        "carbs": {
+          "kind": "numeric",
+          "value": 18.3,
+          "raw": "18.3"
+        },
+        "fat": {
+          "kind": "numeric",
+          "value": 3.0,
+          "raw": "3"
+        }
+      },
+      "rawCells": {
+        "A136": "13-670",
+        "B136": "Beans, chick peas, canned, re-heated, drained",
+        "C136": "Fibre only analysed. 10 samples, 7 products, whole peas, canned in water, no added salt. Heated for 3-5 minutes before draining",
+        "D136": "DB",
+        "E136": "13-560",
+        "F136": "PHE, Nutrient analysis of fresh and processed fruit and vegetables with respect to fibre, 2017",
+        "J136": "8.4",
+        "K136": "3",
+        "L136": "18.3",
+        "M136": "129"
+      }
+    },
+    {
+      "foodCode": "17-038",
+      "foodName": "Oil, olive",
+      "description": "Mean of 35 samples; including virgin and extra virgin olive oil",
+      "mainDataReferences": "Reviewed 2013. Miscellaneous Foods Supplement, 1994; and Fatty Acids Supplement, 1998. Vitamin K1 from Bolton-Smith et al Br.J. Nutr.83, 2000",
+      "footnote": "",
+      "sourceState": "as_sold",
+      "stateMappingStatus": "explicit proposal derived from exact source name; not recipe mapping approval",
+      "basis": {
+        "amount": 100,
+        "unit": "g",
+        "scope": "food as described"
+      },
+      "nutrients": {
+        "calories": {
+          "kind": "numeric",
+          "value": 899.0,
+          "raw": "899"
+        },
+        "protein": {
+          "kind": "trace",
+          "value": null,
+          "raw": "Tr"
+        },
+        "carbs": {
+          "kind": "numeric",
+          "value": 0.0,
+          "raw": "0.0"
+        },
+        "fat": {
+          "kind": "numeric",
+          "value": 99.9,
+          "raw": "99.9"
+        }
+      },
+      "rawCells": {
+        "A1786": "17-038",
+        "B1786": "Oil, olive",
+        "C1786": "Mean of 35 samples; including virgin and extra virgin olive oil",
+        "D1786": "OC",
+        "E1786": "50-324  ",
+        "F1786": "Reviewed 2013. Miscellaneous Foods Supplement, 1994; and Fatty Acids Supplement, 1998. Vitamin K1 from Bolton-Smith et al Br.J. Nutr.83, 2000",
+        "J1786": "Tr",
+        "K1786": "99.9",
+        "L1786": "0.0",
+        "M1786": "899"
+      }
+    },
+    {
+      "foodCode": "18-290",
+      "foodName": "Chicken, light meat, raw",
+      "description": "31 samples, fresh and frozen",
+      "mainDataReferences": "Reviewed 2013. LGC, Nutrient analysis of chicken and turkey, 1994-1995",
+      "footnote": "",
+      "sourceState": "raw",
+      "stateMappingStatus": "explicit proposal derived from exact source name; not recipe mapping approval",
+      "basis": {
+        "amount": 100,
+        "unit": "g",
+        "scope": "food as described"
+      },
+      "nutrients": {
+        "calories": {
+          "kind": "numeric",
+          "value": 106.0,
+          "raw": "106"
+        },
+        "protein": {
+          "kind": "numeric",
+          "value": 24.0,
+          "raw": "24.0"
+        },
+        "carbs": {
+          "kind": "numeric",
+          "value": 0.0,
+          "raw": "0.0"
+        },
+        "fat": {
+          "kind": "numeric",
+          "value": 1.1,
+          "raw": "1.1"
+        }
+      },
+      "rawCells": {
+        "A702": "18-290",
+        "B702": "Chicken, light meat, raw",
+        "C702": "31 samples, fresh and frozen",
+        "D702": "MCA",
+        "E702": "50-433  ",
+        "F702": "Reviewed 2013. LGC, Nutrient analysis of chicken and turkey, 1994-1995",
+        "J702": "24.0",
+        "K702": "1.1",
+        "L702": "0.0",
+        "M702": "106"
+      }
+    }
+  ]
+}

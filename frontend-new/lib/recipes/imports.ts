@@ -1,5 +1,6 @@
 import type { RecipeRecord } from "./types.ts";
 import { recipeRecordErrors } from "./repository.ts";
+import { newApprovalNutritionErrors } from "./nutrition.ts";
 
 type PendingRecipeRecord = RecipeRecord & { review: { status: "pending_review"; reviewedBy: null; reviewedAt: null } };
 
@@ -31,6 +32,7 @@ const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 export function createPendingRecipeImport(payload: RecipeImportPayload): RecipeImportResult<PendingRecipeImport> {
   const record = clone(payload.record);
   const errors = recipeRecordErrors(record);
+  if (errors.length) return { ok: false, errors };
   if (!present(payload.payloadHash)) errors.push("Missing import payload hash");
   if (!present(payload.importedBy)) errors.push("Missing importer identity");
   if (!present(payload.sourceReference) || payload.sourceReference !== record.source.reference) errors.push("Import source reference must match recipe evidence");
@@ -51,6 +53,8 @@ export function approveImportedRecipeVersion(
 ): RecipeImportResult<{ record: RecipeRecord; audit: RecipeImportAudit }> {
   if (!present(reviewer.reviewerId) || !present(reviewer.reviewedAt) || !Number.isFinite(Date.parse(reviewer.reviewedAt))) return { ok: false, errors: ["Valid reviewer identity and review time are required"] };
   const current = clone(pending.record);
+  const nutritionErrors = newApprovalNutritionErrors(current);
+  if (nutritionErrors.length) return { ok: false, errors: nutritionErrors };
   if (current.review.status !== "pending_review" || current.review.reviewedBy !== null || current.review.reviewedAt !== null) return { ok: false, errors: ["Only a pending import can be approved"] };
   const record: RecipeRecord = {
     ...current, version: current.version + 1,

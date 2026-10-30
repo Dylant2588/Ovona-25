@@ -21,6 +21,7 @@ const candidate = (id: string, slot: VerifiedCandidateMeal["slot"], extra: Parti
   cost: 2,
   prepMinutes: 15,
   servings: 2,
+  proteinType: ["plant", "mixed", "poultry", "fish"][Number.parseInt(id.match(/(\d+)/)?.[1] ?? "0", 10) % 4],
   ...extra,
 });
 

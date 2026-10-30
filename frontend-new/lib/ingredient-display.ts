@@ -3,8 +3,13 @@ const NATURAL_COUNTABLE_UNITS = new Set(["large", "each", "piece", "unit"]);
 
 const normalizeUnit = (unit: string) => unit.trim().toLowerCase();
 
-const roundToStep = (value: number, step: number) =>
-  Math.round(value / step) * step;
+// Practical kitchen presentation only: source quantities and macro arithmetic
+// keep their full precision. Never turn a small positive quantity into zero.
+const displayNumber = (value: number, decimals = 1) => {
+  const rounded = Number(value.toFixed(decimals));
+  return String(rounded === 0 && value > 0 ? Number(value.toPrecision(1)) : rounded);
+};
+const measuredNumber = (value: number) => displayNumber(value, value >= 1 ? 0 : 1);
 
 const singularize = (value: string) => {
   const trimmed = value.trim();
@@ -26,16 +31,8 @@ const pluralize = (value: string) => {
   return `${trimmed}s`;
 };
 
-const countFromDisplay = (value: string) => {
-  const match = value.match(/\d+/);
-  if (!match) return 1;
-  const parsed = Number(match[0]);
-  if (!Number.isFinite(parsed) || parsed <= 0) return 1;
-  return parsed;
-};
-
 type HumaniseOptions = {
-  countableRounding?: "nearest" | "up";
+  countableRounding?: "practical" | "exact" | "nearest" | "up";
 };
 
 export const humaniseAmount = (
@@ -44,63 +41,60 @@ export const humaniseAmount = (
   ingredientName: string,
   options: HumaniseOptions = {}
 ): string => {
-  const safeAmount = Number.isFinite(amount) && amount > 0 ? amount : 0;
+  if (!Number.isFinite(amount) || amount < 0) return "Quantity unavailable";
+  const safeAmount = amount;
   const normalizedUnit = normalizeUnit(unit);
   const normalizedName = ingredientName.trim().toLowerCase();
-  const countableRounding = options.countableRounding ?? "nearest";
+  const countableRounding = options.countableRounding ?? "practical";
 
   if (COUNTABLE_UNITS.has(normalizedUnit)) {
-    const rounded =
+    const finalCount =
       countableRounding === "up"
         ? Math.ceil(safeAmount)
-        : Math.round(safeAmount);
-    const finalCount = Math.max(1, rounded);
+        : countableRounding === "nearest" ? Math.round(safeAmount) : safeAmount;
+    const text = displayNumber(finalCount, countableRounding === "exact" ? 4 : 1);
     if (normalizedUnit === "slice") {
-      return `${finalCount} ${finalCount === 1 ? "slice" : "slices"}`;
+      return `${text} ${finalCount > 0 && finalCount <= 1 ? "slice" : "slices"}`;
     }
     if (
       NATURAL_COUNTABLE_UNITS.has(normalizedUnit) ||
       (normalizedUnit === "large" && normalizedName.includes("egg"))
     ) {
-      return `${finalCount}`;
+      return text;
     }
-    return `${finalCount} ${normalizedUnit}`;
+    return `${text} ${normalizedUnit}`;
   }
 
   if (normalizedUnit === "g") {
-    if (safeAmount <= 10) return `${Math.round(safeAmount)}g`;
-    if (safeAmount <= 100) return `${roundToStep(safeAmount, 10)}g`;
-    if (safeAmount <= 500) return `${roundToStep(safeAmount, 25)}g`;
-    return `${roundToStep(safeAmount, 50)}g`;
+    return `${measuredNumber(safeAmount)}g`;
   }
 
   if (normalizedUnit === "ml") {
-    if (safeAmount <= 100) return `${roundToStep(safeAmount, 10)}ml`;
-    if (safeAmount <= 500) return `${roundToStep(safeAmount, 25)}ml`;
-    return `${roundToStep(safeAmount, 50)}ml`;
+    return `${measuredNumber(safeAmount)}ml`;
   }
 
   if (normalizedUnit === "kg" || normalizedUnit === "l") {
-    const rounded = Math.round(safeAmount * 10) / 10;
-    return `${rounded}${normalizedUnit}`;
+    if (safeAmount > 0 && safeAmount < 1) {
+      return `${measuredNumber(safeAmount * 1000)}${normalizedUnit === "kg" ? "g" : "ml"}`;
+    }
+    return `${displayNumber(safeAmount, 2)}${normalizedUnit}`;
   }
 
-  const roundedFallback = Math.round(safeAmount * 10) / 10;
-  return `${roundedFallback} ${normalizedUnit || unit}`.trim();
+  return `${displayNumber(safeAmount)} ${normalizedUnit || unit}`.trim();
 };
 
 type DisplayLineInput = {
   amount: number;
   unit: string;
   ingredientName: string;
-  countableRounding?: "nearest" | "up";
+  countableRounding?: "practical" | "exact" | "nearest" | "up";
 };
 
 export const formatIngredientLineForDisplay = ({
   amount,
   unit,
   ingredientName,
-  countableRounding = "nearest",
+  countableRounding = "practical",
 }: DisplayLineInput): string => {
   const normalizedUnit = normalizeUnit(unit);
   const cleanName = ingredientName.trim() || "Ingredient";
@@ -108,18 +102,18 @@ export const formatIngredientLineForDisplay = ({
     countableRounding,
   });
 
-  if (!COUNTABLE_UNITS.has(normalizedUnit)) {
+  if (!COUNTABLE_UNITS.has(normalizedUnit) || !Number.isFinite(amount) || amount < 0) {
     return `${amountText} ${cleanName}`.trim();
   }
 
-  const count = countFromDisplay(amountText);
   if (normalizedUnit === "slice") {
     return `${amountText} ${cleanName}`.trim();
   }
+  const count = Number(amountText);
 
   const singularName = singularize(cleanName);
-  const displayName = count === 1 ? singularName : pluralize(singularName);
-  return `${count} ${displayName}`.trim();
+  const displayName = count > 0 && count <= 1 ? singularName : pluralize(singularName);
+  return `${amountText} ${displayName}`.trim();
 };
 
 export const formatShoppingLineForDisplay = (input: {
@@ -130,25 +124,25 @@ export const formatShoppingLineForDisplay = (input: {
   const normalizedUnit = normalizeUnit(input.unit);
   const cleanName = input.ingredientName.trim() || "Ingredient";
   const amountText = humaniseAmount(input.quantity, input.unit, cleanName, {
-    countableRounding: "nearest",
+    countableRounding: "practical",
   });
 
-  if (!COUNTABLE_UNITS.has(normalizedUnit)) {
+  if (!COUNTABLE_UNITS.has(normalizedUnit) || !Number.isFinite(input.quantity) || input.quantity < 0) {
     return { amount: amountText, name: cleanName };
   }
 
-  const count = countFromDisplay(amountText);
   if (normalizedUnit === "slice") {
     return {
       amount: amountText,
       name: cleanName,
     };
   }
+  const count = Number(amountText);
 
   const singularName = singularize(cleanName);
-  const displayName = count === 1 ? singularName : pluralize(singularName);
+  const displayName = count > 0 && count <= 1 ? singularName : pluralize(singularName);
   return {
-    amount: `${count}`,
+    amount: amountText,
     name: displayName,
   };
 };

@@ -8,8 +8,11 @@ export async function POST(request: NextRequest) {
   try {
     const { user, supabase } = await resolveRequestAuth(request);
     if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-    const body = await request.json() as { preferences?: PreferencesInput };
-    const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences: body.preferences, supabase });
+    const body = await request.json() as { preferences?: PreferencesInput; requireDifferent?: boolean };
+    if (body.requireDifferent !== undefined && typeof body.requireDifferent !== "boolean") {
+      return NextResponse.json({ error: "invalid_generation_request", message: "Invalid regeneration option." }, { status: 400 });
+    }
+    const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences: body.preferences, supabase, requireDifferent: body.requireDifferent });
     // Generation has already applied the reviewed-recipe boundary and checked
     // daily macro bands. Re-running a mutating enforcement pass here could
     // change a verified plan before it reaches persistence.

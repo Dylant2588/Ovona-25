@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { normalizePlannerProfile } from "../../lib/orchestration/normalize-profile.ts";
 import { orchestrateWeek } from "../../lib/orchestration/schedule.ts";
+import { validateAndRepairWeek } from "../../lib/orchestration/validate.ts";
 import { validRawProfile } from "./fixtures.ts";
 
 const profile = (householdSize = 3) => normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2000, proteinTarget: 120, householdSize });
@@ -21,6 +22,7 @@ const candidates = (calories: number, protein: number, options: { allergens?: re
       cost: 2,
       prepMinutes: 15,
       servings: 2,
+      proteinType: ["plant", "mixed", "poultry", "fish"][index % 4],
     })),
   );
 
@@ -46,7 +48,17 @@ test("repairs individual nutrition portions deterministically and materializes h
 test("returns reason-coded invalidity when bounded repair cannot meet daily bands or use an unsafe candidate", () => {
   const impossible = orchestrateWeek(profile(), candidates(100, 5), {});
   assert.equal(impossible.ok, false);
-  if (!impossible.ok) assert.ok(impossible.error.violations.some((violation) => violation.code === "calories_out_of_band" || violation.code === "repair_exhausted"));
+  if (!impossible.ok) assert.equal(impossible.error.code, "insufficient_candidates");
+
+  const valid = orchestrateWeek(profile(), candidates(475, 29.4));
+  assert.equal(valid.ok, true);
+  if (valid.ok) {
+    const unrecoverable = validateAndRepairWeek(profile(), { days: valid.value.days.map(day => ({
+      ...day, meals: day.meals.map(meal => ({ ...meal, nutrition: { calories: 100, protein: 5, carbs: 10, fat: 2 } })),
+    })) });
+    assert.equal(unrecoverable.ok, false);
+    if (!unrecoverable.ok) assert.ok(unrecoverable.error.violations.some(violation => violation.code === "repair_exhausted"));
+  }
 
   const unsafe = orchestrateWeek(profile(), candidates(450, 28, { allergens: ["peanut"] }), {});
   assert.equal(unsafe.ok, false);
@@ -63,6 +75,19 @@ test("rejects a macro-valid week when exact selected ingredients create an impra
 
   assert.equal(result.ok, false);
   if (!result.ok) {
-    assert.ok(result.error.violations.some((violation) => violation.code === "practical_quantity_exceeded"));
+    assert.equal(result.error.code, "insufficient_candidates");
   }
+  const valid = orchestrateWeek(profile(1), candidates(475, 29.4));
+  assert.equal(valid.ok, true);
+  if (valid.ok) {
+    const direct = validateAndRepairWeek(profile(1), { days: valid.value.days.map(day => ({ ...day,
+      meals: day.meals.map(meal => ({ ...meal, ingredients: [{ name: "Chicken breast", normalizedName: "chicken breast", quantity: 250, unit: "g", pantry: false }] })),
+    })) });
+    assert.equal(direct.ok, false);
+    if (!direct.ok) assert.ok(direct.error.violations.some(violation => violation.code === "practical_quantity_exceeded"));
+  }
+});
+
+test("missing protein metadata cannot evade the daily repetition cap", () => {
+  assert.equal(orchestrateWeek(profile(1), candidates(475, 29.4).map(item => ({ ...item, proteinType: undefined }))).ok, false);
 });

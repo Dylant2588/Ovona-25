@@ -1,0 +1,24 @@
+
+> ovona@0.1.0 lint
+> eslint
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+
+C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\app\meals\page.tsx
+     3:1  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+  1311:6  warning  React Hook useEffect has a missing dependency: 'fetchStoredPlan'. Either include it or remove the dependency array                                                                                                                    react-hooks/exhaustive-deps
+  1466:6  warning  React Hook useEffect has an unnecessary dependency: 'supabase'. Either exclude it or remove the dependency array. Outer scope values like 'supabase' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+  1850:6  warning  React Hook useEffect has a missing dependency: 'displayDays'. Either include it or remove the dependency array                                                                                                                        react-hooks/exhaustive-deps
+
+C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\lib\INTEGRATION.ts
+   39:16  warning  'POST_updated' is defined but never used          @typescript-eslint/no-unused-vars
+   39:29  warning  'request' is defined but never used               @typescript-eslint/no-unused-vars
+  100:10  warning  'shoppingListResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\u1434\OneDrive\Documents\Ovona 25\frontend-new\lib\meal-generator.ts
+  2517:7  warning  'assertPracticalFallbackBasket' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  2593:7  warning  'collectProteinSourcesFromPlan' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 9 problems (0 errors, 9 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

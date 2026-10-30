@@ -1,14 +1,15 @@
-import { readOnboardingMeta } from "@/lib/onboarding-meta";
+import { readOnboardingMeta } from "../onboarding-meta.ts";
 import type { PreferencesInput } from "@/lib/meal-generator";
-import { supabaseServer } from "@/lib/supabaseServer";
 import type {
   GenerationContext,
   GenerationSupabase,
   MicroTargets,
   SlotBudget,
 } from "@/lib/generation/types";
-import { rotationHistoryFromRows } from "./rotation-history";
-import { buildPlanningInput } from "@/lib/planning-input";
+import { rotationHistoryFromRows } from "./rotation-history.ts";
+import { buildPlanningInput } from "../planning-input.ts";
+import { constraintsFromSources, mergeEffectiveConstraints } from "../recipes/server-constraints.ts";
+import type { RecipeConstraints } from "../recipes/types.ts";
 
 type PreferencesRow = Record<string, unknown> | null;
 type ProfileRow = Record<string, unknown> | null;
@@ -71,15 +72,6 @@ const normalizeGoal = (value: unknown): keyof typeof DEFAULT_TARGETS => {
   if (goal === "gain" || goal === "build_muscle") return "gain";
   if (goal === "recomp" || goal === "body_recomposition") return "recomp";
   return "maintain";
-};
-
-const normalizeDietaryMode = (value: unknown) => {
-  const normalized = parseString(value).toLowerCase();
-  if (!normalized || normalized === "mixed") return "mixed";
-  if (normalized.includes("vegan")) return "vegan";
-  if (normalized.includes("vegetarian")) return "vegetarian";
-  if (normalized.includes("pesc")) return "pescatarian";
-  return "mixed";
 };
 
 const deriveHealthConditions = (
@@ -147,10 +139,10 @@ const deriveCalculatedTargets = (
   const explicitFat = parseNumber(preferences?.target_fat);
 
   if (
-    explicitCalories &&
-    explicitProtein &&
-    explicitCarbs &&
-    explicitFat
+    explicitCalories !== null &&
+    explicitProtein !== null &&
+    explicitCarbs !== null &&
+    explicitFat !== null
   ) {
     return {
       calories: explicitCalories,
@@ -178,11 +170,8 @@ const deriveCalculatedTargets = (
     Math.round((explicitCalories ?? tdee * calorieMultiplier) / 10) * 10
   );
   const protein = Math.round(explicitProtein ?? weightKg * deriveProteinPerKg(goal));
-  const fat = Math.max(45, Math.round(explicitFat ?? (calories * 0.27) / 9));
-  const carbs = Math.max(
-    70,
-    Math.round(explicitCarbs ?? (calories - protein * 4 - fat * 9) / 4)
-  );
+  const fat = explicitFat ?? Math.max(45, Math.round((calories * 0.27) / 9));
+  const carbs = explicitCarbs ?? Math.max(70, Math.round((calories - protein * 4 - fat * 9) / 4));
 
   return {
     calories: Number.isFinite(calories) ? calories : defaults.calories,
@@ -280,28 +269,11 @@ const fetchRecentHistory = async (
   return rotationHistoryFromRows(data as Record<string, unknown>[], now);
 };
 
-const parseAllergyRows = (rows: unknown): string[] => {
-  if (!Array.isArray(rows)) return [];
-  const values = rows
-    .map((row) => {
-      if (!row || typeof row !== "object") return "";
-      const record = row as Record<string, unknown>;
-      return (
-        parseString(record.allergy_name) ||
-        parseString(record.allergy) ||
-        parseString(record.allergen) ||
-        parseString(record.name)
-      );
-    })
-    .filter(Boolean);
-  return Array.from(new Set(values));
-};
-
 export async function buildContext(
   userId: string,
-  options?: { supabase?: GenerationSupabase; preferences?: PreferencesInput }
+  options?: { supabase?: GenerationSupabase; preferences?: PreferencesInput; constraints?: RecipeConstraints }
 ): Promise<GenerationContext> {
-  const supabase = options?.supabase ?? (await supabaseServer());
+  const supabase = options?.supabase ?? (await (await import("../supabaseServer")).supabaseServer());
   const requestedPreferences = options?.preferences;
 
   const [prefRes, profileRes, allergyRes, history] = await Promise.all([
@@ -323,6 +295,13 @@ export async function buildContext(
   if (allergyRes.error) {
     console.warn("[context-builder] user_allergies query failed:", allergyRes.error.message);
   }
+  if (prefRes.error || profileRes.error || allergyRes.error) {
+    throw Object.assign(new Error("Saved preferences could not be verified."), { statusCode: 503, code: "preferences_unavailable" });
+  }
+  const effective = mergeEffectiveConstraints(
+    constraintsFromSources(prefRes.data, profileRes.data, allergyRes.data, requestedPreferences),
+    options?.constraints ?? {},
+  );
 
   const requestedTargets = requestedPreferences?.macroTargets;
   const targetSource: Record<string, unknown> = {
@@ -335,13 +314,7 @@ export async function buildContext(
   };
   const targets = deriveCalculatedTargets(targetSource, profile);
   const requestedProfile = requestedPreferences?.profile;
-  const dietaryMode = normalizeDietaryMode(
-    requestedProfile?.dietaryMode ??
-      preferences?.dietary_mode ??
-      preferences?.lifestyle ??
-      profile?.dietary_mode ??
-      null
-  );
+  const dietaryMode = effective.dietaryModes?.find((rule) => rule !== "mixed") ?? "mixed";
   const healthConditions = deriveHealthConditions(preferences, profile);
   const microTargets = deriveMicroTargets(healthConditions);
 
@@ -350,24 +323,8 @@ export async function buildContext(
     carbTarget = Math.max(90, Math.round(carbTarget * 0.8));
   }
 
-  const preferencesAllergies = toStringArray(preferences?.allergies);
-  const profileAllergies = toStringArray(profile?.allergies);
-  const tableAllergies = parseAllergyRows(allergyRes.data ?? []);
-  const allergies = Array.from(
-    new Set(
-      [...(requestedProfile?.allergies ?? []), ...preferencesAllergies, ...profileAllergies, ...tableAllergies].map(
-        (entry) => entry.toLowerCase()
-      )
-    )
-  );
-
-  const dislikes = Array.from(
-    new Set(
-      [...(requestedProfile?.dislikes ?? []), ...toStringArray(profile?.dislikes)].map((entry) =>
-        entry.toLowerCase()
-      )
-    )
-  );
+  const allergies = effective.allergies ?? [];
+  const dislikes = effective.dislikes ?? [];
 
   const cuisines = Array.from(
     new Set(
@@ -390,11 +347,11 @@ export async function buildContext(
     saved: {
       hardExclusions: {
         allergies,
-        dietaryRules: dietaryMode === "mixed" ? [] : [dietaryMode],
-        neverFoods: toStringArray(preferences?.never_foods),
+        dietaryRules: effective.dietaryModes ?? [],
+        neverFoods: effective.neverFoods ?? [],
       },
       foodPreferences: {
-        likes: toStringArray(preferences?.food_likes),
+        likes: [...toStringArray(preferences?.food_likes), ...toStringArray(profile?.food_likes)],
         dislikes,
         cuisines,
       },
@@ -402,12 +359,11 @@ export async function buildContext(
     // PreferencesInput is a legacy client shape. It can add allergies/dislikes but
     // cannot remove server-owned exclusions assembled above.
     requested: {
-      allergies: requestedProfile?.allergies,
-      dislikes: requestedProfile?.dislikes,
+      foodLikes: requestedProfile?.foodLikes,
       cuisines: requestedProfile?.cuisines,
       mealsPerDay,
     },
-    defaults: { maxPrepMinutes: resolveMaxPrepMinutes(preferences, profile), mealsPerDay, weeklyBudget,
+    defaults: { maxPrepMinutes: effective.maxPrepMinutes ?? resolveMaxPrepMinutes(preferences, profile), mealsPerDay, weeklyBudget,
       macroTargets: { calories: targets.calories, protein: targets.protein, carbs: carbTarget, fat: targets.fat } },
     history,
   });

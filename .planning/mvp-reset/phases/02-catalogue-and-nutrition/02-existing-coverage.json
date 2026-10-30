@@ -1,0 +1,1053 @@
+{
+  "reportVersion": "catalogue-coverage-v1",
+  "approvalPolicyVersion": "2026-10-12.1",
+  "nutritionPolicyVersion": "ingredient-v1",
+  "schedulerPolicy": {
+    "calorieBand": {
+      "min": 0.95,
+      "max": 1.08
+    },
+    "proteinBand": {
+      "min": 0.98,
+      "max": 1.1
+    },
+    "scoreWeights": {
+      "nutrition": 40,
+      "preference": 20,
+      "reuse": 15,
+      "prep": 10,
+      "cost": 10,
+      "repetition": 5
+    },
+    "repair": {
+      "maxAttempts": 3
+    },
+    "repetition": {
+      "maxUsesPerWeek": 2
+    },
+    "calorieTargetRange": {
+      "min": 800,
+      "max": 6000
+    },
+    "proteinTargetRange": {
+      "min": 20,
+      "max": 400
+    },
+    "maxPrepMinutes": 240,
+    "maxHouseholdSize": 20
+  },
+  "guarantees": {
+    "legacyCompatible": "Includes existing reviewed legacy nutrition attestations; not necessarily ingredient calculated.",
+    "calculatedOnly": "Only reviewed recipes with reproducible ingredient calculations."
+  },
+  "catalogue": {
+    "records": 38,
+    "uniqueRecipeIds": 38,
+    "pending": 38,
+    "rejected": 0,
+    "malformed": 0,
+    "malformedApproved": 0,
+    "approvedLegacy": 0,
+    "approvedCalculated": 0,
+    "multipleApprovedVersions": []
+  },
+  "issues": [
+    {
+      "index": 0,
+      "recipeId": "apple-cinnamon-pea-oats",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Apple) has no exact nutrition mapping.",
+        "Ingredient 4 (Cinnamon) has no exact nutrition mapping.",
+        "Ingredient 5 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 1,
+      "recipeId": "berry-pea-protein-oats",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 4 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 2,
+      "recipeId": "blueberry-protein-oats",
+      "errors": [
+        "Ingredient 1 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 2 (Chia seeds) has no exact nutrition mapping.",
+        "Ingredient 3 (Water) has no exact nutrition mapping.",
+        "Ingredient 4 (Blueberries) has no exact nutrition mapping.",
+        "Ingredient 5 (Maple syrup) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 3,
+      "recipeId": "chicken-cabbage-noodles",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Soba noodles) has no exact nutrition mapping.",
+        "Ingredient 3 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 4 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 5 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 4,
+      "recipeId": "chicken-crunch-snack-box",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 3 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 5,
+      "recipeId": "chicken-pepper-skewers",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 3 (Olive oil) has no exact nutrition mapping.",
+        "Ingredient 4 (Lime) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 6,
+      "recipeId": "chicken-tomato-pasta",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Wholewheat pasta) has no exact nutrition mapping.",
+        "Ingredient 3 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 7,
+      "recipeId": "chicken-vegetable-soup",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 3 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 4 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 5 (Scallions) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 8,
+      "recipeId": "chipotle-turkey-chili",
+      "errors": [
+        "Ingredient 1 (Ground turkey) has no exact nutrition mapping.",
+        "Ingredient 2 (Black beans) has no exact nutrition mapping.",
+        "Ingredient 3 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Chipotle peppers) has no exact nutrition mapping.",
+        "Ingredient 5 (Corn kernels) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 9,
+      "recipeId": "cocoa-banana-pea-pot",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Banana) has no exact nutrition mapping.",
+        "Ingredient 3 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 4 (Cocoa powder) has no exact nutrition mapping.",
+        "Ingredient 5 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 10,
+      "recipeId": "coconut-lime-salmon",
+      "errors": [
+        "Ingredient 1 (Salmon fillet) has no exact nutrition mapping.",
+        "Ingredient 2 (Coconut milk) has no exact nutrition mapping.",
+        "Ingredient 3 (Jasmine rice) has no exact nutrition mapping.",
+        "Ingredient 4 (Lime) has no exact nutrition mapping.",
+        "Ingredient 5 (Snap peas) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 11,
+      "recipeId": "dark-chocolate-bites",
+      "errors": [
+        "Ingredient 1 (Walnuts) has no exact nutrition mapping.",
+        "Ingredient 2 (Dark chocolate) has no exact nutrition mapping.",
+        "Ingredient 3 (Dates) has no exact nutrition mapping.",
+        "Ingredient 4 (Espresso powder) has no exact nutrition mapping.",
+        "Ingredient 5 (Sea salt) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 12,
+      "recipeId": "egg-white-oat-pancakes",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Banana) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 13,
+      "recipeId": "egg-white-pepper-muffins",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 3 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 14,
+      "recipeId": "greek-yogurt-protein-pot",
+      "errors": [
+        "Ingredient 1 (Greek yogurt) has no exact nutrition mapping.",
+        "Ingredient 2 (Whey protein) has no exact nutrition mapping.",
+        "Ingredient 3 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 4 (Pumpkin seeds) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 15,
+      "recipeId": "harissa-chicken-bowl",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Greek yogurt) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 16,
+      "recipeId": "herbed-chicken-rice-plate",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 17,
+      "recipeId": "kimchi-fried-rice",
+      "errors": [
+        "Ingredient 1 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 2 (Mixed vegetables) has no exact nutrition mapping.",
+        "Ingredient 3 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Scallions) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 18,
+      "recipeId": "lemon-chicken-rice-skillet",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Lime) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 19,
+      "recipeId": "lemongrass-tofu-bowl",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 4 (Mixed vegetables) has no exact nutrition mapping.",
+        "Ingredient 5 (Cucumber) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 20,
+      "recipeId": "matcha-energizer",
+      "errors": [
+        "Ingredient 1 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 2 (Chia seeds) has no exact nutrition mapping.",
+        "Ingredient 3 (Almond milk) has no exact nutrition mapping.",
+        "Ingredient 4 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 5 (Honey) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 21,
+      "recipeId": "miso-soba-salad",
+      "errors": [
+        "Ingredient 1 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 2 (Tofu) has no exact nutrition mapping.",
+        "Ingredient 3 (Mixed vegetables) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Rice vinegar) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 22,
+      "recipeId": "sheet-pan-fajitas",
+      "errors": [
+        "Ingredient 1 (Chicken thighs) has no exact nutrition mapping.",
+        "Ingredient 2 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 3 (Red onion) has no exact nutrition mapping.",
+        "Ingredient 4 (Tortillas) has no exact nutrition mapping.",
+        "Ingredient 5 (Greek yogurt) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 23,
+      "recipeId": "smoky-bean-pea-bowl",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Black beans) has no exact nutrition mapping.",
+        "Ingredient 3 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 4 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 24,
+      "recipeId": "spinach-egg-white-scramble",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 25,
+      "recipeId": "sunrise-egg-wrap",
+      "errors": [
+        "Ingredient 1 (Eggs) has no exact nutrition mapping.",
+        "Ingredient 2 (Whole-grain wrap) has no exact nutrition mapping.",
+        "Ingredient 3 (Avocado) has no exact nutrition mapping.",
+        "Ingredient 4 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 5 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 26,
+      "recipeId": "thai-crunch-salad",
+      "errors": [
+        "Ingredient 1 (Chicken breast) has no exact nutrition mapping.",
+        "Ingredient 2 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 3 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 4 (Peanut butter) has no exact nutrition mapping.",
+        "Ingredient 5 (Brown rice) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 27,
+      "recipeId": "tofu-broccoli-rice-bowl",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Broccoli) has no exact nutrition mapping.",
+        "Ingredient 3 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 28,
+      "recipeId": "tofu-noodle-stir-fry",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Cabbage) has no exact nutrition mapping.",
+        "Ingredient 3 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 4 (Soy sauce) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 29,
+      "recipeId": "tofu-tomato-pasta",
+      "errors": [
+        "Ingredient 1 (Extra-firm tofu) has no exact nutrition mapping.",
+        "Ingredient 2 (Diced tomatoes) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 30,
+      "recipeId": "turkey-bean-lettuce-wraps",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Black beans) has no exact nutrition mapping.",
+        "Ingredient 3 (Tortillas) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 6 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 31,
+      "recipeId": "turkey-cottage-snack-plate",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Cottage cheese) has no exact nutrition mapping.",
+        "Ingredient 3 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 4 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 32,
+      "recipeId": "turkey-cucumber-rolls",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 3 (Carrots) has no exact nutrition mapping.",
+        "Ingredient 4 (Olives) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 33,
+      "recipeId": "turkey-pepper-omelette",
+      "errors": [
+        "Ingredient 1 (Egg whites) has no exact nutrition mapping.",
+        "Ingredient 2 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 3 (Bell peppers) has no exact nutrition mapping.",
+        "Ingredient 4 (Scallions) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 34,
+      "recipeId": "turkey-rice-breakfast-bowl",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Brown rice) has no exact nutrition mapping.",
+        "Ingredient 3 (Spinach) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 35,
+      "recipeId": "turkey-tomato-snack-box",
+      "errors": [
+        "Ingredient 1 (Roast turkey slices) has no exact nutrition mapping.",
+        "Ingredient 2 (Rolled oats) has no exact nutrition mapping.",
+        "Ingredient 3 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 4 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 5 (Olive oil) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 36,
+      "recipeId": "vanilla-berry-pea-shake",
+      "errors": [
+        "Ingredient 1 (Pea protein) has no exact nutrition mapping.",
+        "Ingredient 2 (Mixed berries) has no exact nutrition mapping.",
+        "Ingredient 3 (Banana) has no exact nutrition mapping.",
+        "Ingredient 4 (Water) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    },
+    {
+      "index": 37,
+      "recipeId": "white-bean-snack-box",
+      "errors": [
+        "Ingredient 1 (Mashed white beans) has no exact nutrition mapping.",
+        "Ingredient 2 (Cucumber) has no exact nutrition mapping.",
+        "Ingredient 3 (Cherry tomatoes) has no exact nutrition mapping.",
+        "Ingredient 4 (Olives) has no exact nutrition mapping.",
+        "Ingredient 5 (Whole-grain wrap) has no exact nutrition mapping.",
+        "Legacy/estimated nutrition has no reproducible ingredient calculation."
+      ]
+    }
+  ],
+  "cohorts": [
+    {
+      "id": "mixed-three",
+      "cohort": {
+        "id": "mixed-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 38,
+        "unknown_ingredient": 38,
+        "prep_time_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mixed-five",
+      "cohort": {
+        "id": "mixed-five",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "snack",
+          "lunch",
+          "snack",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 38,
+        "unknown_ingredient": 38,
+        "prep_time_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vegetarian-three",
+      "cohort": {
+        "id": "vegetarian-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "vegetarian",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 38,
+        "unknown_ingredient": 38,
+        "prep_time_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "vegan-three",
+      "cohort": {
+        "id": "vegan-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "vegan",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 38,
+        "unknown_ingredient": 38,
+        "prep_time_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [
+        "Existing scheduler permits at most two meals per broad plant protein type each day. Complete vegan days with three or five meals require an explicit future variety-policy decision; catalogue counts alone cannot resolve this."
+      ],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "pescatarian-three",
+      "cohort": {
+        "id": "pescatarian-three",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "pescatarian",
+        "allergies": [],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 38,
+        "unknown_ingredient": 38,
+        "prep_time_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "mixed-three-15min",
+      "cohort": {
+        "id": "mixed-three-15min",
+        "calorieTarget": 2000,
+        "proteinTarget": 150,
+        "dietaryMode": "mixed",
+        "allergies": [],
+        "maxPrepMinutes": 15,
+        "slots": [
+          "breakfast",
+          "lunch",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 38,
+        "unknown_ingredient": 38,
+        "prep_time_conflict": 22
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "restrictive-five",
+      "cohort": {
+        "id": "restrictive-five",
+        "calorieTarget": 1830,
+        "proteinTarget": 216,
+        "dietaryMode": "mixed",
+        "allergies": [
+          "Dairy",
+          "Nuts",
+          "Fish",
+          "Shellfish",
+          "Sesame"
+        ],
+        "maxPrepMinutes": 30,
+        "slots": [
+          "breakfast",
+          "snack",
+          "lunch",
+          "snack",
+          "dinner"
+        ]
+      },
+      "rejectionReasons": {
+        "recipe_unreviewed": 38,
+        "unknown_ingredient": 38,
+        "prep_time_conflict": 2
+      },
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "policyGaps": [],
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    }
+  ]
+}

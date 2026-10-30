@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import NextLink from "next/link";
+import { planForPreferenceSnapshot } from "@/lib/plan-preference-snapshot";
 import { MealThumbnail } from "@/components/MealThumbnail";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -66,6 +67,11 @@ import type { TooltipContentProps } from "recharts";
 import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabaseClient";
+import { preferencePrepLimitForSave } from "@/lib/preferences-persistence";
+import { allergyOptionSelected, toggleAllergyOption } from "@/lib/allergy-options";
+import { preferenceOptionSelected, togglePreferenceOption, savedDietaryMode } from "@/lib/preference-options";
+import { PreferenceSaveFeedbackError, preferenceSaveFeedback } from "@/lib/preference-feedback";
+import { foodPreferencesWithDrafts } from "@/lib/preference-drafts";
 import {
   buildRecipeSteps,
   buildShoppingList,
@@ -102,6 +108,7 @@ type RawPreferences = {
   goal: string | null;
   meal_complexity: number | null;
   lifestyle: string | null;
+  dietary_mode?: string | null;
   cuisines: string | null;
   allergies: string | null;
   target_calories: number | null;
@@ -694,6 +701,7 @@ function MealsPageContent() {
   const [expandedDayId, setExpandedDayId] = useState<string | null>(null);
   const [preferencesPanelOpen, setPreferencesPanelOpen] = useState(false);
   const [preferencesSaving, setPreferencesSaving] = useState(false);
+  const [preferencesSaveError, setPreferencesSaveError] = useState<string | null>(null);
   const [preferencesNotice, setPreferencesNotice] = useState<PreferencesNoticeState | null>(null);
   const [showCustomizePrompt, setShowCustomizePrompt] = useState(false);
   const [hasCanonicalPreferences, setHasCanonicalPreferences] = useState<boolean | null>(null);
@@ -950,7 +958,8 @@ function MealsPageContent() {
 
   const fetchPlanFromAi = async (
     rotationHistory: RotationHistoryEntry[],
-    preferencesOverride?: PreferencesInput
+    preferencesOverride?: PreferencesInput,
+    requireDifferent = false,
   ): Promise<{ plan: WeeklyMealPlan; enforcement: EnforcementInfo | null }> => {
     const effectivePreferences = preferencesOverride ?? preferences;
     if (!effectivePreferences) {
@@ -966,6 +975,7 @@ function MealsPageContent() {
           preferences: effectivePreferences,
           rotationHistory,
           mealHistory: mealHistorySummary,
+          requireDifferent,
         }),
         signal: controller.signal,
       });
@@ -1085,7 +1095,7 @@ function MealsPageContent() {
           bodyFatPercent: parseNumberField(profileData?.body_fat_percent),
           heightCm: parseNumberField(profileData?.height_cm),
           activityLevel: profileData?.activity_level ?? null,
-          dietaryMode: normalizeDietaryModeValue(prefData?.lifestyle ?? null),
+          dietaryMode: normalizeDietaryModeValue(savedDietaryMode(prefData)),
           trainingSchedule: ensureStringArray(profileData?.training_schedule),
           allergies: mergedAllergies,
           dislikes: ensureStringArray(profileData?.dislikes),
@@ -1309,13 +1319,14 @@ function MealsPageContent() {
     enforcementState: EnforcementInfo | null = enforcement
   ) => {
     if (!user || typeof window === "undefined") return;
+    const savedPlan = planForPreferenceSnapshot(nextPlan, signature);
     try {
       const response = await authFetchWithRetry("/api/meal-plan/state", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          weekStart: toDateOnly(nextPlan.weekStart ?? new Date().toISOString()),
-          plan: nextPlan,
+          weekStart: toDateOnly(savedPlan.weekStart ?? new Date().toISOString()),
+          plan: savedPlan,
           enforcement: enforcementState,
         }),
       });
@@ -1323,8 +1334,9 @@ function MealsPageContent() {
         const rejected = await response.json() as { message?: string };
         throw new Error(rejected.message ?? "Recipe checks prevented saving. Your previous plan is unchanged.");
       }
-      window.localStorage.setItem(storageKeyFor(user.id), JSON.stringify(nextPlan));
+      window.localStorage.setItem(storageKeyFor(user.id), JSON.stringify(savedPlan));
       if (signature) planSignatureRef.current = signature;
+      return savedPlan;
     } catch (error) {
       console.error("Failed to persist plan state", error);
       showToast("Couldn't save your latest plan changes. Try again.", "error", {
@@ -1466,10 +1478,10 @@ function MealsPageContent() {
     const rotationHistory = rotationHistoryFromPlan(plan);
     try {
       setLoadingStepIndex(1);
-      const aiResponse = await fetchPlanFromAi(rotationHistory);
+      const aiResponse = await fetchPlanFromAi(rotationHistory, undefined, true);
       const aiPlan = aiResponse.plan;
-      await persistPlan(aiPlan, preferenceSignature, aiResponse.enforcement ?? null);
-      setPlan(aiPlan);
+      const savedPlan = await persistPlan(aiPlan, preferenceSignature, aiResponse.enforcement ?? null);
+      setPlan(savedPlan ?? aiPlan);
       setEnforcement(aiResponse.enforcement);
       setError(null);
       setLoadingStepIndex(LOADING_STEPS.length);
@@ -1509,8 +1521,8 @@ function MealsPageContent() {
       if (!data.plan) throw new Error("No checked plan was returned. Your existing plan is unchanged.");
       const nextPlan = data.plan;
       const nextEnforcement = data.enforcement ?? null;
-      await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
-      setPlan(nextPlan);
+      const savedPlan = await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
+      setPlan(savedPlan ?? nextPlan);
       setEnforcement(nextEnforcement);
       showToast("Day regenerated.", "success");
     } catch (error) {
@@ -1533,8 +1545,8 @@ function MealsPageContent() {
     try {
       // The state boundary accepts only the exact nutrition-unknown social-meal
       // shape, then excludes its ingredients from any future basket calculation.
-      await persistPlan(nextPlan, preferenceSignature, null);
-      setPlan(nextPlan);
+      const savedPlan = await persistPlan(nextPlan, preferenceSignature, null);
+      setPlan(savedPlan ?? nextPlan);
       setEnforcement(null);
       setExpandedMealId(null);
       showToast("Meal out added. Its nutrition is not counted and its ingredients were removed from your shopping list.", "info");
@@ -1583,8 +1595,8 @@ function MealsPageContent() {
       if (!data.plan) throw new Error("No checked replacement was returned.");
       const nextPlan = data.plan;
       const nextEnforcement = data.enforcement ?? null;
-      await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
-      setPlan(nextPlan);
+      const savedPlan = await persistPlan(nextPlan, preferenceSignature, nextEnforcement);
+      setPlan(savedPlan ?? nextPlan);
       setEnforcement(nextEnforcement);
       showToast("Meal swapped.", "success");
     } catch (error) {
@@ -1605,10 +1617,10 @@ function MealsPageContent() {
     value: string
   ) => {
     setPreferencesPanelState((prev) => {
-      const exists = prev[key].includes(value);
+      if (key === "allergies") return { ...prev, allergies: toggleAllergyOption(prev.allergies, value) };
       return {
         ...prev,
-        [key]: exists ? prev[key].filter((item) => item !== value) : [...prev[key], value],
+        cuisines: togglePreferenceOption(prev.cuisines, value),
       };
     });
   };
@@ -1644,13 +1656,17 @@ function MealsPageContent() {
   const handleSavePreferencePanel = async () => {
     if (!user || !preferences) return;
     setPreferencesSaving(true);
+    setPreferencesSaveError(null);
     setError(null);
     setPreferencesNotice(null);
     const sanitizedAllergies = uniqueStrings(preferencesPanelState.allergies);
-    const sanitizedDislikes = uniqueStrings(preferencesPanelState.dislikes);
-    const sanitizedNeverFoods = uniqueStrings(preferencesPanelState.neverFoods);
-    const sanitizedFoodLikes = uniqueStrings(preferencesPanelState.foodLikes);
+    const {
+      dislikes: sanitizedDislikes,
+      neverFoods: sanitizedNeverFoods,
+      foodLikes: sanitizedFoodLikes,
+    } = foodPreferencesWithDrafts(preferencesPanelState, { dislikeInput, neverFoodInput, foodLikeInput });
     const sanitizedCuisines = uniqueStrings(preferencesPanelState.cuisines);
+    const maxPrepMinutes = preferencePrepLimitForSave(preferencesPanelState.maxPrepMinutes);
     const dietaryMode =
       preferencesPanelState.dietaryMode === "mixed"
         ? null
@@ -1666,7 +1682,7 @@ function MealsPageContent() {
         neverFoods: sanitizedNeverFoods,
         foodLikes: sanitizedFoodLikes,
         cuisines: sanitizedCuisines,
-        maxPrepMinutes: preferencesPanelState.maxPrepMinutes,
+        maxPrepMinutes,
       },
     };
     const nextSignature = preferenceSignatureFor(nextPreferences);
@@ -1684,7 +1700,7 @@ function MealsPageContent() {
           neverFoods: sanitizedNeverFoods,
           foodLikes: sanitizedFoodLikes,
           cuisines: sanitizedCuisines,
-          maxPrepMinutes: preferencesPanelState.maxPrepMinutes,
+          maxPrepMinutes,
           tastePreferences: nextPreferences.tastes,
           goal: nextPreferences.goal,
           mealComplexity: nextPreferences.mealComplexity,
@@ -1697,13 +1713,21 @@ function MealsPageContent() {
         .catch(() => ({}))) as {
         ok?: boolean;
         error?: string;
+        message?: string;
         profileSaved?: boolean;
         allergiesSynced?: boolean;
       };
 
       if (!saveResponse.ok || !savePayload.ok) {
-        throw new Error(savePayload.error ?? "Failed to save preferences");
+        throw new PreferenceSaveFeedbackError(savePayload);
       }
+
+      setPreferencesPanelState((current) => ({ ...current,
+        dislikes: sanitizedDislikes, neverFoods: sanitizedNeverFoods, foodLikes: sanitizedFoodLikes,
+      }));
+      setDislikeInput((current) => current === dislikeInput ? "" : current);
+      setNeverFoodInput((current) => current === neverFoodInput ? "" : current);
+      setFoodLikeInput((current) => current === foodLikeInput ? "" : current);
 
       const hasSecondarySyncWarning =
         savePayload.profileSaved === false || savePayload.allergiesSynced === false;
@@ -1741,12 +1765,14 @@ function MealsPageContent() {
       try {
         setLoadingStepIndex(1);
         const aiResponse = await fetchPlanFromAi(rotationHistory, nextPreferences);
-        await persistPlan(aiResponse.plan, nextSignature, aiResponse.enforcement ?? null);
-        setPlan(aiResponse.plan);
+        const savedPlan = await persistPlan(aiResponse.plan, nextSignature, aiResponse.enforcement ?? null);
+        setPlan(savedPlan ?? aiResponse.plan);
         setEnforcement(aiResponse.enforcement);
+        setPreferencesNotice(null);
         showToast("Preferences applied.", "success");
       } catch (generationError) {
         console.error("Unable to regenerate via AI after saving preferences", generationError);
+        setPreferencesNotice(null);
         setError("Preferences saved. A checked replacement plan isn't available yet; the displayed plan has not been checked against these new preferences.");
         showToast("Preferences saved; your previous plan is retained pending recipe checks.", "warning");
       } finally {
@@ -1762,7 +1788,9 @@ function MealsPageContent() {
       }
     } catch (saveError) {
       console.error("Failed to save preference panel", saveError);
-      setError("We couldn't save your preferences. Please try again.");
+      const message = preferenceSaveFeedback(saveError);
+      setPreferencesSaveError(message);
+      setError(message);
       showToast("Couldn't save preferences. Try again.", "error", {
         actionLabel: "Retry",
         onAction: () => void handleSavePreferencePanel(),
@@ -2137,6 +2165,9 @@ function MealsPageContent() {
             onClick={() => {
               setPreferencesPanelState(panelStateFromPreferences(preferences));
               setDislikeInput("");
+              setNeverFoodInput("");
+              setFoodLikeInput("");
+              setPreferencesSaveError(null);
               setPreferencesPanelOpen(true);
             }}
           >
@@ -2198,6 +2229,9 @@ function MealsPageContent() {
               onClick={() => {
                 setPreferencesPanelState(panelStateFromPreferences(preferences));
                 setDislikeInput("");
+                setNeverFoodInput("");
+                setFoodLikeInput("");
+                setPreferencesSaveError(null);
                 setPreferencesPanelOpen(true);
               }}
             >
@@ -3302,6 +3336,7 @@ function MealsPageContent() {
               Allergies and never-include foods are enforced. Likes and avoid foods guide the plan.
             </Typography>
           </Box>
+          {preferencesSaveError && <Alert severity="error">{preferencesSaveError}</Alert>}
           <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
 
           <Stack spacing={1.25}>
@@ -3342,7 +3377,7 @@ function MealsPageContent() {
                       control={
                         <Checkbox
                           size="small"
-                          checked={preferencesPanelState.allergies.includes(allergy)}
+                          checked={allergyOptionSelected(preferencesPanelState.allergies, allergy)}
                           onChange={() => togglePanelArrayValue("allergies", allergy)}
                         />
                       }
@@ -3428,7 +3463,7 @@ function MealsPageContent() {
                       control={
                         <Checkbox
                           size="small"
-                          checked={preferencesPanelState.cuisines.includes(cuisine)}
+                          checked={preferenceOptionSelected(preferencesPanelState.cuisines, cuisine)}
                           onChange={() => togglePanelArrayValue("cuisines", cuisine)}
                         />
                       }

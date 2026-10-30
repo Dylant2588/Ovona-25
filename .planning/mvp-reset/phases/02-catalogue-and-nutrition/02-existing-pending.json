@@ -1,0 +1,3654 @@
+[
+  {
+    "id": "apple-cinnamon-pea-oats",
+    "version": 1,
+    "title": "Apple Cinnamon Pea Protein Oats",
+    "description": "Apple Cinnamon Pea Protein Oats, made with everyday ingredients.",
+    "slots": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 8,
+    "macros": {
+      "calories": 463,
+      "protein": 55,
+      "carbs": 51,
+      "fat": 6
+    },
+    "ingredients": [
+      {
+        "name": "Pea protein",
+        "canonicalId": "unreviewed_pea_protein",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Rolled oats",
+        "canonicalId": "oats",
+        "amount": 40,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Apple",
+        "canonicalId": "unreviewed_apple",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cinnamon",
+        "canonicalId": "cinnamon",
+        "amount": 2,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Water",
+        "canonicalId": "water",
+        "amount": 250,
+        "unit": "ml",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Mix the pea protein with the water until smooth.",
+      "Cook the oats and apple with the protein mixture for 3–4 minutes, stirring often.",
+      "Finish with cinnamon and serve."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/oats.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:apple-cinnamon-pea-oats",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "berry-pea-protein-oats",
+    "version": 1,
+    "title": "Berry Pea Protein Oats",
+    "description": "Berry Pea Protein Oats, made with everyday ingredients.",
+    "slots": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 8,
+    "macros": {
+      "calories": 465,
+      "protein": 56,
+      "carbs": 48,
+      "fat": 6
+    },
+    "ingredients": [
+      {
+        "name": "Pea protein",
+        "canonicalId": "unreviewed_pea_protein",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Rolled oats",
+        "canonicalId": "oats",
+        "amount": 45,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Mixed berries",
+        "canonicalId": "unreviewed_mixed_berries",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Water",
+        "canonicalId": "water",
+        "amount": 250,
+        "unit": "ml",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Stir the pea protein into the water until smooth.",
+      "Microwave or simmer the oats with the protein mixture for 3–4 minutes, stirring once.",
+      "Fold through the berries and serve warm or chilled."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/oats.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:berry-pea-protein-oats",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "blueberry-protein-oats",
+    "version": 1,
+    "title": "Blueberry Protein Oats",
+    "description": "Overnight oats layered with chia, cinnamon, and fresh blueberries.",
+    "slots": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 5,
+    "macros": {
+      "calories": 380,
+      "protein": 27,
+      "carbs": 48,
+      "fat": 10
+    },
+    "ingredients": [
+      {
+        "name": "Rolled oats",
+        "canonicalId": "oats",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Chia seeds",
+        "canonicalId": "chia_seeds",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Water",
+        "canonicalId": "water",
+        "amount": 240,
+        "unit": "ml",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Blueberries",
+        "canonicalId": "blueberries",
+        "amount": 75,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Maple syrup",
+        "canonicalId": "maple_syrup",
+        "amount": 15,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Prep the ingredients that need chopping so everything is ready to cook.",
+      "Combine Rolled oats and Blueberries in a bowl, jar, or on a board for assembly.",
+      "Mix gently until evenly combined.",
+      "Finish with any toppings and serve, or chill until ready to eat."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/oats.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:blueberry-protein-oats",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "chicken-cabbage-noodles",
+    "version": 1,
+    "title": "Chicken Noodle Stir-Fry",
+    "description": "Chicken Noodle Stir-Fry, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 512,
+      "protein": 53,
+      "carbs": 45,
+      "fat": 14
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 140,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Soba noodles",
+        "canonicalId": "unreviewed_soba_noodles",
+        "amount": 45,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cabbage",
+        "canonicalId": "cabbage",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Carrots",
+        "canonicalId": "carrots",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Soy sauce",
+        "canonicalId": "soy_sauce",
+        "amount": 10,
+        "unit": "ml",
+        "allergens": [
+          "soy",
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 8,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Boil the measured dry noodles according to the packet and drain.",
+      "Slice chicken, cabbage and carrots thinly. Heat the oil and cook the chicken until cooked throughout.",
+      "Add vegetables and stir-fry for 5 minutes, then add the noodles and soy sauce and heat through."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/pasta.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:chicken-cabbage-noodles",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "chicken-crunch-snack-box",
+    "version": 1,
+    "title": "Chicken & Cucumber Snack Box",
+    "description": "Cooked chicken breast with cucumber, tomatoes, and an olive oil dressing.",
+    "slots": [
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 20,
+    "macros": {
+      "calories": 382,
+      "protein": 51,
+      "carbs": 7,
+      "fat": 16
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 160,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Cucumber",
+        "canonicalId": "cucumber",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 10,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Cut the chicken breast into strips and cook in a pan with half the olive oil until cooked through, with no pink centre.",
+      "Slice the cucumber and halve the tomatoes. Toss with the remaining olive oil.",
+      "Serve with the cooked chicken. If preparing ahead, cool promptly and keep refrigerated until ready to eat."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:chicken-crunch-snack-box",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "chicken-pepper-skewers",
+    "version": 1,
+    "title": "Chicken Pepper Skewers",
+    "description": "Chicken Pepper Skewers, made with everyday ingredients.",
+    "slots": [
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 343,
+      "protein": 48,
+      "carbs": 13,
+      "fat": 11
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Bell peppers",
+        "canonicalId": "pepper",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Lime",
+        "canonicalId": "lime",
+        "amount": 1,
+        "unit": "each",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Heat the oven to 200°C. Cut chicken and pepper into similar small pieces.",
+      "Toss with the oil and lime juice and thread onto metal skewers. Place on a baking tray.",
+      "Bake for 18–20 minutes, turning once, until the chicken is cooked throughout with no pink centre."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:chicken-pepper-skewers",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "chicken-tomato-pasta",
+    "version": 1,
+    "title": "Chicken Tomato Pasta",
+    "description": "Chicken Tomato Pasta, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 516,
+      "protein": 53,
+      "carbs": 41,
+      "fat": 15
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 140,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Wholewheat pasta",
+        "canonicalId": "wheat",
+        "amount": 45,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Diced tomatoes",
+        "canonicalId": "tomato",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 50,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 8,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Boil the measured dry pasta according to the packet directions, then drain.",
+      "Dice the chicken and pan-fry in the oil until cooked throughout. Add the tomatoes and simmer for 8 minutes.",
+      "Stir in spinach until wilted, then toss with the cooked pasta."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/pasta.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:chicken-tomato-pasta",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "chicken-vegetable-soup",
+    "version": 1,
+    "title": "Chicken & Vegetable Soup",
+    "description": "Chicken & Vegetable Soup, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 30,
+    "macros": {
+      "calories": 502,
+      "protein": 49,
+      "carbs": 44,
+      "fat": 14
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 140,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Carrots",
+        "canonicalId": "carrots",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cabbage",
+        "canonicalId": "cabbage",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 35,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Scallions",
+        "canonicalId": "scallions",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 8,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Rinse the dry brown rice. Put in a saucepan with 500ml water and the olive oil and bring to a simmer.",
+      "Dice the chicken and vegetables. After 10 minutes add them to the rice, adding water if needed.",
+      "Simmer for another 20 minutes until rice is tender and chicken cooked throughout. Season to taste and serve."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/soup.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:chicken-vegetable-soup",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "chipotle-turkey-chili",
+    "version": 1,
+    "title": "Chipotle Turkey Chili",
+    "description": "Smoky chili with black beans, roasted corn, and cilantro yogurt.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 35,
+    "macros": {
+      "calories": 455,
+      "protein": 42,
+      "carbs": 37,
+      "fat": 17
+    },
+    "ingredients": [
+      {
+        "name": "Ground turkey",
+        "canonicalId": "turkey",
+        "amount": 300,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Black beans",
+        "canonicalId": "black_beans",
+        "amount": 200,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Diced tomatoes",
+        "canonicalId": "tomato",
+        "amount": 200,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Chipotle peppers",
+        "canonicalId": "chipotle_peppers",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Corn kernels",
+        "canonicalId": "corn_kernels",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Preheat the oven to 210°C.",
+      "Slice Diced tomatoes and Chipotle peppers.",
+      "Arrange Ground turkey on a lined tray, drizzle with oil, season, and spread into a single layer.",
+      "Roast for 25 minutes until cooked through and lightly golden.",
+      "Rest for 2 minutes, then plate and finish with Diced tomatoes."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:chipotle-turkey-chili",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "cocoa-banana-pea-pot",
+    "version": 1,
+    "title": "Cocoa Banana Pea Protein Pot",
+    "description": "Cocoa Banana Pea Protein Pot, made with everyday ingredients.",
+    "slots": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 7,
+    "macros": {
+      "calories": 457,
+      "protein": 55,
+      "carbs": 52,
+      "fat": 6
+    },
+    "ingredients": [
+      {
+        "name": "Pea protein",
+        "canonicalId": "unreviewed_pea_protein",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Banana",
+        "canonicalId": "banana",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Rolled oats",
+        "canonicalId": "oats",
+        "amount": 30,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cocoa powder",
+        "canonicalId": "unreviewed_cocoa_powder",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Water",
+        "canonicalId": "water",
+        "amount": 220,
+        "unit": "ml",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Blend the banana with the water and pea protein until smooth.",
+      "Stir through the oats and cocoa powder.",
+      "Chill for 5 minutes or warm gently in a pan, stirring until thickened."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:cocoa-banana-pea-pot",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "coconut-lime-salmon",
+    "version": 1,
+    "title": "Coconut Lime Salmon",
+    "description": "Seared salmon in coconut broth with jasmine rice and snap peas.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 28,
+    "macros": {
+      "calories": 610,
+      "protein": 40,
+      "carbs": 52,
+      "fat": 26
+    },
+    "ingredients": [
+      {
+        "name": "Salmon fillet",
+        "canonicalId": "salmon",
+        "amount": 200,
+        "unit": "g",
+        "allergens": [
+          "fish"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "fish",
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Coconut milk",
+        "canonicalId": "coconut_milk",
+        "amount": 160,
+        "unit": "ml",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Jasmine rice",
+        "canonicalId": "rice",
+        "amount": 90,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Lime",
+        "canonicalId": "lime",
+        "amount": 1,
+        "unit": "each",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Snap peas",
+        "canonicalId": "snap_peas",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Lime.",
+      "Heat a pan over medium heat and add a small drizzle of oil.",
+      "Add Salmon fillet to the pan and cook over medium heat for 4-8 minutes until cooked through.",
+      "Cook Jasmine rice until tender, then add it to the pan.",
+      "Stir in Coconut milk, season to taste, and serve while hot."
+    ],
+    "proteinType": "fish",
+    "image": "/images/meals/plate.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:coconut-lime-salmon",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "dark-chocolate-bites",
+    "version": 1,
+    "title": "Dark Chocolate Walnut Bites",
+    "description": "Two-bite energy balls with cacao, walnuts, and espresso salt.",
+    "slots": [
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 10,
+    "macros": {
+      "calories": 190,
+      "protein": 6,
+      "carbs": 14,
+      "fat": 12
+    },
+    "ingredients": [
+      {
+        "name": "Walnuts",
+        "canonicalId": "walnut",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [
+          "tree_nuts"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Dark chocolate",
+        "canonicalId": "unreviewed_dark_chocolate",
+        "amount": 90,
+        "unit": "g",
+        "allergens": [
+          "milk",
+          "tree_nuts"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Dates",
+        "canonicalId": "dates",
+        "amount": 70,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Espresso powder",
+        "canonicalId": "espresso_powder",
+        "amount": 4,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Sea salt",
+        "canonicalId": "sea_salt",
+        "amount": 2,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Set out the ingredients and any containers for assembly.",
+      "Combine the ingredients in a bowl.",
+      "Mix gently until evenly combined.",
+      "Finish with any toppings and serve, or chill until ready to eat."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:dark-chocolate-bites",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "egg-white-oat-pancakes",
+    "version": 1,
+    "title": "Banana Oat Pancakes",
+    "description": "Banana Oat Pancakes, made with everyday ingredients.",
+    "slots": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "readyInMinutes": 18,
+    "macros": {
+      "calories": 255,
+      "protein": 21,
+      "carbs": 31,
+      "fat": 5
+    },
+    "ingredients": [
+      {
+        "name": "Egg whites",
+        "canonicalId": "egg",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Rolled oats",
+        "canonicalId": "oats",
+        "amount": 25,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Banana",
+        "canonicalId": "banana",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 3,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Blend the oats into flour, then blend with the banana and egg whites.",
+      "Brush a non-stick pan with the measured oil and heat over medium-low heat.",
+      "Cook small pancakes for 3–4 minutes per side until firm and cooked throughout; work in batches."
+    ],
+    "proteinType": "mixed",
+    "image": "/images/meals/oats.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:egg-white-oat-pancakes",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "egg-white-pepper-muffins",
+    "version": 1,
+    "title": "Pepper & Egg Bites",
+    "description": "Pepper & Egg Bites, made with everyday ingredients.",
+    "slots": [
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 202,
+      "protein": 24,
+      "carbs": 6,
+      "fat": 8
+    },
+    "ingredients": [
+      {
+        "name": "Egg whites",
+        "canonicalId": "egg",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Eggs",
+        "canonicalId": "egg",
+        "amount": 1,
+        "unit": "large",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Bell peppers",
+        "canonicalId": "pepper",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 30,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 3,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Heat the oven to 180°C. Grease a muffin tin with the measured oil.",
+      "Finely chop the pepper and spinach and divide between the cups. Whisk the egg and whites, then pour over the vegetables.",
+      "Bake for 18–20 minutes until fully set. Cool promptly and refrigerate if keeping for later."
+    ],
+    "proteinType": "mixed",
+    "image": "/images/meals/eggs.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:egg-white-pepper-muffins",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "greek-yogurt-protein-pot",
+    "version": 1,
+    "title": "Greek Yogurt Protein Pot",
+    "description": "Greek yogurt layered with whey, berries, and toasted seeds.",
+    "slots": [
+      "snack",
+      "breakfast"
+    ],
+    "servings": 1,
+    "readyInMinutes": 4,
+    "macros": {
+      "calories": 280,
+      "protein": 32,
+      "carbs": 22,
+      "fat": 8
+    },
+    "ingredients": [
+      {
+        "name": "Greek yogurt",
+        "canonicalId": "milk",
+        "amount": 220,
+        "unit": "g",
+        "allergens": [
+          "milk"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Whey protein",
+        "canonicalId": "milk",
+        "amount": 25,
+        "unit": "g",
+        "allergens": [
+          "milk"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Mixed berries",
+        "canonicalId": "unreviewed_mixed_berries",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Pumpkin seeds",
+        "canonicalId": "pumpkin_seeds",
+        "amount": 12,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Set out the ingredients and any containers for assembly.",
+      "Combine Greek yogurt and Mixed berries in a bowl, jar, or on a board for assembly.",
+      "Stir in Greek yogurt and mix until everything is evenly coated.",
+      "Finish with any toppings and serve, or chill until ready to eat."
+    ],
+    "proteinType": "mixed",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:greek-yogurt-protein-pot",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "harissa-chicken-bowl",
+    "version": 1,
+    "title": "Smoky Chicken Rice Bowl",
+    "description": "Smoky chicken, rice, tomatoes, and yogurt over spinach.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 30,
+    "macros": {
+      "calories": 529,
+      "protein": 55,
+      "carbs": 57,
+      "fat": 7
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 140,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Diced tomatoes",
+        "canonicalId": "tomato",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Greek yogurt",
+        "canonicalId": "milk",
+        "amount": 40,
+        "unit": "g",
+        "allergens": [
+          "milk"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Diced tomatoes, then wash Spinach.",
+      "Heat a pan over medium heat and add a small drizzle of oil.",
+      "Add Chicken breast to the pan and cook over medium heat for 4-8 minutes until cooked through.",
+      "Stir in Diced tomatoes and Spinach and cook briefly until just wilted.",
+      "Cook Brown rice until tender, then add it to the pan.",
+      "Stir in Greek yogurt, season to taste, and serve while hot."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:harissa-chicken-bowl",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "herbed-chicken-rice-plate",
+    "version": 1,
+    "title": "Herbed Chicken Rice Plate",
+    "description": "Chicken breast, brown rice, spinach, and tomatoes with herbs.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 20,
+    "macros": {
+      "calories": 418,
+      "protein": 46,
+      "carbs": 33,
+      "fat": 11
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 130,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 35,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Cherry tomatoes, then wash Spinach.",
+      "Heat a pan over medium heat and add a small drizzle of oil.",
+      "Add Chicken breast to the pan and cook over medium heat for 4-8 minutes until cooked through.",
+      "Stir in Spinach and Cherry tomatoes and cook briefly until just wilted.",
+      "Cook Brown rice until tender, then add it to the pan.",
+      "Stir in Olive oil, season to taste, and serve while hot."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:herbed-chicken-rice-plate",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "kimchi-fried-rice",
+    "version": 1,
+    "title": "Egg & Veg Fried Rice",
+    "description": "Brown rice stir-fried with mixed vegetables and eggs.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 17,
+    "macros": {
+      "calories": 466,
+      "protein": 22,
+      "carbs": 66,
+      "fat": 12
+    },
+    "ingredients": [
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 70,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Mixed vegetables",
+        "canonicalId": "unreviewed_mixed_vegetables",
+        "amount": 140,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Eggs",
+        "canonicalId": "egg",
+        "amount": 2,
+        "unit": "large",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Soy sauce",
+        "canonicalId": "soy_sauce",
+        "amount": 15,
+        "unit": "ml",
+        "allergens": [
+          "soy",
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Scallions",
+        "canonicalId": "scallions",
+        "amount": 30,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Scallions.",
+      "Heat a pan over medium heat and add a small drizzle of oil.",
+      "Crack the eggs into a bowl, season, whisk, then cook over medium-low heat for about 2 minutes until just set.",
+      "Stir in Scallions and cook briefly until just wilted.",
+      "Cook Brown rice until tender, then add it to the pan.",
+      "Season to taste, combine everything, and serve while hot."
+    ],
+    "proteinType": "mixed",
+    "image": "/images/meals/eggs.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:kimchi-fried-rice",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "lemon-chicken-rice-skillet",
+    "version": 1,
+    "title": "Lemon Chicken Rice Skillet",
+    "description": "Chicken breast, brown rice, spinach, and tomatoes with lemon.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 20,
+    "macros": {
+      "calories": 438,
+      "protein": 46,
+      "carbs": 40,
+      "fat": 11
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 130,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 35,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Lime",
+        "canonicalId": "lime",
+        "amount": 1,
+        "unit": "each",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Cherry tomatoes and Lime, then wash Spinach.",
+      "Heat a pan over medium heat and add a small drizzle of oil.",
+      "Add Chicken breast to the pan and cook over medium heat for 4-8 minutes until cooked through.",
+      "Stir in Spinach and Cherry tomatoes and cook briefly until just wilted.",
+      "Cook Brown rice until tender, then add it to the pan.",
+      "Stir in Olive oil, season to taste, and serve while hot."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:lemon-chicken-rice-skillet",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "lemongrass-tofu-bowl",
+    "version": 1,
+    "title": "Soy Ginger Tofu Bowls",
+    "description": "Quick tofu rice bowls with soy sauce, veg, and cucumber.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 22,
+    "macros": {
+      "calories": 510,
+      "protein": 28,
+      "carbs": 60,
+      "fat": 18
+    },
+    "ingredients": [
+      {
+        "name": "Extra-firm tofu",
+        "canonicalId": "tofu",
+        "amount": 200,
+        "unit": "g",
+        "allergens": [
+          "soy"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 70,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Soy sauce",
+        "canonicalId": "soy_sauce",
+        "amount": 15,
+        "unit": "ml",
+        "allergens": [
+          "soy",
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Mixed vegetables",
+        "canonicalId": "unreviewed_mixed_vegetables",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cucumber",
+        "canonicalId": "cucumber",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Cucumber.",
+      "Heat a pan over medium heat and add a small drizzle of oil.",
+      "Add Extra-firm tofu to the pan and cook over medium heat for 4-8 minutes until cooked through.",
+      "Cook Brown rice until tender, then add it to the pan.",
+      "Season to taste, combine everything, and serve while hot."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:lemongrass-tofu-bowl",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "matcha-energizer",
+    "version": 1,
+    "title": "Berry Chia Energizer",
+    "description": "Quick oats, chia, and berries soaked in almond milk.",
+    "slots": [
+      "snack",
+      "breakfast"
+    ],
+    "servings": 1,
+    "readyInMinutes": 5,
+    "macros": {
+      "calories": 210,
+      "protein": 9,
+      "carbs": 18,
+      "fat": 11
+    },
+    "ingredients": [
+      {
+        "name": "Rolled oats",
+        "canonicalId": "oats",
+        "amount": 30,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Chia seeds",
+        "canonicalId": "chia_seeds",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Almond milk",
+        "canonicalId": "unreviewed_almond_milk",
+        "amount": 200,
+        "unit": "ml",
+        "allergens": [
+          "tree_nuts"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Mixed berries",
+        "canonicalId": "unreviewed_mixed_berries",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Honey",
+        "canonicalId": "unreviewed_honey",
+        "amount": 12,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Set out the ingredients and any containers for assembly.",
+      "Combine Rolled oats and Mixed berries in a bowl, jar, or on a board for assembly.",
+      "Stir in Almond milk and Honey and mix until everything is evenly coated.",
+      "Finish with any toppings and serve, or chill until ready to eat."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:matcha-energizer",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "miso-soba-salad",
+    "version": 1,
+    "title": "Tofu Rice Power Salad",
+    "description": "Tofu, brown rice, crunchy veg, and a simple soy dressing.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 20,
+    "macros": {
+      "calories": 480,
+      "protein": 24,
+      "carbs": 62,
+      "fat": 16
+    },
+    "ingredients": [
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 55,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Tofu",
+        "canonicalId": "tofu",
+        "amount": 180,
+        "unit": "g",
+        "allergens": [
+          "soy"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Mixed vegetables",
+        "canonicalId": "unreviewed_mixed_vegetables",
+        "amount": 140,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Soy sauce",
+        "canonicalId": "soy_sauce",
+        "amount": 15,
+        "unit": "ml",
+        "allergens": [
+          "soy",
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Rice vinegar",
+        "canonicalId": "rice_vinegar",
+        "amount": 15,
+        "unit": "ml",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Prep the ingredients that need chopping so everything is ready to cook.",
+      "Combine Tofu, Brown rice, and Rice vinegar in a bowl, jar, or on a board for assembly.",
+      "Stir in Rice vinegar and mix until everything is evenly coated.",
+      "Finish with any toppings and serve, or chill until ready to eat."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/salad.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:miso-soba-salad",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "sheet-pan-fajitas",
+    "version": 1,
+    "title": "Sheet-Pan Fajitas",
+    "description": "Fiery chicken, peppers, and onions with lime yogurt.",
+    "slots": [
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 590,
+      "protein": 48,
+      "carbs": 45,
+      "fat": 24
+    },
+    "ingredients": [
+      {
+        "name": "Chicken thighs",
+        "canonicalId": "unreviewed_chicken_thighs",
+        "amount": 320,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Bell peppers",
+        "canonicalId": "pepper",
+        "amount": 180,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Red onion",
+        "canonicalId": "unreviewed_red_onion",
+        "amount": 70,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Tortillas",
+        "canonicalId": "unreviewed_tortillas",
+        "amount": 3,
+        "unit": "piece",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Greek yogurt",
+        "canonicalId": "milk",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [
+          "milk"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Preheat the oven to 210°C.",
+      "Slice Bell peppers and Red onion.",
+      "Arrange Chicken thighs on a lined tray, drizzle with oil, season, and spread into a single layer.",
+      "Roast for 18 minutes until cooked through and lightly golden.",
+      "Rest for 2 minutes, then plate and finish with Greek yogurt."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/plate.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:sheet-pan-fajitas",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "smoky-bean-pea-bowl",
+    "version": 1,
+    "title": "Smoky Bean & Pea Protein Bowl",
+    "description": "Smoky Bean & Pea Protein Bowl, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 18,
+    "macros": {
+      "calories": 729,
+      "protein": 65,
+      "carbs": 95,
+      "fat": 10
+    },
+    "ingredients": [
+      {
+        "name": "Pea protein",
+        "canonicalId": "unreviewed_pea_protein",
+        "amount": 55,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Black beans",
+        "canonicalId": "black_beans",
+        "amount": 170,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 45,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Diced tomatoes",
+        "canonicalId": "tomato",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Bell peppers",
+        "canonicalId": "pepper",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Cook the brown rice according to the packet directions.",
+      "Warm the beans, tomatoes and pepper in a pan with the oil until piping hot.",
+      "Whisk the pea protein with a little cold water, stir it through the bean mixture, then spoon over the rice."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:smoky-bean-pea-bowl",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "spinach-egg-white-scramble",
+    "version": 1,
+    "title": "Spinach Egg Scramble",
+    "description": "Spinach Egg Scramble, made with everyday ingredients.",
+    "slots": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "readyInMinutes": 12,
+    "macros": {
+      "calories": 205,
+      "protein": 25,
+      "carbs": 7,
+      "fat": 9
+    },
+    "ingredients": [
+      {
+        "name": "Egg whites",
+        "canonicalId": "egg",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Eggs",
+        "canonicalId": "egg",
+        "amount": 1,
+        "unit": "large",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 3,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Whisk the egg whites and whole egg together.",
+      "Heat the oil in a non-stick pan. Add halved tomatoes and spinach; cook for 2 minutes.",
+      "Add the eggs and gently stir over medium heat until fully set throughout. Serve immediately."
+    ],
+    "proteinType": "mixed",
+    "image": "/images/meals/eggs.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:spinach-egg-white-scramble",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "sunrise-egg-wrap",
+    "version": 1,
+    "title": "Sunrise Egg Wrap",
+    "description": "Scrambled eggs, smashed avocado, and veggies tucked into a whole-grain wrap.",
+    "slots": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "readyInMinutes": 12,
+    "macros": {
+      "calories": 422,
+      "protein": 27,
+      "carbs": 36,
+      "fat": 19
+    },
+    "ingredients": [
+      {
+        "name": "Eggs",
+        "canonicalId": "egg",
+        "amount": 3,
+        "unit": "large",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Whole-grain wrap",
+        "canonicalId": "wheat",
+        "amount": 1,
+        "unit": "piece",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Avocado",
+        "canonicalId": "avocado",
+        "amount": 0.5,
+        "unit": "each",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 40,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Crack eggs into a bowl, season with salt and pepper, whisk briefly.",
+      "Heat a non-stick pan on medium with a drop of oil.",
+      "Pour in eggs, stir gently until just set (about 2 minutes).",
+      "Warm the wrap in the same pan for 30 seconds.",
+      "Spread mashed avocado down the centre of the wrap.",
+      "Add spinach, scrambled eggs, and halved cherry tomatoes. Roll up and eat."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/wrap.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:sunrise-egg-wrap",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "thai-crunch-salad",
+    "version": 1,
+    "title": "Crunch Chicken Salad",
+    "description": "Shredded cabbage and carrots with chicken and light peanut dressing.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 18,
+    "macros": {
+      "calories": 430,
+      "protein": 38,
+      "carbs": 24,
+      "fat": 22
+    },
+    "ingredients": [
+      {
+        "name": "Chicken breast",
+        "canonicalId": "chicken",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Cabbage",
+        "canonicalId": "cabbage",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Carrots",
+        "canonicalId": "carrots",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Peanut butter",
+        "canonicalId": "peanut",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [
+          "peanuts"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 40,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Carrots, then wash Cabbage.",
+      "Combine Chicken breast, Brown rice, Cabbage, and Carrots in a bowl, jar, or on a board for assembly.",
+      "Stir in Peanut butter and mix until everything is evenly coated.",
+      "Finish with any toppings and serve, or chill until ready to eat."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/salad.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:thai-crunch-salad",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "tofu-broccoli-rice-bowl",
+    "version": 1,
+    "title": "Tofu Broccoli Rice Bowl",
+    "description": "Tofu Broccoli Rice Bowl, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 526,
+      "protein": 52,
+      "carbs": 28,
+      "fat": 27
+    },
+    "ingredients": [
+      {
+        "name": "Extra-firm tofu",
+        "canonicalId": "tofu",
+        "amount": 270,
+        "unit": "g",
+        "allergens": [
+          "soy"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Broccoli",
+        "canonicalId": "broccoli",
+        "amount": 160,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Carrots",
+        "canonicalId": "carrots",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Soy sauce",
+        "canonicalId": "soy_sauce",
+        "amount": 10,
+        "unit": "ml",
+        "allergens": [
+          "soy",
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Cube the tofu and pan-fry in the oil until golden on every side.",
+      "Add broccoli, carrot and soy sauce.",
+      "Cook until tender and serve."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:tofu-broccoli-rice-bowl",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "tofu-noodle-stir-fry",
+    "version": 1,
+    "title": "Tofu Noodle Stir-Fry",
+    "description": "Tofu Noodle Stir-Fry, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 502,
+      "protein": 49,
+      "carbs": 22,
+      "fat": 27
+    },
+    "ingredients": [
+      {
+        "name": "Extra-firm tofu",
+        "canonicalId": "tofu",
+        "amount": 270,
+        "unit": "g",
+        "allergens": [
+          "soy"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cabbage",
+        "canonicalId": "cabbage",
+        "amount": 130,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Bell peppers",
+        "canonicalId": "pepper",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Soy sauce",
+        "canonicalId": "soy_sauce",
+        "amount": 10,
+        "unit": "ml",
+        "allergens": [
+          "soy",
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Pan-fry the cubed tofu in the oil until golden.",
+      "Add the vegetables and soy sauce.",
+      "Stir-fry until tender and serve."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/pasta.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:tofu-noodle-stir-fry",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "tofu-tomato-pasta",
+    "version": 1,
+    "title": "Tofu Tomato Pasta",
+    "description": "Tofu Tomato Pasta, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 25,
+    "macros": {
+      "calories": 501,
+      "protein": 50,
+      "carbs": 21,
+      "fat": 27
+    },
+    "ingredients": [
+      {
+        "name": "Extra-firm tofu",
+        "canonicalId": "tofu",
+        "amount": 270,
+        "unit": "g",
+        "allergens": [
+          "soy"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Diced tomatoes",
+        "canonicalId": "tomato",
+        "amount": 180,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Crumble the tofu and cook in the oil until lightly golden.",
+      "Add tomatoes and spinach.",
+      "Simmer for 8 minutes and serve."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/pasta.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:tofu-tomato-pasta",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "turkey-bean-lettuce-wraps",
+    "version": 1,
+    "title": "Turkey & Bean Wraps",
+    "description": "Turkey & Bean Wraps, made with everyday ingredients.",
+    "slots": [
+      "lunch",
+      "dinner"
+    ],
+    "servings": 1,
+    "readyInMinutes": 12,
+    "macros": {
+      "calories": 438,
+      "protein": 37,
+      "carbs": 44,
+      "fat": 14
+    },
+    "ingredients": [
+      {
+        "name": "Roast turkey slices",
+        "canonicalId": "turkey",
+        "amount": 110,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Black beans",
+        "canonicalId": "black_beans",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Tortillas",
+        "canonicalId": "unreviewed_tortillas",
+        "amount": 1,
+        "unit": "piece",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cucumber",
+        "canonicalId": "cucumber",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 8,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Drain and rinse the cooked tinned black beans. Wash and chop the vegetables and toss with the measured oil.",
+      "Warm the tortilla in a dry pan and heat the beans until piping hot.",
+      "Fill the tortilla with beans, ready-to-eat turkey slices and vegetables, fold and serve."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/wrap.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:turkey-bean-lettuce-wraps",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "turkey-cottage-snack-plate",
+    "version": 1,
+    "title": "Turkey & Cottage Snack Plate",
+    "description": "Lean turkey slices, cottage cheese, and crunchy cucumbers.",
+    "slots": [
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 6,
+    "macros": {
+      "calories": 250,
+      "protein": 31,
+      "carbs": 9,
+      "fat": 10
+    },
+    "ingredients": [
+      {
+        "name": "Roast turkey slices",
+        "canonicalId": "turkey",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Cottage cheese",
+        "canonicalId": "milk",
+        "amount": 150,
+        "unit": "g",
+        "allergens": [
+          "milk"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Cucumber",
+        "canonicalId": "cucumber",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 8,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Preheat the oven to 210°C.",
+      "Slice Cucumber.",
+      "Arrange Roast turkey slices on a lined tray, drizzle with oil, season, and spread into a single layer.",
+      "Roast for 12 minutes until cooked through and lightly golden.",
+      "Rest for 2 minutes, then plate and serve."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:turkey-cottage-snack-plate",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "turkey-cucumber-rolls",
+    "version": 1,
+    "title": "Turkey Cucumber Rolls",
+    "description": "Turkey Cucumber Rolls, made with everyday ingredients.",
+    "slots": [
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 8,
+    "macros": {
+      "calories": 184,
+      "protein": 23,
+      "carbs": 12,
+      "fat": 6
+    },
+    "ingredients": [
+      {
+        "name": "Roast turkey slices",
+        "canonicalId": "turkey",
+        "amount": 90,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Cucumber",
+        "canonicalId": "cucumber",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Carrots",
+        "canonicalId": "carrots",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olives",
+        "canonicalId": "unreviewed_olives",
+        "amount": 25,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Wash the vegetables. Cut the cucumber and carrot into thin sticks.",
+      "Wrap the ready-to-eat turkey slices around the vegetable sticks. Serve with the olives.",
+      "Keep refrigerated if preparing ahead."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:turkey-cucumber-rolls",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "turkey-pepper-omelette",
+    "version": 1,
+    "title": "Turkey & Pepper Omelette",
+    "description": "Turkey & Pepper Omelette, made with everyday ingredients.",
+    "slots": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "readyInMinutes": 15,
+    "macros": {
+      "calories": 260,
+      "protein": 33,
+      "carbs": 9,
+      "fat": 10
+    },
+    "ingredients": [
+      {
+        "name": "Egg whites",
+        "canonicalId": "egg",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [
+          "eggs"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [
+          "animal_product"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Roast turkey slices",
+        "canonicalId": "turkey",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Bell peppers",
+        "canonicalId": "pepper",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Scallions",
+        "canonicalId": "scallions",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 8,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Dice the pepper and slice the spring onions and ready-to-eat turkey.",
+      "Heat the oil in a non-stick pan and soften the pepper and onions for 4 minutes.",
+      "Add the turkey and egg whites. Cook gently until the egg is set throughout, then fold the omelette and serve."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/eggs.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:turkey-pepper-omelette",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "turkey-rice-breakfast-bowl",
+    "version": 1,
+    "title": "Turkey Rice Breakfast Bowl",
+    "description": "Lean turkey slices with brown rice, spinach, and tomatoes.",
+    "slots": [
+      "breakfast"
+    ],
+    "servings": 1,
+    "readyInMinutes": 35,
+    "macros": {
+      "calories": 307,
+      "protein": 46,
+      "carbs": 22,
+      "fat": 4
+    },
+    "ingredients": [
+      {
+        "name": "Roast turkey slices",
+        "canonicalId": "turkey",
+        "amount": 180,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Brown rice",
+        "canonicalId": "rice",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Spinach",
+        "canonicalId": "spinach",
+        "amount": 30,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Rinse the measured dry brown rice. Add to a saucepan with plenty of boiling water and simmer for 25–30 minutes, until tender. Drain any remaining water.",
+      "While the rice cooks, wash the spinach and halve the cherry tomatoes. Slice the ready-to-eat roast turkey slices into strips.",
+      "Stir the spinach into the hot drained rice until wilted, then add the tomatoes and cooked turkey slices. Serve immediately."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/bowl.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:turkey-rice-breakfast-bowl",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "turkey-tomato-snack-box",
+    "version": 1,
+    "title": "Turkey Tomato Snack Box",
+    "description": "Lean turkey with tomatoes, cucumber, oats, and olive oil.",
+    "slots": [
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 10,
+    "macros": {
+      "calories": 343,
+      "protein": 43,
+      "carbs": 23,
+      "fat": 10
+    },
+    "ingredients": [
+      {
+        "name": "Roast turkey slices",
+        "canonicalId": "turkey",
+        "amount": 160,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [
+          "meat"
+        ],
+        "reviewed": false
+      },
+      {
+        "name": "Rolled oats",
+        "canonicalId": "oats",
+        "amount": 20,
+        "unit": "g",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cucumber",
+        "canonicalId": "cucumber",
+        "amount": 100,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olive oil",
+        "canonicalId": "olive_oil",
+        "amount": 5,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Put the rolled oats in a small saucepan with enough water to cover. Simmer gently for 5 minutes, stirring and adding a little water as needed, until soft.",
+      "Wash and slice the cucumber and cherry tomatoes. Cut the ready-to-eat roast turkey slices into strips.",
+      "Stir the olive oil into the savoury oats and serve alongside the turkey, cucumber, and tomatoes. If packing ahead, cool promptly and refrigerate until ready to eat."
+    ],
+    "proteinType": "poultry",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:turkey-tomato-snack-box",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "vanilla-berry-pea-shake",
+    "version": 1,
+    "title": "Vanilla Berry Pea Protein Shake",
+    "description": "Vanilla Berry Pea Protein Shake, made with everyday ingredients.",
+    "slots": [
+      "breakfast",
+      "snack"
+    ],
+    "servings": 1,
+    "readyInMinutes": 5,
+    "macros": {
+      "calories": 371,
+      "protein": 50,
+      "carbs": 39,
+      "fat": 4
+    },
+    "ingredients": [
+      {
+        "name": "Pea protein",
+        "canonicalId": "unreviewed_pea_protein",
+        "amount": 60,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Mixed berries",
+        "canonicalId": "unreviewed_mixed_berries",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Banana",
+        "canonicalId": "banana",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Water",
+        "canonicalId": "water",
+        "amount": 300,
+        "unit": "ml",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Add the water, pea protein, berries and banana to a blender.",
+      "Blend until completely smooth.",
+      "Serve immediately or keep chilled for up to one day."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/plate.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:vanilla-berry-pea-shake",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  },
+  {
+    "id": "white-bean-snack-box",
+    "version": 1,
+    "title": "White Bean Snack Box",
+    "description": "Mashed white beans, veggies, olives, and whole-grain wrap wedges.",
+    "slots": [
+      "snack",
+      "lunch"
+    ],
+    "servings": 1,
+    "readyInMinutes": 8,
+    "macros": {
+      "calories": 320,
+      "protein": 12,
+      "carbs": 32,
+      "fat": 16
+    },
+    "ingredients": [
+      {
+        "name": "Mashed white beans",
+        "canonicalId": "unreviewed_mashed_white_beans",
+        "amount": 120,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cucumber",
+        "canonicalId": "cucumber",
+        "amount": 80,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Cherry tomatoes",
+        "canonicalId": "tomato",
+        "amount": 70,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Olives",
+        "canonicalId": "unreviewed_olives",
+        "amount": 40,
+        "unit": "g",
+        "allergens": [],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      },
+      {
+        "name": "Whole-grain wrap",
+        "canonicalId": "wheat",
+        "amount": 0.5,
+        "unit": "piece",
+        "allergens": [
+          "gluten"
+        ],
+        "mayContain": [],
+        "dietaryFlags": [],
+        "reviewed": false
+      }
+    ],
+    "steps": [
+      "Slice Cucumber and Cherry tomatoes.",
+      "Warm Whole-grain wrap briefly so they are soft and easy to fold.",
+      "Combine Mashed white beans, Whole-grain wrap, Cucumber, and Cherry tomatoes in a bowl, jar, or on a board for assembly.",
+      "Mix gently until evenly combined.",
+      "Fill the warm Whole-grain wrap, roll or fold, and serve."
+    ],
+    "proteinType": "plant",
+    "image": "/images/meals/snack.svg",
+    "source": {
+      "kind": "internal",
+      "reference": "Ovona internal catalogue:white-bean-snack-box",
+      "rights": "Internal draft; ownership and usage rights require review",
+      "reviewed": false
+    },
+    "nutrition": {
+      "method": "estimated_internal_ingredient_baselines",
+      "reference": "frontend-new/lib/meal-generator.ts; estimates require measured-source review",
+      "reviewed": false
+    },
+    "review": {
+      "status": "pending_review",
+      "reviewedBy": null,
+      "reviewedAt": null
+    }
+  }
+]

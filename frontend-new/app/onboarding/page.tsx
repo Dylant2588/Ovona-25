@@ -21,6 +21,9 @@ import {
   Typography,
 } from "@mui/material";
 import { supabase } from "@/lib/supabaseClient";
+import { OnboardingSessionChangedError, saveOnboardingPreferences } from "@/lib/onboarding-preferences";
+import { allergyOptionSelected, toggleAllergyOption } from "@/lib/allergy-options";
+import { foodPreferencesWithDrafts } from "@/lib/preference-drafts";
 import {
   readOnboardingMeta,
   writeOnboardingMeta,
@@ -353,11 +356,7 @@ export default function OnboardingPage() {
     parseNumber(heightCm) !== null;
 
   const toggleAllergy = (allergy: string) => {
-    setAllergies((prev) =>
-      prev.includes(allergy)
-        ? prev.filter((item) => item !== allergy)
-        : uniqueStrings([...prev, allergy])
-    );
+    setAllergies((prev) => toggleAllergyOption(prev, allergy));
   };
 
   const addDislike = (value: string) => {
@@ -399,7 +398,10 @@ export default function OnboardingPage() {
     const chosenGoal = (useDefaults ? "maintain" : goal) as GoalKey;
     const chosenDietaryMode = useDefaults ? "mixed" : dietaryMode;
     const chosenAllergies = useDefaults ? [] : uniqueStrings(allergies);
-    const chosenDislikes = useDefaults ? [] : uniqueStrings(dislikes);
+    const chosenDislikes = useDefaults ? [] : foodPreferencesWithDrafts(
+      { dislikes, neverFoods: [], foodLikes: [] },
+      { dislikeInput, neverFoodInput: "", foodLikeInput: "" },
+    ).dislikes;
     const chosenCookingTime = useDefaults ? DEFAULT_SKIP_META.cookingTime! : cookingTime;
     const chosenMealsPerDay = useDefaults ? DEFAULT_SKIP_META.mealsPerDay! : mealsPerDay;
 
@@ -416,12 +418,10 @@ export default function OnboardingPage() {
     const profileNotesValue = writeOnboardingMeta(profileNotes, profileMeta);
     const nextRoute = useDefaults ? "/meals?onboarding=skipped" : "/meals?onboarding=ready";
 
-    const preferenceResponse = await fetch("/api/preferences", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    let preferenceResponse: Response;
+    try {
+      if (userId !== user.id) throw new OnboardingSessionChangedError();
+      preferenceResponse = await saveOnboardingPreferences(supabase.auth, user.id, chosenCookingTime, {
         dietaryMode: chosenDietaryMode,
         allergies: chosenAllergies,
         dislikes: chosenDislikes,
@@ -437,13 +437,20 @@ export default function OnboardingPage() {
           activityLevel: profileActivity,
           notes: profileNotesValue,
         },
-      }),
-    });
+      });
+    } catch (error) {
+      setSaving(false);
+      setError(error instanceof OnboardingSessionChangedError
+        ? error.message
+        : "Could not save your preferences. Please try again.");
+      return;
+    }
     const preferencePayload = (await preferenceResponse
       .json()
       .catch(() => ({}))) as {
       ok?: boolean;
       error?: string;
+      message?: string;
       profileSaved?: boolean;
       allergiesSynced?: boolean;
     };
@@ -451,7 +458,11 @@ export default function OnboardingPage() {
     if (!preferenceResponse.ok || !preferencePayload.ok) {
       console.error("onboarding preferences save failed", preferencePayload.error);
       setSaving(false);
-      setError("Could not save your preferences. Please try again.");
+      setError(preferencePayload.error === "preferences_schema_unsupported"
+        ? (typeof preferencePayload.message === "string" && preferencePayload.message.trim()
+          ? preferencePayload.message
+          : "Your safety preferences could not be saved. Please try again after the service is updated.")
+        : "Could not save your preferences. Please try again.");
       return;
     }
 
@@ -692,7 +703,7 @@ export default function OnboardingPage() {
                           control={
                             <Checkbox
                               size="small"
-                              checked={allergies.includes(allergy)}
+                              checked={allergyOptionSelected(allergies, allergy)}
                               onChange={() => toggleAllergy(allergy)}
                             />
                           }

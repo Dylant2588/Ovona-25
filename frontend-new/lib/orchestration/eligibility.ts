@@ -15,6 +15,10 @@ export const isVerifiedCandidate = (candidate: unknown): candidate is VerifiedCa
     !isFiniteNonNegative(candidate.servings) || candidate.servings <= 0) {
     return false;
   }
+  if ((candidate.proteinFamilies !== undefined && (!isStringArray(candidate.proteinFamilies) || !candidate.proteinFamilies.length || candidate.proteinFamilies.length > 8)) ||
+      (candidate.proteinType !== undefined && (typeof candidate.proteinType !== "string" || !candidate.proteinType.trim())) ||
+      (candidate.recipeId !== undefined && (typeof candidate.recipeId !== "string" || !candidate.recipeId.trim())) ||
+      (candidate.recipeVersion !== undefined && (!Number.isSafeInteger(candidate.recipeVersion) || Number(candidate.recipeVersion) < 1))) return false;
 
   const nutrition = candidate.nutrition;
   if (![nutrition.calories, nutrition.protein, nutrition.carbs, nutrition.fat].every(isFiniteNonNegative) || !isFiniteNonNegative(nutrition.calories) || nutrition.calories <= 0) {
