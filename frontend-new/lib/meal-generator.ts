@@ -2984,12 +2984,7 @@ export const buildShoppingList = (plan: WeeklyMealPlan): ShoppingListItem[] => {
   // The shopping list is a pure ledger over the exact final ingredient JSON
   // saved on approved meals. No base recipe, inferred substitute, or portion
   // multiplier is consulted at this stage.
-  return buildFinalIngredientLedger(plan.days.flatMap((day) => day.meals))
-    .map((item) => ({
-      ...item,
-      quantity: Number(item.quantity.toFixed(4)),
-      amountNeeded: Number((item.amountNeeded ?? item.quantity).toFixed(4)),
-    }));
+  return buildFinalIngredientLedger(plan.days.flatMap((day) => day.meals));
 };
 
 export const normalizeShoppingList = async (
