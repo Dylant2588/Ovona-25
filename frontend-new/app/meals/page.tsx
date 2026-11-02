@@ -4,6 +4,9 @@
 
 import NextLink from "next/link";
 import { planForPreferenceSnapshot } from "@/lib/plan-preference-snapshot";
+import { ingredientLedgerKey } from "@/lib/ingredient-ledger";
+import { shoppingMealSources, shoppingSourceLabel } from "@/lib/shopping-provenance";
+import { reviewedMethodForDisplay } from "@/lib/reviewed-method";
 import { MealThumbnail } from "@/components/MealThumbnail";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -586,6 +589,9 @@ const normalizeSteps = (value: unknown) =>
     : [];
 
 const resolveRecipeSteps = (meal: PlanMeal) => {
+  // Reviewed methods are evidence, not legacy generated prose to filter.
+  const reviewedSteps = reviewedMethodForDisplay(meal);
+  if (reviewedSteps !== null) return reviewedSteps;
   const steps = sanitizeRecipeSteps(
     normalizeSteps((meal as PlanMeal & { steps?: string[] }).steps)
   );
@@ -678,7 +684,6 @@ function MealsPageContent() {
   const [planLoading, setPlanLoading] = useState(true);
   const [planLoadingElapsedMs, setPlanLoadingElapsedMs] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [normalizedList, setNormalizedList] = useState<ShoppingListItem[] | null>(null);
   const [normalizingList, setNormalizingList] = useState(false);
   const [shoppingListError, setShoppingListError] = useState<string | null>(null);
   const [shoppingReloadToken, setShoppingReloadToken] = useState(0);
@@ -1889,7 +1894,6 @@ function MealsPageContent() {
 
   useEffect(() => {
     if (!plan || !shoppingList.length) {
-      setNormalizedList([]);
       setBasketPricing(null);
       setPriceComparison(null);
       setNormalizingList(false);
@@ -1897,7 +1901,6 @@ function MealsPageContent() {
       return;
     }
     if (authLoading || !userId) {
-      setNormalizedList(shoppingList);
       setBasketPricing(null);
       setPriceComparison(null);
       setNormalizingList(false);
@@ -1930,10 +1933,8 @@ function MealsPageContent() {
             priceComparison?: RetailerComparison;
           };
           if (active) {
-            const resolvedItems = data.items ?? shoppingList;
-            setNormalizedList(resolvedItems);
             setBasketPricing(null);
-            setPriceComparison(data.priceComparison ?? null);
+            setPriceComparison(data.planId === plan.id ? data.priceComparison ?? null : null);
             setNormalizingList(false);
             return;
           }
@@ -1946,7 +1947,6 @@ function MealsPageContent() {
       }
 
       if (active) {
-        setNormalizedList(shoppingList);
         setBasketPricing(null);
         setPriceComparison(null);
         setNormalizingList(false);
@@ -1977,7 +1977,10 @@ function MealsPageContent() {
     userId,
   ]);
 
-  const displayShoppingList = normalizedList?.length ? normalizedList : shoppingList;
+  // Quantities always come from the meals on screen, even during requests or
+  // failures. Server responses provide pricing only, never a replacement basket.
+  const displayShoppingList = shoppingList;
+  const shoppingSources = useMemo(() => shoppingMealSources(displayDays), [displayDays]);
 
   const shoppingItemPrices = useMemo(() => {
     const keyToPrice = new Map<string, number | null>();
@@ -3246,6 +3249,7 @@ function MealsPageContent() {
                         {items.map((item) => {
                           const itemPrice = shoppingItemPrices.get(shoppingItemKey(item));
                           const displayLine = shoppingDisplayLine(item);
+                          const sources = shoppingSources.get(ingredientLedgerKey(item.name, item.unit)) ?? [];
                           return (
                             <Stack
                               key={shoppingItemKey(item)}
@@ -3257,9 +3261,12 @@ function MealsPageContent() {
                               <Typography fontWeight={600} sx={{ minWidth: 84 }}>
                                 {displayLine.amount}
                               </Typography>
-                              <Typography color="text.secondary" sx={{ flexGrow: 1 }}>
-                                {displayLine.name}
-                              </Typography>
+                              <Stack sx={{ flexGrow: 1 }}>
+                                <Typography color="text.secondary">{displayLine.name}</Typography>
+                                {sources.length > 0 && <Typography variant="caption" color="text.secondary">
+                                  Used in: {shoppingSourceLabel(sources)}
+                                </Typography>}
+                              </Stack>
                               <Typography
                                 variant="body2"
                                 sx={{ minWidth: 64, textAlign: "right", fontWeight: 600 }}
