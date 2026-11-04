@@ -3,6 +3,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import NextLink from "next/link";
+import { planAnchor, planCacheKey, planDayCount, type PlanScope } from "@/lib/plan-scope";
+import { matchesPlanPeriod } from "@/lib/plan-view";
 import { approvedShoppingItems } from "@/lib/shopping-approval";
 import { planForPreferenceSnapshot } from "@/lib/plan-preference-snapshot";
 import { ingredientLedgerKey } from "@/lib/ingredient-ledger";
@@ -477,7 +479,6 @@ const weekStartISO = (value: string) => {
   return date.toISOString().split("T")[0];
 };
 
-const storageKeyFor = (userId: string) => `ovona-meal-plan-${userId}`;
 const onboardingSkipKeyFor = (userId: string) => `ovona-onboarding-skipped-${userId}`;
 const onboardingMetaKeyFor = (userId: string) => `ovona-onboarding-meta-${userId}`;
 const readOnboardingMetaFromStorage = (userId: string): OnboardingMeta | null => {
@@ -676,6 +677,11 @@ function MealsPageContent() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const router = useRouter();
   const searchParams = useSearchParams();
+  const planningScope: PlanScope = searchParams.get("scope") === "week" ? "week" : "day";
+  const planningAnchor = planAnchor(planningScope, new Date().toISOString());
+  const periodDays = planDayCount(planningScope);
+  const planningScopeRef = useRef(planningScope);
+  useEffect(() => { planningScopeRef.current = planningScope; }, [planningScope]);
   const { user, loading: authLoading } = useAuth();
   const userId = user?.id ?? null;
   const [preferences, setPreferences] = useState<PreferencesInput | null>(null);
@@ -983,6 +989,8 @@ function MealsPageContent() {
           rotationHistory,
           mealHistory: mealHistorySummary,
           requireDifferent,
+          scope: planningScope,
+          date: planningAnchor,
         }),
         signal: controller.signal,
       });
@@ -1215,12 +1223,13 @@ function MealsPageContent() {
     if (typeof window === "undefined") return;
 
     const signature = preferenceSignature;
-    const key = storageKeyFor(userId);
+    const key = planCacheKey(userId, planningScope, planningAnchor);
     const cachedRaw = window.localStorage.getItem(key);
     let cachedPlan: WeeklyMealPlan | null = null;
     if (cachedRaw) {
       try {
         cachedPlan = JSON.parse(cachedRaw) as WeeklyMealPlan;
+        if (!matchesPlanPeriod(cachedPlan, userId, planningScope, planningAnchor)) cachedPlan = null;
       } catch {
         cachedPlan = null;
       }
@@ -1240,9 +1249,10 @@ function MealsPageContent() {
 
       // Try stored plan on server first to keep state across devices
       try {
-        const storedPayload = await fetchStoredPlan(weekStartISO(new Date().toISOString()));
+        const storedPayload = await fetchStoredPlan(planningAnchor);
+        if (canceled) return;
         if (
-          storedPayload?.plan &&
+          storedPayload?.plan && matchesPlanPeriod(storedPayload.plan, userId, planningScope, planningAnchor) &&
           (!signature || storedPayload.plan.preferenceSignature === signature)
         ) {
           const storedEnforced = storedPayload.enforcement
@@ -1265,7 +1275,7 @@ function MealsPageContent() {
           setEnforcement(storedEnforced.enforcement);
           setError(planHasSocialMeal(storedEnforced.plan)
             ? "This plan includes a meal out. Its nutrition is intentionally unverified and its ingredients are excluded from your shopping list."
-            : "Saved plan: ingredient and allergy checks have not been verified against the reviewed recipe library. Generate a checked plan when the library is ready.");
+            : "Saved plan loaded. Ingredient and allergy checks are being refreshed before showing the shopping list.");
           setPlanLoading(false);
           setLoadingStepIndex(LOADING_STEPS.length);
           console.log("Meal plan load", {
@@ -1275,6 +1285,7 @@ function MealsPageContent() {
           return;
         }
       } catch (error) {
+        if (canceled) return;
         console.error("Failed to load plan from server", error);
         showToast("Couldn't load your saved plan. Generate a new one when you're ready.", "error");
       }
@@ -1318,7 +1329,7 @@ function MealsPageContent() {
     return () => {
       canceled = true;
     };
-  }, [preferences, preferenceSignature, userId]);
+  }, [preferences, preferenceSignature, userId, planningScope, planningAnchor]);
 
   const persistPlan = async (
     nextPlan: WeeklyMealPlan,
@@ -1341,9 +1352,14 @@ function MealsPageContent() {
         const rejected = await response.json() as { message?: string };
         throw new Error(rejected.message ?? "Recipe checks prevented saving. Your previous plan is unchanged.");
       }
-      window.localStorage.setItem(storageKeyFor(user.id), JSON.stringify(savedPlan));
+      const result = await response.json() as { plan?: WeeklyMealPlan };
+      if (planningScopeRef.current !== planningScope || !matchesPlanPeriod(result.plan, user.id, planningScope, planningAnchor)) {
+        throw new Error("The saved plan belongs to another planning period. Reload your current plan.");
+      }
+      const authoritativePlan = result.plan!;
+      window.localStorage.setItem(planCacheKey(user.id, planningScope, planningAnchor), JSON.stringify(authoritativePlan));
       if (signature) planSignatureRef.current = signature;
-      return savedPlan;
+      return authoritativePlan;
     } catch (error) {
       console.error("Failed to persist plan state", error);
       showToast("Couldn't save your latest plan changes. Try again.", "error", {
@@ -1359,7 +1375,7 @@ function MealsPageContent() {
   const fetchStoredPlan = async (weekStart: string) => {
     try {
       const response = await authFetchWithRetry(
-        `/api/meal-plan/state?weekStart=${weekStart}`
+        `/api/meal-plan/state?weekStart=${weekStart}&scope=${planningScope}`
       );
       if (!response.ok) return null;
       const data = (await response.json()) as {
@@ -1485,14 +1501,14 @@ function MealsPageContent() {
     const rotationHistory = rotationHistoryFromPlan(plan);
     try {
       setLoadingStepIndex(1);
-      const aiResponse = await fetchPlanFromAi(rotationHistory, undefined, true);
+      const aiResponse = await fetchPlanFromAi(rotationHistory, undefined, !!plan);
       const aiPlan = aiResponse.plan;
       const savedPlan = await persistPlan(aiPlan, preferenceSignature, aiResponse.enforcement ?? null);
       setPlan(savedPlan ?? aiPlan);
       setEnforcement(aiResponse.enforcement);
       setError(null);
       setLoadingStepIndex(LOADING_STEPS.length);
-      showToast("Week regenerated.", "success");
+      showToast(planningScope === "day" ? "Day generated." : "Week regenerated.", "success");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Reviewed recipes are not ready yet. Your existing plan is unchanged.";
       setError(message);
@@ -1812,25 +1828,25 @@ function MealsPageContent() {
     return {
       calories:
         typeof macroTargets.calories === "number"
-          ? macroTargets.calories * WORKDAY_COUNT
+          ? macroTargets.calories * periodDays
           : null,
       protein:
         typeof macroTargets.protein === "number"
-          ? macroTargets.protein * WORKDAY_COUNT
+          ? macroTargets.protein * periodDays
           : null,
       carbs:
         typeof macroTargets.carbs === "number"
-          ? macroTargets.carbs * WORKDAY_COUNT
+          ? macroTargets.carbs * periodDays
           : null,
       fat:
-        typeof macroTargets.fat === "number" ? macroTargets.fat * WORKDAY_COUNT : null,
+        typeof macroTargets.fat === "number" ? macroTargets.fat * periodDays : null,
     };
-  }, [macroTargets]);
+  }, [macroTargets, periodDays]);
 
   const displayDays = useMemo(() => {
     if (!plan) return [];
-    return plan.days.slice(0, WORKDAY_COUNT);
-  }, [plan]);
+    return plan.days.slice(0, periodDays);
+  }, [plan, periodDays]);
 
   const workweekTotals = useMemo<MacroBreakdown>(
     () => sumMacroBreakdowns(displayDays.map((day) => day.totals)),
@@ -1881,9 +1897,10 @@ function MealsPageContent() {
   const weekRange = useMemo(() => {
     if (!plan) return "";
     const start = new Date(plan.weekStart);
-    const end = addDays(start, WORKDAY_COUNT - 1);
+    if (planningScope === "day") return start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const end = addDays(start, periodDays - 1);
     return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${end.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
-  }, [plan]);
+  }, [plan, planningScope, periodDays]);
 
   const shoppingList = useMemo<ShoppingListItem[]>(() => {
     if (!plan) return [];
@@ -1939,6 +1956,7 @@ function MealsPageContent() {
             setBasketPricing(null);
             setPriceComparison(data.planId === plan.id ? data.priceComparison ?? null : null);
             setShoppingApproval(data.planId === plan.id ? { plan, preferences } : null);
+            if (data.planId === plan.id) setError(previous => previous === "Saved plan loaded. Ingredient and allergy checks are being refreshed before showing the shopping list." ? null : previous);
             setNormalizingList(false);
             return;
           }
@@ -2127,11 +2145,19 @@ function MealsPageContent() {
             Your plan
           </Typography>
           <Typography variant="h3" component="h1" fontWeight={700} gutterBottom sx={{ fontSize: { xs: "1.7rem", md: "2rem" }, letterSpacing: "-0.04em", lineHeight: 1.15 }}>
-            Your meal plan
+            {planningScope === "day" ? "Your day of meals" : "Your weekly meal plan"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Meals planned around your goals and the time you have.
           </Typography>
+          <Stack direction="row" spacing={1} role="group" aria-label="Planning period" sx={{ mt: 1.5 }}>
+            {(["day", "week"] as const).map(scope => <Button key={scope} size="small" variant={planningScope === scope ? "contained" : "outlined"} aria-pressed={planningScope === scope} disabled={planLoading || regeneratingWeek || preferencesSaving || swappingMealId !== null || regeneratingDayIndex !== null} onClick={() => {
+              if (scope === planningScope) return;
+              setPlan(null); setEnforcement(null); setShoppingApproval(null); setError(null); setPlanLoading(true);
+              const params = new URLSearchParams(searchParams.toString()); params.set("scope", scope);
+              router.replace(`/meals?${params.toString()}`, { scroll: false });
+            }}>{scope === "day" ? "One day" : "Full week"}</Button>)}
+          </Stack>
           {!plan && preferenceTastes.length > 0 && (
             <Stack direction="row" spacing={1} mt={2} flexWrap="wrap" useFlexGap>
               {preferenceTastes.slice(0, 4).map((taste) => (
@@ -2208,7 +2234,7 @@ function MealsPageContent() {
             onClick={handleRegenerate}
             disabled={regeneratingWeek || planLoading}
           >
-            {regeneratingWeek ? "Regenerating week..." : "Make a new plan"}
+            {regeneratingWeek ? "Generating meals..." : planningScope === "day" ? "Make a daily plan" : "Make a new week"}
           </Button>
         </Stack>
       </Stack>
@@ -2341,7 +2367,7 @@ function MealsPageContent() {
             <Stack spacing={2}>
               <Typography variant="h5">{error?.includes("no longer meets") ? "Your plan needs a refresh" : "Generate your first meal plan"}</Typography>
               <Typography color="text.secondary">
-                Create a full week in one click, then swap or regenerate anything you want.
+                {planningScope === "day" ? "Create a day of practical meals, then swap anything you want." : "Create a full week, then swap or regenerate anything you want."}
               </Typography>
               <Button
                 variant="contained"
@@ -2870,7 +2896,7 @@ function MealsPageContent() {
           </Stack>
           <Accordion disableGutters sx={{ border: "1px solid rgba(255,255,255,0.08)", bgcolor: "rgba(10,14,26,0.7)", borderRadius: 3, "&:before": { display: "none" } }}>
             <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />} sx={{ px: { xs: 2, md: 3 }, minHeight: 64 }}>
-              <Typography fontWeight={600}>Nutrition details · weekly totals and trends</Typography>
+              <Typography fontWeight={600}>{planningScope === "day" ? "Nutrition details · daily totals" : "Nutrition details · weekly totals and trends"}</Typography>
             </AccordionSummary>
             <AccordionDetails sx={{ px: { xs: 2, md: 3 }, pb: 3 }}>
           <Stack
@@ -2889,7 +2915,7 @@ function MealsPageContent() {
             >
               <CardHeader
                 avatar={<RestaurantMenuRoundedIcon color="secondary" />}
-                title="Weekly totals"
+                title={planningScope === "day" ? "Daily totals" : "Weekly totals"}
                 subheader={weekRange}
               />
               <CardContent>
@@ -2942,7 +2968,7 @@ function MealsPageContent() {
                               {total.toLocaleString()} {unitLabel}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                              {`Weekly: ${total.toLocaleString()} ${unitLabel} (avg ${average.toLocaleString()}/day)`}
+                              {`${planningScope === "day" ? "Daily" : "Weekly"}: ${total.toLocaleString()} ${unitLabel}${planningScope === "week" ? ` (avg ${average.toLocaleString()}/day)` : ""}`}
                             </Typography>
                             {typeof dailyTarget === "number" && (
                               <Typography variant="body2" color="text.secondary">
@@ -3173,7 +3199,7 @@ function MealsPageContent() {
                   width="100%"
                 >
                   <Stack spacing={0.5}>
-                    <Typography variant="h6">Weekly shopping list</Typography>
+                    <Typography variant="h6">{planningScope === "day" ? "Daily shopping list" : "Weekly shopping list"}</Typography>
                     <Typography variant="body2" color="text.secondary">
                       {displayShoppingList.length} unique items
                     </Typography>
