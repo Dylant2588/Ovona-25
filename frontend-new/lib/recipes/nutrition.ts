@@ -13,6 +13,43 @@ const macros = (value: unknown): value is RecipeMacros => object(value) && keys.
 const quantize = (value: number) => Math.abs(value) < 1e15 ? Math.round(value * 1e6) / 1e6 : value;
 const quantized = (value: RecipeMacros): RecipeMacros => Object.fromEntries(keys.map(key => [key, quantize(value[key])])) as RecipeMacros;
 
+export const MICRONUTRIENT_KEYS = ["calcium_mg", "iron_mg", "vitamin_c_mg"] as const;
+export type MicronutrientKey = typeof MICRONUTRIENT_KEYS[number];
+export type MicronutrientCoverage = {
+  unit: "mg"; status: "unknown" | "partial" | "complete";
+  knownSubtotal: number | null; amount: number | null;
+  knownIngredients: number; totalIngredients: number;
+};
+
+/** Optional nutrient projection shares source validation and quantity conversion with macro evidence.
+ * It deliberately does not change the immutable ingredient-v1 calculation payload.
+ */
+export function calculateRecipeMicronutrients(value: unknown): Record<MicronutrientKey, MicronutrientCoverage> {
+  const ingredients = object(value) && Array.isArray(value.ingredients) ? value.ingredients : [];
+  const servings = object(value) && positive(value.servings) ? value.servings : null;
+  return Object.fromEntries(MICRONUTRIENT_KEYS.map(key => {
+    let subtotal = 0; let known = 0;
+    for (const ingredient of ingredients) {
+      if (!servings || !object(ingredient)) continue;
+      // A one-line macro calculation exercises the existing exact source/basis/state checks.
+      const sourceCheck = calculateRecipeNutrition({ servings: 1, ingredients: [ingredient] });
+      if (!sourceCheck.ok) continue;
+      const evidence = ingredient.nutrition;
+      if (!object(evidence) || !object(evidence.food) || !object(evidence.food.micronutrients)) continue;
+      const nutrient = evidence.food.micronutrients[key];
+      if (typeof nutrient !== "number" || !Number.isFinite(nutrient) || nutrient < 0) continue;
+      const converted = convertIngredientQuantity(ingredient);
+      if (!converted.ok || !object(evidence.food.basis)) continue;
+      const amount = nutrient * (converted.sourceAmount / Number(evidence.food.basis.amount)) / servings;
+      if (!Number.isFinite(amount) || !Number.isFinite(subtotal + amount)) continue;
+      subtotal += amount; known++;
+    }
+    const status = known === 0 ? "unknown" : known === ingredients.length ? "complete" : "partial";
+    return [key, { unit: "mg", status, knownSubtotal: known ? quantize(subtotal) : null,
+      amount: status === "complete" ? quantize(subtotal) : null, knownIngredients: known, totalIngredients: ingredients.length }];
+  })) as Record<MicronutrientKey, MicronutrientCoverage>;
+}
+
 /** Pure offline calculation: source snapshots are stored inside the immutable recipe.
  * Batch quantities are summed at full precision; servings are applied exactly once.
  */

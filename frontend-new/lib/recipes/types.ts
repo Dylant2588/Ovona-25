@@ -3,6 +3,8 @@ export type FoodState = "raw" | "cooked" | "drained" | "cooked_drained" | "as_so
 export type FoodCompositionSnapshot = {
   id: string; revision: string; name: string; state: FoodState;
   basis: { amount: number; unit: "g" | "ml" | "each" }; macros: RecipeMacros;
+  /** Milligrams per the existing food basis. Missing values are not zero. */
+  micronutrients?: { calcium_mg?: number | null; iron_mg?: number | null; vitamin_c_mg?: number | null };
   source: { publisher: string; dataset: string; version: string; reference: string; retrievedAt: string; licence: string; foodCode: string };
 };
 export type QuantityConversionEvidence = {

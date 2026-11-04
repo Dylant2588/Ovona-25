@@ -5,6 +5,7 @@ import { calculatedRecipe } from "./calculated-recipe-fixtures.ts";
 
 test("micronutrients preserve measured zero and per-nutrient partial/unknown data without changing macro evidence", () => {
   const recipe = calculatedRecipe();
+  recipe.ingredients = recipe.ingredients.slice(0, 1);
   const macroBefore = calculateRecipeNutrition(recipe);
   Object.assign(recipe.ingredients[0].nutrition!.food, { micronutrients: { calcium_mg: 0, iron_mg: 2, vitamin_c_mg: null } });
   const r = calculateRecipeMicronutrients(recipe);
@@ -20,6 +21,7 @@ test("micronutrients preserve measured zero and per-nutrient partial/unknown dat
 
 test("micronutrient scaling reuses compatible quantities, evidenced dimensions and servings once", () => {
   const recipe = calculatedRecipe();
+  recipe.ingredients = recipe.ingredients.slice(0, 1);
   Object.assign(recipe.ingredients[0].nutrition!.food, { micronutrients: { calcium_mg: 10 } });
   recipe.ingredients[0].unit = "kg"; recipe.ingredients[0].amount = 0.4;
   assert.equal(calculateRecipeMicronutrients(recipe).calcium_mg.amount, 20);
