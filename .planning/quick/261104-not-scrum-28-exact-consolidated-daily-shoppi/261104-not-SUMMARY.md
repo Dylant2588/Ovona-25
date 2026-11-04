@@ -1,0 +1,3 @@
+
+## Parent mobile verification
+Actual390x844browser:approved17-item daily basket,ordereddepartments andrecipe-quantity-before-pack-rounding caption visible. Tapped chicken disclosure:262gusedin2meals revealedHerbedChickenRicePlateandChickenCucumberSnackBox. Savedshopping-mobile-proof.png;viewportreset. Full230tests0fail0skip,tscpass,lint0errors9existingwarnings. No merge/deploy. Existing7/8authorisedUIreusedandadoptedonlyasrequired28functionality;othercardsnotclosed.

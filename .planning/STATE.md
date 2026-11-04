@@ -80,6 +80,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261104-not | SCRUM-28 daily ledger/provenance, department UI and mobile disclosure; 230 tests passed | 2026-11-04 | c327bc8 | [261104-not](./quick/261104-not-scrum-28-exact-consolidated-daily-shoppi/) |
 | 261104-nb2 | SCRUM-27 macro goals and sourced partial micronutrients; 227 tests passed; complete-day adequacy remains unknown | 2026-11-04 | 730a4f1 | [261104-nb2](./quick/261104-nb2-scrum-27-daily-nutrition-targets-and-evi/) |
 | 261104-gbq | SCRUM-26 daily coverage: 38 reviewed recipes; supported hard/soft restriction witnesses; 220 tests passed; source-calculated gap explicit | 2026-11-04 | pending | [261104-gbq](./quick/261104-gbq-scrum-26-reviewed-daily-recipe-coverage-/) |
 | 261104-g05 | SCRUM-25 explicit daily scope, revision-first persistence, daily UI and live save/swap/reload; 216 tests passed | 2026-11-04 | fd4b18a | [261104-g05](./quick/261104-g05-scrum-25-explicit-one-day-generation-app/) |
