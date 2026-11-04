@@ -3,7 +3,7 @@ export const ALLERGENS = ["celery", "gluten", "crustaceans", "eggs", "fish", "lu
 const allergyAliases: Record<string, string[]> = {
   celery: ["celery", "celeriac"], gluten: ["gluten", "wheat", "barley", "rye", "oats", "cereals containing gluten"],
   crustaceans: ["crustaceans", "shellfish", "prawn", "prawns", "shrimp", "crab", "lobster"], eggs: ["egg", "eggs"],
-  fish: ["fish", "salmon", "tuna", "cod"], lupin: ["lupin", "lupine"], milk: ["milk", "dairy", "lactose", "whey"],
+  fish: ["fish", "salmon", "tuna", "cod"], lupin: ["lupin", "lupine"], milk: ["milk", "dairy", "lactose", "whey", "casein", "caseinate", "caseinates", "sodium caseinate", "calcium caseinate"],
   molluscs: ["molluscs", "mollusks", "mussels", "oysters", "squid", "shellfish"], mustard: ["mustard"],
   peanuts: ["peanut", "peanuts", "groundnut", "groundnuts", "nuts"], sesame: ["sesame", "sesame seeds", "tahini"],
   soy: ["soy", "soya", "soybeans", "soybean"], sulphites: ["sulphites", "sulfites", "sulphur dioxide", "sulfur dioxide"],
@@ -19,7 +19,7 @@ const taxon = (id: string, aliases: string[], allergens: string[] = [], dietaryF
 export const INGREDIENT_TAXONOMY: IngredientTaxon[] = [
   taxon("chicken", ["chicken", "chicken breast"], [], ["meat"]), taxon("turkey", ["turkey", "ground turkey", "roast turkey slices", "turkey breast"], [], ["meat"]),
   taxon("egg", ["egg", "eggs", "egg whites", "liquid egg whites"], ["eggs"], ["animal_product"]),
-  taxon("milk", ["milk", "greek yogurt", "cottage cheese", "whey protein"], ["milk"], ["animal_product"]),
+  taxon("milk", ["milk", "greek yogurt", "cottage cheese", "whey protein", "whey", "casein", "caseinate", "caseinates", "sodium caseinate", "calcium caseinate"], ["milk"], ["animal_product"]),
   taxon("salmon", ["salmon", "salmon fillet"], ["fish"], ["fish", "animal_product"]),
   taxon("tofu", ["tofu", "extra firm tofu"], ["soy"]), taxon("soy_sauce", ["soy sauce"], ["soy", "gluten"]),
   taxon("oats", ["oats", "rolled oats"], ["gluten"]), taxon("wheat", ["whole grain wrap", "whole wheat wraps", "wholemeal wraps", "whole wheat pasta", "wholewheat pasta", "pasta", "noodles"], ["gluten"]),
