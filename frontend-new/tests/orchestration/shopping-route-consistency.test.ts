@@ -44,7 +44,7 @@ function handler(history: unknown[], authorised = true, realApproval = false, al
     "@/lib/meal-generator": { WORKDAY_COUNT: 7, buildShoppingList },
     "@/lib/retailer-comparison": { compareRetailerBaskets: () => ({ status: "price_comparison_unavailable", claimable: false }) },
     "@/lib/serverAuth": { resolveRequestAuth: async () => ({ user: authorised ? { id: "owner-a" } : null, session: {}, supabase: db }) },
-    "@/lib/recipes/server-constraints": { loadServerConstraints: async () => { constraintReads++; return loadServerConstraints(safetyDb, "owner-a"); } },
+    "@/lib/recipes/server-constraints": { loadServerConstraints: async () => { constraintReads++; const saved = await loadServerConstraints(safetyDb, "owner-a"); return allergy === "exclude-chickpeas" ? { ...saved, allergies: [], neverFoods: ["chickpeas"] } : saved; } },
     "@/lib/recipes/plan-boundary": { approvalFailure, approvePlanForUser: async (_db: unknown, owner: string, value: WeeklyMealPlan, _preferences: unknown, injected: { constraints: () => Promise<unknown> }) => {
       approvals++;
       return realApproval ? approvePlanForUser(safetyDb, owner, value, undefined, { ...injected, context: async () => ({ calorieTarget: 1650, proteinTarget: 120, mealsPerDay: 3 }) } as never) : value;
@@ -67,7 +67,7 @@ test("both shopping boundaries approve real reviewed recipes against one current
     const invalid = handler(rows(forged), true, true);
     assert.equal((method === "get" ? await invalid.get() : await invalid.post({ plan: forged })).status, 422);
     assert.equal(invalid.writes(), 0);
-    const restricted = handler(rows(current), true, true, "chicken");
+    const restricted = handler(rows(current), true, true, "exclude-chickpeas");
     assert.equal((method === "get" ? await restricted.get() : await restricted.post({ plan: current, preferences: { profile: { allergies: [] } } })).status, 422);
     assert.equal(restricted.writes(), 0);
   }

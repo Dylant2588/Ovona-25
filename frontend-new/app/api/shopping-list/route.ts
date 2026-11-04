@@ -7,6 +7,10 @@ import {
 } from "@/lib/meal-generator";
 import { compareRetailerBaskets, type RetailerObservation } from "@/lib/retailer-comparison";
 import { resolveRequestAuth } from "@/lib/serverAuth";
+import { approvePlanForUser, approvalFailure } from "@/lib/recipes/plan-boundary";
+import { loadServerConstraints, type ConstraintDatabase } from "@/lib/recipes/server-constraints";
+import type { RecipeReader } from "@/lib/recipes/repository";
+import type { RecipeConstraints } from "@/lib/recipes/types";
 
 const toISODate = (value: string) => {
   const parsed = new Date(value);
@@ -57,6 +61,7 @@ const shoppingListResponse = async (
   items: ShoppingListItem[],
   supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"],
   userId: string,
+  constraints: RecipeConstraints,
   planId?: string
 ) => {
   const [observationResponse, preferenceResponse] = await Promise.all([
@@ -64,13 +69,25 @@ const shoppingListResponse = async (
     supabase.from("user_preferences").select("weekly_budget").eq("user_id", userId).maybeSingle(),
   ]);
   const comparison = observationResponse.error
-    ? { status: "price_comparison_unavailable" as const, claimable: false as const, reasons: ["price_observations_unavailable"], unmatchedItems: [] }
-    : compareRetailerBaskets(items, (observationResponse.data ?? []).map((row) => toObservation(row as Record<string, unknown>)).filter((row): row is RetailerObservation => row !== null), Number(preferenceResponse.data?.weekly_budget));
+    ? { status: "price_comparison_unavailable" as const, claimable: false as const, dietaryStatus: "unverified" as const, reasons: ["price_observations_unavailable"], unmatchedItems: [] }
+    : compareRetailerBaskets(items, (observationResponse.data ?? []).map((row) => toObservation(row as Record<string, unknown>)).filter((row): row is RetailerObservation => row !== null), Number(preferenceResponse.data?.weekly_budget), new Date(), constraints);
   return NextResponse.json({
     items,
     planId: planId ?? null,
     priceComparison: comparison,
   });
+};
+
+/** Use one authoritative constraint snapshot for recipe approval and product evaluation. */
+const approvedShoppingResponse = async (plan: WeeklyMealPlan, supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"], userId: string) => {
+  try {
+    const constraints = await loadServerConstraints(supabase as unknown as ConstraintDatabase, userId);
+    const approved = await approvePlanForUser(supabase as unknown as RecipeReader, userId, plan, undefined, { constraints: async () => constraints });
+    return await shoppingListResponse(buildShoppingList(approved), supabase, userId, constraints, plan.id);
+  } catch (error) {
+    const failure = approvalFailure(error);
+    return NextResponse.json(failure.body, { status: failure.status });
+  }
 };
 
 export async function GET(request: NextRequest) {
@@ -120,7 +137,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "incomplete_stored_plan", message: "A complete current week is required to build its shopping list." }, { status: 409 });
   }
   const plan = { id: planId, userId: user.id, weekStart, days } as WeeklyMealPlan;
-  return shoppingListResponse(buildShoppingList(plan), supabase, user.id, planId);
+  return approvedShoppingResponse(plan, supabase, user.id);
 }
 
 export async function POST(request: NextRequest) {
@@ -166,5 +183,5 @@ export async function POST(request: NextRequest) {
   if (!completeDays(plan.days, effectiveWeekStart)) return NextResponse.json({ error: "invalid_plan", message: "A complete week with valid final ingredient quantities is required." }, { status: 400 });
   // POST is an ephemeral projection of the caller's current plan. It must not
   // persist a second independently writable source of shopping quantities.
-  return shoppingListResponse(buildShoppingList(plan as unknown as WeeklyMealPlan), supabase, user.id, plan.id);
+  return approvedShoppingResponse(plan as unknown as WeeklyMealPlan, supabase, user.id);
 }
