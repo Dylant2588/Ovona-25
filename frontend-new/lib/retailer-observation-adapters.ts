@@ -1,7 +1,10 @@
+import { isProductSuitability, type ProductSuitability } from "./retailer-comparison.ts";
+
 export type RetailerPriceObservation = {
   retailerId: string; retailerName: string; ingredientKey: string; packSize: number; packUnit: string;
   unitPrice: number; currency: string; estimated: boolean; sourceReference: string;
   provenanceStatus: "operator_imported" | "licensed_feed"; observedAt: string; importedAt: string;
+  suitability?: ProductSuitability;
 };
 
 export type OperatorObservationBatch = {
@@ -18,6 +21,7 @@ export function acceptOperatorObservationBatch(batch: OperatorObservationBatch):
   if (!present(batch.adapterVersion) || !present(batch.importedBy) || !present(batch.importBatchId)) errors.push("Operator batch identity is required");
   if (!Array.isArray(batch.observations) || batch.observations.length === 0) errors.push("At least one operator observation is required");
   for (const observation of batch.observations ?? []) {
+    if (observation.suitability !== undefined && !isProductSuitability(observation.suitability)) errors.push("Declared product suitability must contain reviewed ingredient and allergen evidence");
     if (![observation.retailerId, observation.retailerName, observation.ingredientKey, observation.packUnit, observation.currency, observation.sourceReference, observation.provenanceStatus].every(present)) errors.push("Retailer provenance and source evidence are required");
     if (!Number.isFinite(observation.packSize) || observation.packSize <= 0 || !Number.isFinite(observation.unitPrice) || observation.unitPrice < 0) errors.push("Valid pack and price values are required");
     if (!/^[A-Z]{3}$/.test(observation.currency)) errors.push("Currency must be ISO-4217");

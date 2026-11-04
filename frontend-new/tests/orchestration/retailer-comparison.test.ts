@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { compareRetailerBaskets, type RetailerObservation } from "../../lib/retailer-comparison.ts";
+import { acceptOperatorObservationBatch } from "../../lib/retailer-observation-adapters.ts";
 
 const now = new Date("2026-10-13T12:00:00.000Z");
 const items = [{ name: "Chicken", displayName: "Chicken", quantity: 500, unit: "g" }];
@@ -55,5 +56,16 @@ test("retailer restrictions are applied before price ranking including derivativ
   if (result.status === "qualified") assert.equal(result.lowestObservedCompleteBasket, 4);
   for (const constraints of [{ neverFoods: ["chicken"] }, { dietaryMode: "vegan" }, { allergies: ["unknown"] }]) {
     assert.equal(compareRetailerBaskets(items, safe, 10, now, constraints).status, "price_comparison_unavailable");
+  }
+});
+
+test("operator evidence preserves reviewed suitability and rejects malformed declarations", () => {
+  const suitability = { status: "reviewed" as const, allergens: [], mayContain: [], ingredients: ["chicken"], dietaryTags: [] };
+  const batch = { adapterVersion: "1", importedBy: "operator", importBatchId: "batch", observations: [{ ...observation("alpha", 4), importedAt: now.toISOString(), suitability }] };
+  const accepted = acceptOperatorObservationBatch(batch);
+  assert.equal(accepted.ok, true);
+  if (accepted.ok) assert.deepEqual(accepted.value.observations[0].suitability, suitability);
+  for (const invalid of [{ status: "reviewed" }, { ...suitability, ingredients: [] }, { ...suitability, allergens: [null] }]) {
+    assert.equal(acceptOperatorObservationBatch({ ...batch, observations: [{ ...batch.observations[0], suitability: invalid as never }] }).ok, false);
   }
 });
