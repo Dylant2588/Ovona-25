@@ -1,3 +1,4 @@
+import { parsePlanScope, planDayCount, strictPlanDate } from "../plan-scope.ts";
 import type { WeeklyMealPlan, PreferencesInput } from "../meal-generator.ts";
 import type { RecipeRecord, RecipeConstraints } from "./types.ts";
 import { loadReviewedRecipes, type RecipeReader } from "./repository.ts";
@@ -39,15 +40,16 @@ const loadNutritionContext = async (database: RecipeReader, userId: string): Pro
 /** Validate before invoking any persistence callback; injected doubles test this real boundary. */
 export async function approvePlanForUser(database: RecipeReader, userId: string,
   plan: WeeklyMealPlan, preferences?: PreferencesInput, dependencies: BoundaryDependencies = {}): Promise<WeeklyMealPlan> {
-  if (!plan || plan.userId !== userId || !Array.isArray(plan.days) || plan.days.length !== 7 ||
+  const dayCount = planDayCount(parsePlanScope(plan?.scope));
+  if (!plan || plan.userId !== userId || !Array.isArray(plan.days) || plan.days.length !== dayCount ||
       plan.days.some((day) => !day || !Array.isArray(day.meals) || !day.meals.length)) {
     throw new MealApprovalError("meal_approval_failed", ["Invalid plan ownership or incomplete week."]);
   }
   const constraints = await (dependencies.constraints ?? loadServerConstraints)(database, userId, preferences);
   const context = dependencies.context ? await dependencies.context() : await loadNutritionContext(database, userId);
-  const start = new Date(plan.weekStart);
-  const dates = plan.days.map((day) => new Date(day.date));
-  if (!Number.isFinite(start.getTime()) || new Set(plan.days.map((day) => day.id)).size !== 7 ||
+  const start = new Date(`${strictPlanDate(plan.weekStart)}T00:00:00Z`);
+  const dates = plan.days.map((day) => new Date(`${strictPlanDate(day.date)}T00:00:00Z`));
+  if (!Number.isFinite(start.getTime()) || new Set(plan.days.map((day) => day.id)).size !== dayCount ||
       dates.some((date, index) => !Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== new Date(start.getTime() + index * 86400000).toISOString().slice(0, 10))) {
     throw new MealApprovalError("meal_approval_failed", ["Plan days must identify seven unique consecutive dates in this week."]);
   }

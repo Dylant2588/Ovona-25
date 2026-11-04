@@ -1,3 +1,4 @@
+import { parsePlanScope, planDayCount, type PlanScope } from "../plan-scope.ts";
 import { filterEligibleCandidates } from "./eligibility.ts";
 import { rankCandidates } from "./score.ts";
 import { validateAndRepairWeek } from "./validate.ts";
@@ -85,6 +86,7 @@ const selectDay = (
   excludedDays: ReadonlySet<string>,
   canSearch: () => boolean,
   spreadBudgets: boolean,
+  dayCount: number,
 ): SelectedMeal[] | null => {
   const slots = profile.hardConstraints.requiredSlots;
   const result: { meals: SelectedMeal[] | null } = { meals: null };
@@ -93,7 +95,7 @@ const selectDay = (
     if (index === slots.length) {
       if (excludedDays.has(JSON.stringify(choices.map(candidate => candidate.id).sort()))) return false;
       const shared = portionMultiplierFor(profile, choices);
-      const limits = remainingPortionLimits(profile, selected, choices, spreadBudgets ? 7 - dayIndex : 1);
+      const limits = remainingPortionLimits(profile, selected, choices, spreadBudgets ? dayCount - dayIndex : 1);
       // The API and approval boundary store rounded macros for each meal.
       // A shared portion can meet continuous bands yet fail those final totals.
       const sharedCalories = shared === null ? 0 : choices.reduce((s, m) => s + Math.round(m.nutrition.calories * shared), 0);
@@ -174,12 +176,14 @@ export const orchestrateWeek = (
   profile: PlannerProfile,
   candidates: readonly unknown[],
   history: CandidateHistory = {},
+  scope: PlanScope = "week",
 ): WeekScheduleResult => {
+  const dayCount = planDayCount(parsePlanScope(scope));
   const eligibility = filterEligibleCandidates(profile, candidates);
   if (!eligibility.eligible.length) {
     return { ok: false, error: { code: "insufficient_candidates", violations: [{ day: 1, code: "insufficient_candidates", message: "No hard-constraint-safe candidates are available." }] } };
   }
-  const unavoidable = unavoidablePracticalViolations(profile, eligibility.eligible);
+  const unavoidable = unavoidablePracticalViolations(profile, eligibility.eligible, dayCount);
   if (unavoidable.length) return { ok: false, error: { code: "insufficient_candidates", violations: unavoidable.map(limit => ({ day: 0, code: "practical_quantity_exceeded",
     message: `${limit.label} would require at least ${Math.ceil(limit.grams!)}g per week even at the smallest portion, above the ${limit.maxGrams}g practical limit.` })) } };
   // Weekly caps require revisiting earlier days. Committing the first feasible
@@ -195,10 +199,10 @@ export const orchestrateWeek = (
   type Days = Array<{ day: number; meals: SelectedMeal[] }>;
   const visitWeek = (days: Days, selected: SelectedMeal[]): WeekScheduleResult | null => {
     if (!canSearch()) return null;
-    if (days.length === 7) {
-      if (history.differentFromDays?.length === 7 && history.differentFromDays.every((ids, index) =>
+    if (days.length === dayCount) {
+      if (history.differentFromDays?.length === dayCount && history.differentFromDays.every((ids, index) =>
         JSON.stringify([...ids].map(id => id.toLowerCase()).sort()) === JSON.stringify(days[index].meals.map(meal => meal.similarityKey.toLowerCase()).sort()))) return null;
-      const checked = validateAndRepairWeek(profile, { days });
+      const checked = validateAndRepairWeek(profile, { days }, scope);
       return checked.ok ? checked : null;
     }
     const day = days.length + 1;
@@ -208,10 +212,10 @@ export const orchestrateWeek = (
       if (!canSearch()) return null;
       // Search the full day pool under fair budgets first; falling back inside
       // the first combination would spend future days' allowance too early.
-      const meals = selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek, day - 1, excluded, canSearch, true)
-        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek + 1, day - 1, excluded, canSearch, true)
-        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek, day - 1, excluded, canSearch, false)
-        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek + 1, day - 1, excluded, canSearch, false);
+      const meals = selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek, day - 1, excluded, canSearch, true, dayCount)
+        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek + 1, day - 1, excluded, canSearch, true, dayCount)
+        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek, day - 1, excluded, canSearch, false, dayCount)
+        ?? selectDay(profile, eligibility.eligible, selected, history, profile.policy.repetition.maxUsesPerWeek + 1, day - 1, excluded, canSearch, false, dayCount);
       if (!meals) return null;
       excluded.add(JSON.stringify(meals.map(meal => meal.candidateId).sort()));
       const result = visitWeek([...days, { day, meals }], [...selected, ...meals]);

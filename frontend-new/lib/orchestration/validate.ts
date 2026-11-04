@@ -1,3 +1,4 @@
+import { planDayCount, parsePlanScope, type PlanScope } from "../plan-scope.ts";
 import type { PlannerProfile, SelectedMeal, ScheduleViolation, WeekSchedule, WeekScheduleResult } from "./types.ts";
 import { practicalIngredientViolations } from "./practical-ingredients.ts";
 
@@ -57,10 +58,11 @@ const portionFactor = (totals: { calories: number; protein: number }, profile: P
   return Math.min(max, Math.max(min, 1));
 };
 
-export const validateAndRepairWeek = (profile: PlannerProfile, schedule: WeekSchedule): WeekScheduleResult => {
+export const validateAndRepairWeek = (profile: PlannerProfile, schedule: WeekSchedule, scope: PlanScope = "week"): WeekScheduleResult => {
+  const dayCount = planDayCount(parsePlanScope(scope));
   const violations: ScheduleViolation[] = [];
-  if (schedule.days.length !== 7) {
-    violations.push({ day: 0, code: "missing_slot", message: "A weekly schedule must contain exactly seven days." });
+  if (schedule.days.length !== dayCount) {
+    violations.push({ day: 0, code: "missing_slot", message: `A ${scope} schedule must contain exactly ${dayCount} day(s).` });
   }
   const repairedDays = schedule.days.map((day) => {
     for (const slot of new Set(profile.hardConstraints.requiredSlots)) {

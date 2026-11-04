@@ -48,7 +48,7 @@ export const hasPracticalIngredientBasket = (
 
 /** Conservative lower bound: ignore repetition and use the smallest allowed
  * portion. If even this exceeds a cap, searching different orders cannot help. */
-export function unavoidablePracticalViolations(profile: PlannerProfile, candidates: readonly VerifiedCandidateMeal[]): PracticalIngredientViolation[] {
+export function unavoidablePracticalViolations(profile: PlannerProfile, candidates: readonly VerifiedCandidateMeal[], dayCount = 7): PracticalIngredientViolation[] {
   return WEEKLY_PROTEIN_INGREDIENT_LIMITS.flatMap(limit => {
     let minimum = 0;
     for (const slot of profile.hardConstraints.requiredSlots) {
@@ -60,7 +60,7 @@ export function unavoidablePracticalViolations(profile: PlannerProfile, candidat
         return sum + ingredient.quantity * (unit === "kg" ? 1000 : 1);
       }, 0)));
     }
-    const grams = minimum * 0.7 * 7 * profile.householdSize;
+    const grams = minimum * 0.7 * dayCount * profile.householdSize;
     const maxGrams = limit.maxGrams * profile.householdSize;
     return grams > maxGrams ? [{ label: limit.label, grams, maxGrams }] : [];
   });

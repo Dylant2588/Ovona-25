@@ -1,3 +1,4 @@
+import { parsePlanScope, planAnchor, type PlanScope } from "../plan-scope.ts";
 import { randomUUID } from "crypto";
 import { imageForMeal } from "@/lib/meal-images";
 import { preferenceSignatureFor, type MealInstance, type PreferencesInput, type WeeklyMealPlan } from "@/lib/meal-generator";
@@ -16,7 +17,9 @@ const sum = (meals: MealInstance[]) => meals.reduce((total, meal) => ({ calories
 { calories: 0, protein: 0, carbs: 0, fat: 0 });
 
 export async function generateWeeklyPlanWithArtifacts(userId: string,
-  options?: { preferences?: PreferencesInput; supabase?: GenerationSupabase; requireDifferent?: boolean }): Promise<GenerationArtifacts> {
+  options?: { preferences?: PreferencesInput; supabase?: GenerationSupabase; requireDifferent?: boolean; scope?: PlanScope; date?: string }): Promise<GenerationArtifacts> {
+  const scope = parsePlanScope(options?.scope);
+  const anchor = planAnchor(scope, options?.date ?? new Date().toISOString());
   const database = options?.supabase ?? await supabaseServer();
   const hydrated = await buildDeterministicPlanningInput(userId, { ...options, supabase: database });
   if (!hydrated.ok) {
@@ -26,7 +29,7 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
     throw new MealApprovalError(hydrated.error.code, hydrated.error.reasons, hydrated.error.statusCode, message);
   }
   const { context, recipes, profile, candidates, history } = hydrated.value;
-  const previous = await loadPreviousPlanRotation(database, userId, recipes);
+  const previous = await loadPreviousPlanRotation(database, userId, recipes, scope);
   const rotation = { ...history,
     recentCandidateIds: [...new Set([...history.recentCandidateIds, ...previous.recentCandidateIds])],
     recentSimilarityKeys: [...new Set([...(history.recentSimilarityKeys ?? []), ...previous.recentSimilarityKeys])],
@@ -62,12 +65,12 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
       }
     }
   }
-  let schedule = orchestrateWeek(profile, rankedCandidates, rotation);
+  let schedule = orchestrateWeek(profile, rankedCandidates, rotation, scope);
   // Recency and AI are ranking hints, not feasibility rules. A poor traversal
   // must not hide a valid week. Retry with the identical hard-safe pool, all
   // profile preferences and quantity limits, keeping the explicit new-week check.
   if (!schedule.ok) {
-    schedule = orchestrateWeek(profile, candidates, { differentFromDays: rotation.differentFromDays });
+    schedule = orchestrateWeek(profile, candidates, { differentFromDays: rotation.differentFromDays }, scope);
   }
   if (!schedule.ok) {
     if (schedule.error.code === "planning_search_exhausted") {
@@ -91,11 +94,9 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
           : undefined
     );
   }
-  const weekStart = new Date();
-  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  weekStart.setHours(0, 0, 0, 0);
+  const weekStart = new Date(`${anchor}T00:00:00Z`);
   let weeklyPlan: WeeklyMealPlan = {
-    id: randomUUID(), userId, weekStart: weekStart.toISOString(), generatedAt: new Date().toISOString(),
+    id: randomUUID(), userId, scope, weekStart: weekStart.toISOString(), generatedAt: new Date().toISOString(),
     preferenceSignature: options?.preferences ? preferenceSignatureFor(options.preferences) : "",
     days: schedule.value.days.map((day) => {
       const date = new Date(weekStart); date.setDate(date.getDate() + day.day - 1);
@@ -154,7 +155,7 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
     })));
   if (practical.length) throw new MealApprovalError("impractical_ingredient_basket", practical, 422,
     "The final portions exceed a practical weekly ingredient quantity. Your existing plan is unchanged.");
-  if (options?.requireDifferent && sameRecipeDays(previous.previousDayRecipeIds, weeklyPlan.days)) {
+  if (options?.requireDifferent && sameRecipeDays(previous.previousDayRecipeIds, weeklyPlan.days, scope)) {
     throw new MealApprovalError("no_alternative_reviewed_plan", ["The available safe recipes produced the same meals."], 422,
       "A different checked plan was not found with the available recipes and your restrictions. Your existing plan is unchanged.");
   }

@@ -1,3 +1,4 @@
+import type { PlanScope } from "../plan-scope.ts";
 import { filterEligibleCandidates } from "./eligibility.ts";
 import { rankCandidates, type ScoreContext } from "./score.ts";
 import type { CandidateHistory } from "./schedule.ts";
@@ -54,6 +55,7 @@ export const replaceMeal = (
   profile: PlannerProfile,
   history: CandidateHistory = {},
   policy: PlannerPolicy = profile.policy,
+  scope: PlanScope = "week",
 ): WeekScheduleResult => {
   const targetDay = result.days.find((day) => day.day === target.day);
   const oldMeal = targetDay?.meals.find((meal) => meal.slot === target.slot);
@@ -76,7 +78,7 @@ export const replaceMeal = (
       meals: day.meals.map((meal) => meal === oldMeal ? replacement : meal),
     } : day),
   };
-  const validated = validateAndRepairWeek(effectiveProfile, replacementWeek);
+  const validated = validateAndRepairWeek(effectiveProfile, replacementWeek, scope);
   if (!validated.ok) return { ok: false, error: { code: "replacement_validation_failed", violations: validated.error.violations } };
 
   // A replacement may not silently repair another slot; preserve all non-target selections exactly.

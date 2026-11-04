@@ -63,6 +63,7 @@ export type DayPlan = {
 };
 
 export type WeeklyMealPlan = {
+  scope?: "day" | "week";
   id: string;
   userId?: string;
   weekStart: string;
