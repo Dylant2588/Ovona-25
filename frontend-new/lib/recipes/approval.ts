@@ -1,7 +1,7 @@
 import type { ApprovalConstraints, ApprovalResult, RecipeRecord, RecipeMacros } from "./types.ts";
 import { recipeRecordErrors } from "./repository.ts";
 import { ALLERGENS, canonicalAllergens, findIngredientTaxon, normalizeIngredient } from "./taxonomy.ts";
-export const APPROVAL_POLICY_VERSION = "2026-10-12.1";
+export const APPROVAL_POLICY_VERSION = "2026-11-04.1";
 const result = (recipe: RecipeRecord): ApprovalResult => ({ approved: true, reasons: [], recipeId: recipe.id, recipeVersion: recipe.version, policyVersion: APPROVAL_POLICY_VERSION });
 const deny = (r: ApprovalResult, code: string, message: string) => { r.approved = false; r.reasons.push({ code, message }); };
 export function approveRecipe(recipe: RecipeRecord, constraints: ApprovalConstraints = {}): ApprovalResult {

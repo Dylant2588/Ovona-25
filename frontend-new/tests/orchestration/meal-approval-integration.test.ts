@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { writeApprovedPlan } from "../../lib/recipes/plan-boundary.ts";
-import { loadServerConstraints } from "../../lib/recipes/server-constraints.ts";
+import { loadServerConstraints, constraintsFromSources } from "../../lib/recipes/server-constraints.ts";
+import { parsePreferencePatch } from "../../lib/preferences-persistence.ts";
 import { recipeDatabase, reviewedPlan, reviewedRecipe } from "./reviewed-recipe-fixture.ts";
 const dependencies = { context: async () => ({ calorieTarget: 1650, proteinTarget: 120, mealsPerDay: 3 }) };
 test("actual persistence boundary writes a reviewed fixture with recomputed totals", async () => {
@@ -63,4 +64,21 @@ test("missing review and unavailable saved preferences reject before mutation", 
 test("client restrictions never erase saved allergies, dietary modes or dislikes", async () => {
   const constraints = await loadServerConstraints(recipeDatabase({ allergy: "milk", dietary: "vegan" }), "user-1", { tastes: [], profile: { allergies: [], dietaryMode: "mixed", dislikes: ["chickpeas"] } });
   assert.deepEqual(constraints.allergies, ["milk"]); assert.deepEqual(constraints.dietaryModes, ["vegan", "mixed"]); assert.deepEqual(constraints.dislikes, ["chickpeas"]);
+});
+
+test("saved safety patch round-trips allergy, exclusion and diet without a client override erasing them", () => {
+  const patch = parsePreferencePatch({ allergies: ["Dairy"], neverFoods: ["Chickpeas"], dietaryMode: "vegan" });
+  const saved = constraintsFromSources([patch], [], [], { tastes: [], profile: { allergies: [], neverFoods: [], dietaryMode: "mixed" } });
+  assert.deepEqual(saved.allergies, ["milk"]);
+  assert.deepEqual(saved.neverFoods, ["chickpeas"]);
+  assert.deepEqual(saved.dietaryModes, ["vegan", "mixed"]);
+});
+
+test("a reviewed recipe conflicting with a saved hard exclusion never reaches persistence", async () => {
+  let writes = 0;
+  await assert.rejects(writeApprovedPlan(recipeDatabase(), "user-1", reviewedPlan(), async () => { writes++; }, undefined, {
+    ...dependencies,
+    constraints: async () => ({ neverFoods: ["chickpeas"] }),
+  }), /Never-include ingredient/);
+  assert.equal(writes, 0);
 });
