@@ -1,6 +1,6 @@
 import type { ShoppingListItem } from "@/lib/meal-generator";
 import type { RecipeConstraints } from "./recipes/types.ts";
-import { canonicalAllergens, findIngredientTaxon, normalizeIngredient } from "./recipes/taxonomy.ts";
+import { canonicalAllergens, findIngredientTaxon, matchesNeverFood, normalizeIngredient } from "./recipes/taxonomy.ts";
 
 export type ProductSuitability = Readonly<{
   status: "reviewed";
@@ -32,8 +32,7 @@ export function productDietaryStatus(value: unknown, constraints: RecipeConstrai
     const ingredient = findIngredientTaxon(name);
     if (!ingredient) return "unverified";
     if (ingredient.allergens.some(a => blocked.has(a))) return "conflict";
-    const aliases = [name, ingredient.id, ...ingredient.aliases].map(normalizeIngredient);
-    if ((constraints.neverFoods ?? []).some(food => aliases.includes(normalizeIngredient(food)))) return "conflict";
+    if ((constraints.neverFoods ?? []).some(food => matchesNeverFood(name, ingredient, food))) return "conflict";
     const diets = [...(constraints.dietaryModes ?? []), ...(constraints.dietaryMode ? [constraints.dietaryMode] : [])].map(normalizeIngredient);
     if (diets.includes("vegan") && ingredient.dietaryFlags.some(f => ["animal_product", "meat", "fish"].includes(f))) return "conflict";
     if ((diets.includes("vegetarian") && ingredient.dietaryFlags.some(f => ["meat", "fish"].includes(f))) || (diets.some(d => ["pescatarian", "pescetarian"].includes(d)) && ingredient.dietaryFlags.includes("meat"))) return "conflict";

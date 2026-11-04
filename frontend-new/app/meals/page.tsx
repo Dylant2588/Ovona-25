@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import NextLink from "next/link";
+import { approvedShoppingItems } from "@/lib/shopping-approval";
 import { planForPreferenceSnapshot } from "@/lib/plan-preference-snapshot";
 import { ingredientLedgerKey } from "@/lib/ingredient-ledger";
 import { shoppingMealSources, shoppingSourceLabel } from "@/lib/shopping-provenance";
@@ -686,6 +687,7 @@ function MealsPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [normalizingList, setNormalizingList] = useState(false);
   const [shoppingListError, setShoppingListError] = useState<string | null>(null);
+  const [shoppingApproval, setShoppingApproval] = useState<{ plan: WeeklyMealPlan; preferences: PreferencesInput | null } | null>(null);
   const [shoppingReloadToken, setShoppingReloadToken] = useState(0);
   const [shoppingExpanded, setShoppingExpanded] = useState(false);
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
@@ -1893,6 +1895,7 @@ function MealsPageContent() {
   }, [displayDays, plan, workweekTotals]);
 
   useEffect(() => {
+    setShoppingApproval(null);
     if (!plan || !shoppingList.length) {
       setBasketPricing(null);
       setPriceComparison(null);
@@ -1935,10 +1938,13 @@ function MealsPageContent() {
           if (active) {
             setBasketPricing(null);
             setPriceComparison(data.planId === plan.id ? data.priceComparison ?? null : null);
+            setShoppingApproval(data.planId === plan.id ? { plan, preferences } : null);
             setNormalizingList(false);
             return;
           }
         } else {
+          const failure = await response.json().catch(() => null) as { message?: string } | null;
+          if (active) setShoppingListError(failure?.message || "This shopping list could not pass recipe checks. Retry after reviewing your preferences.");
           hadFailure = true;
         }
       } catch (error) {
@@ -1951,7 +1957,7 @@ function MealsPageContent() {
         setPriceComparison(null);
         setNormalizingList(false);
         if (hadFailure) {
-          setShoppingListError("Couldn't load shopping list. Try again.");
+          setShoppingListError(previous => previous || "Couldn't load shopping list. Try again.");
           showToast("Couldn't load shopping list. Try again.", "error", {
             actionLabel: "Retry",
             onAction: () => {
@@ -1971,15 +1977,15 @@ function MealsPageContent() {
     authFetchWithRetry,
     authLoading,
     plan,
+    preferences,
     profileLocale,
     shoppingList,
     shoppingReloadToken,
     userId,
   ]);
 
-  // Quantities always come from the meals on screen, even during requests or
-  // failures. Server responses provide pricing only, never a replacement basket.
-  const displayShoppingList = shoppingList;
+  // Quantities come from the current meals only after server dietary approval.
+  const displayShoppingList = approvedShoppingItems(shoppingList, plan, preferences, shoppingApproval, userId, authLoading);
   const shoppingSources = useMemo(() => shoppingMealSources(displayDays), [displayDays]);
 
   const shoppingItemPrices = useMemo(() => {
@@ -2208,6 +2214,7 @@ function MealsPageContent() {
       </Stack>
 
       {error && <Alert severity="error">{error}</Alert>}
+      {shoppingListError && <Alert severity="error" action={<Button color="inherit" size="small" onClick={retryShoppingList}>Retry shopping list</Button>}>{shoppingListError}</Alert>}
       {preferencesNotice && (
         <Alert
           severity={preferencesNotice.severity}

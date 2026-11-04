@@ -45,3 +45,9 @@ export const INGREDIENT_TAXONOMY: IngredientTaxon[] = [
   taxon("unreviewed_dark_chocolate", ["dark chocolate"], ["milk", "tree_nuts"]),
 ];
 export const findIngredientTaxon = (name: string) => INGREDIENT_TAXONOMY.find(entry => entry.aliases.includes(normalizeIngredient(name)));
+
+/** The same hard exclusion semantics apply to reviewed recipes and retailer ingredients. */
+export function matchesNeverFood(name: string, taxon: IngredientTaxon, restriction: string): boolean {
+  const neverFood = normalizeIngredient(restriction);
+  return !neverFood || [name, taxon.id, ...taxon.aliases].map(normalizeIngredient).includes(neverFood) || normalizeIngredient(name).split(" ").includes(neverFood);
+}

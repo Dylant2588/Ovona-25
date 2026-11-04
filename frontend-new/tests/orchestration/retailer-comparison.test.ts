@@ -57,6 +57,8 @@ test("retailer restrictions are applied before price ranking including derivativ
   for (const constraints of [{ neverFoods: ["chicken"] }, { dietaryMode: "vegan" }, { allergies: ["unknown"] }]) {
     assert.equal(compareRetailerBaskets(items, safe, 10, now, constraints).status, "price_comparison_unavailable");
   }
+  const breast = safe.map(o => ({ ...o, suitability: { ...evidence, ingredients: ["chicken breast"] } }));
+  assert.equal(compareRetailerBaskets(items, breast, 10, now, { neverFoods: ["breast"] }).status, "price_comparison_unavailable");
 });
 
 test("operator evidence preserves reviewed suitability and rejects malformed declarations", () => {
