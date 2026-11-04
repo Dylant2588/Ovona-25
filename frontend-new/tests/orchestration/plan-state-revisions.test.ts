@@ -46,15 +46,15 @@ test("actual daily state handlers commit complete revisions, reload and preserve
     "@/lib/plan-scope": scopes, "@/lib/plan-revisions": revisions,
   };
   const code = ts.transpileModule(fs.readFileSync("app/api/meal-plan/state/route.ts", "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  const module = { exports: {} as { POST(request: Request): Promise<Response>; GET(request: unknown): Promise<Response> } };
-  new Function("require", "module", "exports", code)((id: string) => { assert.ok(id in deps, id); return deps[id]; }, module, module.exports);
+  const routeModule = { exports: {} as { POST(request: Request): Promise<Response>; GET(request: unknown): Promise<Response> } };
+  new Function("require", "module", "exports", code)((id: string) => { assert.ok(id in deps, id); return deps[id]; }, routeModule, routeModule.exports);
   const day = { ...reviewedPlan(), scope: "day" as const, days: reviewedPlan().days.slice(0, 1) };
-  const post = (plan = day) => module.exports.POST(new Request("http://localhost/api/meal-plan/state", { method: "POST", body: JSON.stringify({ plan }) }));
+  const post = (plan = day) => routeModule.exports.POST(new Request("http://localhost/api/meal-plan/state", { method: "POST", body: JSON.stringify({ plan }) }));
   const response = await post(); assert.equal(response.status, 200);
   const saved = await response.json(); assert.notEqual(saved.plan.id, day.id); assert.equal(saved.plan.scope, "day");
   assert.equal(saved.plan.weeklyTotals.calories, 1650); assert.deepEqual(saved.warnings, ["rotation_history_not_recorded"]);
   assert.equal(history.length, 8); assert.equal(summaries, 0); assert.equal(deletes, 0);
-  const loadedResponse = await module.exports.GET({ nextUrl: new URL("http://localhost/api/meal-plan/state?weekStart=2026-10-12&scope=day") });
+  const loadedResponse = await routeModule.exports.GET({ nextUrl: new URL("http://localhost/api/meal-plan/state?weekStart=2026-10-12&scope=day") });
   assert.equal(loadedResponse.status, 200); const loaded = await loadedResponse.json();
   assert.equal(loaded.plan.id, saved.plan.id); assert.deepEqual(loaded.plan.days[0].meals, saved.plan.days[0].meals);
   assert.equal(selectPlanRevision(history, "user-1", "week", "2026-10-12")?.id, "original-week");

@@ -5,7 +5,8 @@ export function parsePlanScope(value: unknown): PlanScope {
   throw Object.assign(new Error("Choose day or week planning scope."), { statusCode: 400, code: "invalid_plan_scope" });
 }
 export const planDayCount = (scope: PlanScope) => scope === "day" ? 1 : 7;
-export function strictPlanDate(value: string): string {
+export function strictPlanDate(value: unknown): string {
+  if (typeof value !== "string") throw Object.assign(new Error("Choose a valid calendar date."), { statusCode: 400, code: "invalid_plan_date" });
   const date = value.slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(value)) || new Date(date).toISOString().slice(0, 10) !== date) {
     throw Object.assign(new Error("Choose a valid calendar date."), { statusCode: 400, code: "invalid_plan_date" });
