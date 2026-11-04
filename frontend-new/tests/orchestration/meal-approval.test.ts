@@ -2,6 +2,20 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { approveRecipe, validateMealAgainstRecipe, validatePlanAgainstRecipes, validateSocialMeal } from "../../lib/recipes/approval.ts";
 import { reviewedMeal, reviewedRecipe } from "./recipe-fixtures.ts";
+import { canonicalAllergens, findIngredientTaxon } from "../../lib/recipes/taxonomy.ts";
+
+test("reviewed milk derivatives retain canonical evidence and never bypass milk restrictions", () => {
+  for (const name of ["whey", "casein", "sodium caseinate", "calcium caseinate"]) {
+    assert.deepEqual(canonicalAllergens(name), ["milk"]);
+    assert.equal(findIngredientTaxon(name)?.id, "milk");
+    const recipe = reviewedRecipe();
+    recipe.ingredients = [{ name, canonicalId: "milk", amount: 100, unit: "g", allergens: ["milk"], dietaryFlags: ["animal_product"], reviewed: true }];
+    assert.equal(approveRecipe(recipe).approved, true);
+    assert.equal(approveRecipe(recipe, { allergies: ["milk"] }).approved, false);
+    recipe.ingredients[0].allergens = [];
+    assert.equal(approveRecipe(recipe).approved, false);
+  }
+});
 test("approved evidence admits safe two-serving recipe once and scales trusted portions", () => {
   const recipe = reviewedRecipe(), meal = reviewedMeal();
   assert.equal(meal.ingredients[0].amount, 200);
