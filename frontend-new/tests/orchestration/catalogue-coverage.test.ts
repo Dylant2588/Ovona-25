@@ -35,6 +35,50 @@ test("actual seven-day scheduling succeeds in compatibility mode without claimin
   assert.equal(first.cohorts[0].calculatedOnly.status, "not_feasible");
 });
 
+test("explicit daily coverage uses one complete day and preserves legacy weekly default", () => {
+  const record = legacyCatalogue()[0];
+  const daily = { ...cohort, scope: "day" as const };
+  const report = reportCatalogueCoverage([record], [daily]);
+  assert.equal(report.cohorts[0].legacyCompatible.status, "feasible");
+  assert.equal(report.cohorts[0].legacyCompatible.plan?.days.length, 1);
+  assert.equal(report.cohorts[0].dayCount, 1);
+  assert.equal(report.cohorts[0].slots.breakfast.periodDemand, 1);
+  assert.notEqual(reportCatalogueCoverage([record], [cohort]).cohorts[0].legacyCompatible.status, "feasible");
+  assert.equal(report.cohorts[0].calculatedOnly.status, "not_feasible");
+});
+
+test("turkey never-food is hard while turkey avoidance stays a soft ranking preference", () => {
+  const turkey = legacyCatalogue()[0];
+  turkey.ingredients[0] = { ...turkey.ingredients[0], name: "Turkey breast", canonicalId: "turkey" };
+  const daily = { ...cohort, scope: "day" as const };
+  const hard = reportCatalogueCoverage([turkey], [{ ...daily, neverFoods: ["turkey"] }]);
+  assert.equal(hard.cohorts[0].legacyCompatible.admittedRecipes, 0);
+  assert.ok(hard.cohorts[0].rejectionReasons.never_food_conflict > 0);
+  const soft = reportCatalogueCoverage([turkey], [{ ...daily, dislikes: ["turkey"] }]);
+  assert.equal(soft.cohorts[0].legacyCompatible.status, "feasible");
+  for (const invalid of [{ scope: "month" }, { neverFoods: "turkey" }, { dislikes: [""] }]) {
+    assert.throws(() => reportCatalogueCoverage([], [{ ...daily, ...invalid } as CoverageCohort]));
+  }
+});
+
+test("synthetic owner-shaped five-slot daily fixture respects restrictions and serving division", () => {
+  const definitions = [["breakfast", "Pea protein", "unreviewed_pea_protein", []], ["snack", "Chicken breast", "chicken", ["meat"]],
+    ["lunch", "Tofu", "tofu", []], ["snack", "Pea protein", "unreviewed_pea_protein", []], ["dinner", "Chicken breast", "chicken", ["meat"]]] as const;
+  const records = definitions.map(([slot, name, canonicalId, flags], index) => {
+    const recipe = reviewedRecipe(); recipe.id = `synthetic-owner-${index}`; recipe.slots = [slot];
+    recipe.macros = { calories: 366, protein: 43.2, carbs: 30, fat: 10 };
+    recipe.ingredients[0] = { ...recipe.ingredients[0], name, canonicalId, allergens: canonicalId === "tofu" ? ["soy"] : [], dietaryFlags: [...flags] };
+    return recipe;
+  });
+  const owner = { id: "synthetic-owner", scope: "day" as const, calorieTarget: 1830, proteinTarget: 216, dietaryMode: "mixed", allergies: ["Dairy", "Nuts", "Fish", "Shellfish", "Eggs", "Sesame"], neverFoods: ["egg", "turkey"], dislikes: ["turkey"], maxPrepMinutes: 30, slots: ["breakfast", "snack", "lunch", "snack", "dinner"] as CoverageCohort["slots"] };
+  const report = reportCatalogueCoverage(records, [owner]);
+  assert.equal(report.cohorts[0].legacyCompatible.status, "feasible");
+  const meals = report.cohorts[0].legacyCompatible.plan!.days[0].meals;
+  assert.equal(meals.length, 5); assert.equal(report.cohorts[0].slots.snack.periodDemand, 2);
+  assert.ok(meals.every(meal => meal.ingredients[0].quantity === 200));
+  assert.equal(reportCatalogueCoverage(records, [{ ...owner, neverFoods: ["chicken", "tofu", "pea protein"] }]).cohorts[0].legacyCompatible.status, "not_feasible");
+});
+
 test("slot counts never claim macro feasibility and repeated snack demand counts twice", () => {
   const records = legacyCatalogue().map(recipe => ({ ...recipe, slots: ["breakfast", "lunch", "dinner", "snack"] as const, macros: { calories: 10, protein: 1, carbs: 1, fat: 0 } }));
   const five = { ...cohort, id: "five", slots: ["breakfast", "snack", "lunch", "snack", "dinner"] as CoverageCohort["slots"] };
