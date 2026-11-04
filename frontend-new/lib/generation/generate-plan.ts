@@ -75,7 +75,7 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
   if (!schedule.ok) {
     if (schedule.error.code === "planning_search_exhausted") {
       throw new MealApprovalError("planning_search_exhausted", schedule.error.violations, 422,
-        "The planner could not find a complete practical week within its search limit. Your existing plan is unchanged. Try different meal targets or review more suitable recipes.");
+        `The planner could not find a complete practical ${scope} within its search limit. Your existing plan is unchanged. Try different meal targets or review more suitable recipes.`);
     }
     const practicalBasketFailure = schedule.error.violations.some(
       (violation) => violation.code === "practical_quantity_exceeded"
@@ -88,7 +88,7 @@ export async function generateWeeklyPlanWithArtifacts(userId: string,
       schedule.error.violations,
       422,
       practicalBasketFailure
-        ? "The available reviewed recipes would create an impractical weekly ingredient basket. Your existing plan is unchanged."
+        ? `The available reviewed recipes would create an impractical ingredient basket for this ${scope}. Your existing plan is unchanged.`
         : coverageReason
           ? `${coverageReason} Review more recipes for that meal type, or choose a longer preparation limit. Your existing plan is unchanged.`
           : undefined

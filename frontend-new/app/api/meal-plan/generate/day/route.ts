@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const plan = await approvePlanForUser(supabase as never, user.id, payload.plan, payload.preferences);
     const dayIndex = payload.dayIndex ?? plan.days.findIndex((day) => day.date.startsWith(payload.dayDate?.split("T")[0] ?? "invalid"));
     if (!plan.days[dayIndex]) return NextResponse.json({ error: "Invalid day" }, { status: 400 });
-    const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences: payload.preferences, supabase });
+    const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences: payload.preferences, supabase, scope: plan.scope, date: plan.weekStart });
     plan.days[dayIndex] = { ...plan.days[dayIndex], meals: artifacts.weeklyPlan.days[dayIndex].meals,
       totals: artifacts.weeklyPlan.days[dayIndex].totals };
     const approved = await approvePlanForUser(supabase as never, user.id, plan, payload.preferences);

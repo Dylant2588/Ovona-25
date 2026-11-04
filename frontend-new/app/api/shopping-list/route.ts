@@ -1,7 +1,8 @@
+import { parsePlanScope, planDayCount } from "@/lib/plan-scope";
+import { readPlanRevisions, selectPlanRevision, type HistoryReader } from "@/lib/plan-revisions";
 import { NextRequest, NextResponse } from "next/server";
 import {
   buildShoppingList,
-  WORKDAY_COUNT,
   type ShoppingListItem,
   type WeeklyMealPlan,
 } from "@/lib/meal-generator";
@@ -24,8 +25,8 @@ const object = (value: unknown): value is Record<string, unknown> => !!value && 
 const text = (value: unknown): value is string => typeof value === "string" && !!value.trim();
 
 /** Validate the materialized ingredient contract without re-scaling or inventing recipe data. */
-const completeDays = (value: unknown, weekStart: string): value is WeeklyMealPlan["days"] => {
-  if (!Array.isArray(value) || value.length !== WORKDAY_COUNT) return false;
+const completeDays = (value: unknown, weekStart: string, count = 7): value is WeeklyMealPlan["days"] => {
+  if (!Array.isArray(value) || value.length !== count) return false;
   const dayIds = new Set<string>();
   const dates = new Set<string>();
   for (const day of value) {
@@ -33,7 +34,7 @@ const completeDays = (value: unknown, weekStart: string): value is WeeklyMealPla
     let date: string;
     try { date = toISODate(day.date); } catch { return false; }
     const index = Math.round((new Date(date).getTime() - new Date(weekStart).getTime()) / 86400000);
-    if (index < 0 || index >= WORKDAY_COUNT || dates.has(date)) return false;
+    if (index < 0 || index >= count || dates.has(date)) return false;
     dates.add(date); dayIds.add(day.id);
     for (const meal of day.meals) {
       if (!object(meal)) return false;
@@ -113,31 +114,16 @@ export async function GET(request: NextRequest) {
     console.warn("[shopping-list] using bearer fallback auth");
   }
 
-  const { data, error } = await supabase
-    .from("plan_history")
-    .select("meals,plan_id,day_id,date,created_at")
-    .eq("user_id", user.id)
-    .eq("week_start", weekStart)
-    .order("created_at", { ascending: false })
-    .limit(100);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  try {
+    const scope = parsePlanScope(request.nextUrl.searchParams.get("scope") ?? undefined);
+    const rows = await readPlanRevisions(supabase as unknown as HistoryReader, user.id, weekStart);
+    const plan = selectPlanRevision(rows, user.id, scope, weekStart);
+    if (!plan) return NextResponse.json({ error: rows.length ? "incomplete_stored_plan" : "no_plan_for_week" }, { status: rows.length ? 409 : 404 });
+    if (!completeDays(plan.days, weekStart, planDayCount(scope))) return NextResponse.json({ error: "incomplete_stored_plan" }, { status: 409 });
+    return approvedShoppingResponse(plan, supabase, user.id);
+  } catch (error) {
+    const failure = approvalFailure(error); return NextResponse.json(failure.body, { status: failure.status });
   }
-
-  // A shopping cache is not authoritative: it may belong to an earlier plan
-  // or a late request. Rebuild only from the latest owner's actual meal rows.
-  const mealRows = (data ?? []).filter(row => row.day_id !== "shopping-list" && row.day_id !== "alternatives");
-  if (!mealRows.length) return NextResponse.json({ error: "no_plan_for_week" }, { status: 404 });
-  const planId = mealRows[0].plan_id;
-  const days = mealRows.filter(row => row.plan_id === planId)
-    .sort((a, b) => String(a.date).localeCompare(String(b.date)))
-    .map(row => object(row.meals) ? { ...row.meals, id: row.day_id, date: row.date } : null);
-  if (!text(planId) || !completeDays(days, weekStart)) {
-    return NextResponse.json({ error: "incomplete_stored_plan", message: "A complete current week is required to build its shopping list." }, { status: 409 });
-  }
-  const plan = { id: planId, userId: user.id, weekStart, days } as WeeklyMealPlan;
-  return approvedShoppingResponse(plan, supabase, user.id);
 }
 
 export async function POST(request: NextRequest) {
@@ -180,7 +166,9 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "invalid weekStart" }, { status: 400 });
   }
-  if (!completeDays(plan.days, effectiveWeekStart)) return NextResponse.json({ error: "invalid_plan", message: "A complete week with valid final ingredient quantities is required." }, { status: 400 });
+  let count: number;
+  try { count = planDayCount(parsePlanScope(plan.scope)); } catch { return NextResponse.json({ error: "invalid_plan_scope" }, { status: 400 }); }
+  if (!completeDays(plan.days, effectiveWeekStart, count)) return NextResponse.json({ error: "invalid_plan", message: "A complete week with valid final ingredient quantities is required." }, { status: 400 });
   // POST is an ephemeral projection of the caller's current plan. It must not
   // persist a second independently writable source of shopping quantities.
   return approvedShoppingResponse(plan as unknown as WeeklyMealPlan, supabase, user.id);

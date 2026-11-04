@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const mealIndex = payload.mealIndex ?? day?.meals.findIndex((meal) => meal.mealSlot === payload.mealSlot) ?? -1;
     const meal = day?.meals[mealIndex];
     if (!meal) return NextResponse.json({ error: "Invalid meal position" }, { status: 400 });
-    const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences: payload.preferences, supabase });
+    const artifacts = await generateWeeklyPlanWithArtifacts(user.id, { preferences: payload.preferences, supabase, scope: plan.scope, date: plan.weekStart });
     const replacement = artifacts.weeklyPlan.days.flatMap((entry) => entry.meals)
       .find((candidate) => candidate.mealSlot === meal.mealSlot && candidate.baseId !== meal.baseId);
     if (!replacement) throw new MealApprovalError("insufficient_reviewed_catalogue", ["No different reviewed recipe meets your preferences."]);

@@ -1,3 +1,4 @@
+import * as planScope from "../../lib/plan-scope.ts";
 import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs";
@@ -30,6 +31,7 @@ function entry(proposal: unknown, options: { exhaustRanked?: boolean; failApprov
   }).outputText;
   const generationModule = { exports: {} as { generateWeeklyPlanWithArtifacts(id: string, options: unknown): Promise<{ weeklyPlan: WeeklyMealPlan }> } };
   const deps: Record<string, unknown> = {
+    "../plan-scope.ts": planScope,
     crypto: require("node:crypto"),
     "@/lib/meal-images": { imageForMeal: () => "/images/meals/bowl.svg" },
     "@/lib/meal-generator": { preferenceSignatureFor: () => "test-signature" },
@@ -59,7 +61,7 @@ function entry(proposal: unknown, options: { exhaustRanked?: boolean; failApprov
     if (!(id in deps)) throw Error(`Unexpected generation dependency: ${id}`);
     return deps[id];
   }, generationModule, generationModule.exports);
-  return { run: () => generationModule.exports.generateWeeklyPlanWithArtifacts("user-1", { supabase: {} }), calls };
+  return { run: (options = {}) => generationModule.exports.generateWeeklyPlanWithArtifacts("user-1", { supabase: {}, ...options }), calls };
 }
 
 test("actual generation falls back for unavailable, refused and unsafe AI output, retaining real final approval", async () => {
@@ -103,4 +105,13 @@ test("shared portions cannot admit a day whose individually rounded calories exc
     assert.ok(calories <= 1830 * 1.08 && calories >= 1830 * 0.95);
     assert.ok(protein >= 216 * 0.98 && protein <= 216 * 1.1);
   }
+});
+
+
+test("actual generation materializes and approves exactly one requested day", async () => {
+  const result = await entry({ ok: false, error: { code: "ai_proposal_unavailable" } }).run({ scope: "day", date: "2026-11-04" });
+  assert.equal(result.weeklyPlan.scope, "day"); assert.equal(result.weeklyPlan.days.length, 1);
+  assert.equal(result.weeklyPlan.weekStart.slice(0, 10), "2026-11-04");
+  assert.equal(result.weeklyPlan.days[0].date.slice(0, 10), "2026-11-04");
+  assert.equal(result.weeklyPlan.weeklyTotals.calories, result.weeklyPlan.days[0].totals.calories);
 });

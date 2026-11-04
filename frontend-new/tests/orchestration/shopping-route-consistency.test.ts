@@ -1,3 +1,5 @@
+import * as planScope from "../../lib/plan-scope.ts";
+import * as planRevisions from "../../lib/plan-revisions.ts";
 import assert from "node:assert/strict";
 import test from "node:test";
 import fs from "node:fs";
@@ -30,7 +32,7 @@ function handler(history: unknown[], authorised = true, realApproval = false, al
     const query = {
       select: () => query,
       eq: (key: string, value: unknown) => { if (table === "plan_history") filters.push([key, value]); return query; },
-      order: () => query, limit: () => query,
+      order: () => query, limit: () => query, range: () => query,
       maybeSingle: async () => ({ data: table === "plan_history" ? history.find((x: unknown) => (x as { day_id?: string }).day_id === "shopping-list") : { weekly_budget: 55 }, error: null }),
       then: (resolve: (v: unknown) => unknown) => Promise.resolve({ data: table === "plan_history" ? history : [], error: null }).then(resolve),
       delete: () => { writes++; throw Error("Shopping cache writes are forbidden"); },
@@ -40,6 +42,8 @@ function handler(history: unknown[], authorised = true, realApproval = false, al
   const code = ts.transpileModule(fs.readFileSync("app/api/shopping-list/route.ts", "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
   const routeModule = { exports: {} as { GET(request: unknown): Promise<Response>; POST(request: unknown): Promise<Response> } };
   const deps: Record<string, unknown> = {
+    "@/lib/plan-scope": planScope,
+    "@/lib/plan-revisions": planRevisions,
     "next/server": { NextResponse: { json: (v: unknown, init?: ResponseInit) => Response.json(v, init) } },
     "@/lib/meal-generator": { WORKDAY_COUNT: 7, buildShoppingList },
     "@/lib/retailer-comparison": { compareRetailerBaskets: () => ({ status: "price_comparison_unavailable", claimable: false }) },
@@ -53,7 +57,7 @@ function handler(history: unknown[], authorised = true, realApproval = false, al
   new Function("require", "module", "exports", code)((id: string) => {
     if (!(id in deps)) throw Error(`Unexpected dependency ${id}`); return deps[id];
   }, routeModule, routeModule.exports);
-  return { get: () => routeModule.exports.GET({ nextUrl: new URL(`http://localhost/api/shopping-list?weekStart=${week}`) }),
+  return { get: (scope = "week") => routeModule.exports.GET({ nextUrl: new URL(`http://localhost/api/shopping-list?weekStart=${week}&scope=${scope}`) }),
     post: (body: unknown) => routeModule.exports.POST(new Request("http://localhost/api/shopping-list", { method: "POST", body: JSON.stringify(body) })), filters, writes: () => writes, approvals: () => approvals, constraintReads: () => constraintReads };
 }
 
@@ -88,10 +92,22 @@ test("GET derives current quantities from complete saved meals and ignores stale
   }
 });
 
+test("daily shopping is scope-isolated and reloads only the same complete revision", async () => {
+  const day = plan(); day.scope = "day"; day.days = day.days.slice(0, 1); day.id = "daily-current";
+  const dailyRows = planRevisions.revisionRows(day, "owner-a", day.id, week);
+  const h = handler([...dailyRows, ...rows()]);
+  const posted = await h.post({ plan: day }); assert.equal(posted.status, 200);
+  const loaded = await h.get("day"); assert.equal(loaded.status, 200);
+  const result = await loaded.json(); assert.equal(result.planId, day.id); assert.equal(result.items[0].quantity, 75);
+  const weekly = await (await h.get()).json(); assert.notEqual(weekly.planId, day.id); assert.equal(weekly.items[0].quantity, 525);
+  const incomplete = rows().slice(0, 6).map(row => ({ ...row, plan_id: "incomplete-newer" }));
+  assert.equal((await handler([...incomplete, ...rows()]).get()).status, 200);
+  assert.equal(h.writes(), 0);
+});
+
 test("GET rejects incomplete, duplicated or malformed latest week rather than returning old cache", async () => {
   const complete = rows();
   for (const history of [complete.slice(0, 6), [...complete.slice(0, 6), complete[0]],
-    [...complete.slice(0, 6).map(r => ({ ...r, plan_id: "new-incomplete" })), ...complete],
     complete.map((r, i) => i ? r : { ...r, meals: { meals: [{ ingredients: [{ name: "Olives", amount: -2, unit: "g" }] }] } })]) {
     const response = await handler(history).get(); assert.equal(response.status, 409);
   }
