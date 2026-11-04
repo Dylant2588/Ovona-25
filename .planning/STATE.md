@@ -80,6 +80,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261104-dwi | SCRUM-11 hard dietary enforcement across recipe, retailer and shopping boundaries; 207 tests passed; awaiting owner review | 2026-11-04 | 70d37e2 | [261104-dwi](./quick/261104-dwi-scrum-11-ov-03-hard-dietary-restriction-/) |
 | 260811-o94 | Implement Ovona first product-redesign slice: Today/This week meal UX, lightweight I ate this capture with calm adaptation feedback, and responsive polish while preserving planner features. | 2026-08-11 | 837e7e7 | [260811-o94-implement-ovona-first-product-redesign-s](./quick/260811-o94-implement-ovona-first-product-redesign-s/) |
 
 | 261012-o3c | Polish planner hierarchy and meal presentation for a premium feel | 2026-10-12 | af09634 | [261012-o3c-polish-planner-with-premium-hierarchy-an](./quick/261012-o3c-polish-planner-with-premium-hierarchy-an/) |
