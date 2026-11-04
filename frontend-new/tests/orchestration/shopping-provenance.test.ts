@@ -37,6 +37,20 @@ test("provenance follows same-plan swaps and compatible units, not stale shoppin
   assert.equal(shoppingMealSources([{ meals: [{ title: "Meal out", mealKind: "social", ingredients: [ingredient(99)] }] }]).size, 0);
 });
 
+test("source grouping distinguishes reviewed recipe identity and version even when titles match", () => {
+  const days = [{ meals: [
+    { title: "Same title", baseId: "recipe-a", recipeVersion: 1, ingredients: [ingredient(10)] },
+    { title: "Same title", baseId: "recipe-a", recipeVersion: 1, ingredients: [ingredient(15)] },
+    { title: "Same title", baseId: "recipe-a", recipeVersion: 2, ingredients: [ingredient(20)] },
+    { title: "Same title", baseId: "recipe-b", recipeVersion: 1, ingredients: [ingredient(25)] },
+    { title: "Same title", ingredients: [ingredient(30)] },
+  ] }];
+  const sources = shoppingMealSources(days).get(ingredientLedgerKey("Olives", "g"))!;
+  assert.equal(sources.length, 4);
+  assert.deepEqual(sources.map(s => [s.meals, s.quantity]), [[2, 25], [1, 20], [1, 25], [1, 30]]);
+  assert.equal(sources.reduce((sum, s) => sum + s.quantity, 0), 100);
+});
+
 test("reviewed cooking instructions retain ingredient steps even when they mention packet directions", () => {
   const steps = ["Cook the rice according to package directions, then stir in the olives.", "Serve and enjoy."];
   assert.deepEqual(reviewedMethodForDisplay({ recipeVersion: 2, steps }), steps);
