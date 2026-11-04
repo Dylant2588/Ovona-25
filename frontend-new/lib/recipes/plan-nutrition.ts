@@ -9,7 +9,7 @@ export type PlanNutritionSummary = { planId: string; days: Array<{ dayId: string
 
 const references = { calcium_mg: 800, iron_mg: 14, vitamin_c_mg: 80 };
 const referenceUrl = "https://www.legislation.gov.uk/eur/2011/1169/pdfs/eur_20111169_2014-02-19_en.pdf";
-const quantize = (v: number) => Math.round(v * 1e6) / 1e6;
+const quantize = (v: number) => Math.abs(v) < 1e15 ? Math.round(v * 1e6) / 1e6 : v;
 
 /** Read-only projection of an already approved plan. Display enrichment is never approval evidence. */
 export function buildPlanNutritionSummary(plan: WeeklyMealPlan, recipes: readonly RecipeRecord[], displayMappings: readonly DisplayNutritionMapping[] = []): PlanNutritionSummary {

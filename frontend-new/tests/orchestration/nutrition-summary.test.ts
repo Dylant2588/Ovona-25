@@ -32,6 +32,8 @@ test("embedded source evidence takes precedence and portions, reload and social 
   assert.equal(r.days[0].micronutrients.calcium_mg.amount, 55);
   assert.equal(r.days[0].micronutrients.calcium_mg.estimated, false);
   assert.deepEqual(buildPlanNutritionSummary(JSON.parse(JSON.stringify(plan)), [recipe], []), r);
+  recipe.ingredients[0].nutrition.food.micronutrients!.calcium_mg = 1e306;
+  assert.equal(Number.isFinite(buildPlanNutritionSummary(plan, [recipe], []).days[0].micronutrients.calcium_mg.amount), true);
   plan.days[0].meals[0].mealKind = "social";
   const social = buildPlanNutritionSummary(plan, [recipe], []).days[0];
   assert.equal(social.macroEvidence, "unknown"); assert.equal(social.micronutrients.calcium_mg.status, "partial");
