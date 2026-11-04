@@ -40,7 +40,7 @@ test("provenance follows same-plan swaps and compatible units, not stale shoppin
 test("source grouping distinguishes reviewed recipe identity and version even when titles match", () => {
   const days = [{ meals: [
     { title: "Same title", baseId: "recipe-a", recipeVersion: 1, ingredients: [ingredient(10)] },
-    { title: "Same title", baseId: "recipe-a", recipeVersion: 1, ingredients: [ingredient(15)] },
+    { title: "Renamed display title", baseId: "recipe-a", recipeVersion: 1, ingredients: [ingredient(15)] },
     { title: "Same title", baseId: "recipe-a", recipeVersion: 2, ingredients: [ingredient(20)] },
     { title: "Same title", baseId: "recipe-b", recipeVersion: 1, ingredients: [ingredient(25)] },
     { title: "Same title", ingredients: [ingredient(30)] },

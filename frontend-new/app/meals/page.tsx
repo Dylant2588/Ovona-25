@@ -7,10 +7,12 @@ import { DailyNutritionPanel } from "@/components/DailyNutritionPanel";
 import type { PlanNutritionSummary } from "@/lib/recipes/plan-nutrition";
 import { planAnchor, planCacheKey, planDayCount, type PlanScope } from "@/lib/plan-scope";
 import { matchesPlanPeriod } from "@/lib/plan-view";
-import { approvedShoppingItems } from "@/lib/shopping-approval";
 import { planForPreferenceSnapshot } from "@/lib/plan-preference-snapshot";
 import { ingredientLedgerKey } from "@/lib/ingredient-ledger";
-import { shoppingMealSources, shoppingSourceLabel } from "@/lib/shopping-provenance";
+import { shoppingMealSources } from "@/lib/shopping-provenance";
+import { approvedShoppingItems } from "@/lib/shopping-approval";
+import { groupShoppingDepartments } from "@/lib/shopping-departments";
+import { ShoppingRecipeSources, type ShoppingSourceView } from "@/components/ShoppingRecipeSources";
 import { reviewedMethodForDisplay } from "@/lib/reviewed-method";
 import { MealThumbnail } from "@/components/MealThumbnail";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -522,26 +524,6 @@ const formatIngredientLine = (item: IngredientLine) => {
   });
 };
 
-const SHOPPING_CATEGORY_ORDER = [
-  "protein",
-  "dairy",
-  "produce",
-  "pantry",
-  "bakery",
-  "frozen",
-] as const;
-
-const shoppingCategoryRank = (category: string) => {
-  const normalized = category.trim().toLowerCase();
-  if (normalized.startsWith("protein")) return 0;
-  if (normalized.startsWith("dairy")) return 1;
-  if (normalized.startsWith("produce")) return 2;
-  if (normalized.startsWith("pantry")) return 3;
-  if (normalized.startsWith("bakery")) return 4;
-  if (normalized.startsWith("frozen")) return 5;
-  return SHOPPING_CATEGORY_ORDER.length;
-};
-
 const shoppingItemKey = (item: ShoppingListItem) =>
   `${(item.displayName ?? item.name).trim().toLowerCase()}|${item.quantity}|${item.unit}|${
     item.category ?? "Pantry"
@@ -701,6 +683,7 @@ function MealsPageContent() {
   const [nutritionError, setNutritionError] = useState<string | null>(null);
   const [shoppingReloadToken, setShoppingReloadToken] = useState(0);
   const [shoppingExpanded, setShoppingExpanded] = useState(false);
+  const [shoppingSourceView, setShoppingSourceView] = useState<ShoppingSourceView>("reveal");
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
   const [clientReady, setClientReady] = useState(false);
   const planLoadingRef = useRef(planLoading);
@@ -2068,21 +2051,7 @@ function MealsPageContent() {
 
   const groupedShoppingList = useMemo(
     () =>
-      displayShoppingList.length
-        ? Array.from(
-            displayShoppingList.reduce((map, item) => {
-              const key = item.category ?? "Pantry";
-              if (!map.has(key)) {
-                map.set(key, []);
-              }
-              map.get(key)!.push(item);
-              return map;
-            }, new Map<string, ShoppingListItem[]>())
-          ).map(([category, items]) => ({
-            category,
-            items: items.sort((a, b) => a.name.localeCompare(b.name)),
-          }))
-            .map(({ category, items }) => {
+      groupShoppingDepartments(displayShoppingList).map(({ category, items }) => {
               const subtotal = items.reduce((total, item) => {
                 const price = shoppingItemPrices.get(shoppingItemKey(item));
                 return typeof price === "number" ? total + price : total;
@@ -2098,13 +2067,7 @@ function MealsPageContent() {
                 subtotal: Number(subtotal.toFixed(2)),
                 hasPricedItems: pricedItems > 0,
               };
-            })
-            .sort((a, b) => {
-              const rankDiff =
-                shoppingCategoryRank(a.category) - shoppingCategoryRank(b.category);
-              return rankDiff !== 0 ? rankDiff : a.category.localeCompare(b.category);
-            })
-        : [],
+            }),
     [displayShoppingList, shoppingItemPrices]
   );
 
@@ -2264,6 +2227,10 @@ function MealsPageContent() {
 
       {error && <Alert severity="error">{error}</Alert>}
       {shoppingListError && <Alert severity="error" action={<Button color="inherit" size="small" onClick={retryShoppingList}>Retry shopping list</Button>}>{shoppingListError}</Alert>}
+      {plan && normalizingList && <Alert severity="info" role="status">Checking shopping requirements against your saved restrictions…</Alert>}
+      {plan && !normalizingList && shoppingList.length === 0 && plan.days.every(day => day.meals.every(isSocialMeal)) && (
+        <Alert severity="info">No recipe ingredients to buy for this {planningScope === "day" ? "day" : "week"}. Meals out do not add shopping requirements.</Alert>
+      )}
       {preferencesNotice && (
         <Alert
           severity={preferencesNotice.severity}
@@ -3232,6 +3199,9 @@ function MealsPageContent() {
                     <Typography variant="body2" color="text.secondary">
                       {displayShoppingList.length} unique items
                     </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Amounts are recipe requirements before purchase-pack rounding.
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {priceComparison?.status === "qualified"
                         ? `${priceComparison.bestRetailer.name}: ${formatGbp(priceComparison.lowestObservedCompleteBasket)}${priceComparison.withinBudget ? " · within your budget" : " · over your budget"}`
@@ -3245,11 +3215,6 @@ function MealsPageContent() {
                         {basketPricing.unmatchedItems.length} item(s) missing price match
                       </Typography>
                     ) : null}
-                    {normalizingList && (
-                      <Typography variant="caption" color="text.secondary">
-                        Loading shopping list...
-                      </Typography>
-                    )}
                   </Stack>
                   <Chip
                     label={shoppingExpanded ? "Hide items" : "View items"}
@@ -3266,32 +3231,10 @@ function MealsPageContent() {
                 }}
               >
                 <Stack spacing={2}>
-                  {shoppingListError && (
-                    <Alert
-                      severity="error"
-                      action={
-                        <Button color="inherit" size="small" onClick={retryShoppingList}>
-                          Retry
-                        </Button>
-                      }
-                    >
-                      Couldn&apos;t load shopping list. Try again.
-                    </Alert>
-                  )}
-
-                  {normalizingList && (
-                    <Stack spacing={1.25}>
-                      {Array.from({ length: 4 }).map((_, index) => (
-                        <Skeleton
-                          key={`shopping-skeleton-${index}`}
-                          variant="rounded"
-                          height={34}
-                          sx={{ borderRadius: 1.5 }}
-                        />
-                      ))}
-                    </Stack>
-                  )}
-
+                  <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" role="group" aria-label="Recipe source display" sx={{ mb: 2 }}>
+                    <Button size="small" variant={shoppingSourceView === "reveal" ? "outlined" : "text"} aria-pressed={shoppingSourceView === "reveal"} onClick={() => setShoppingSourceView("reveal")}>Reveal recipes</Button>
+                    <Button size="small" variant={shoppingSourceView === "inline" ? "outlined" : "text"} aria-pressed={shoppingSourceView === "inline"} onClick={() => setShoppingSourceView("inline")}>Inline icons</Button>
+                  </Stack>
                   {groupedShoppingList.map(({ category, items, subtotal, hasPricedItems }) => (
                     <Box
                       key={category}
@@ -3317,21 +3260,19 @@ function MealsPageContent() {
                               key={shoppingItemKey(item)}
                               direction="row"
                               justifyContent="space-between"
-                              alignItems="center"
+                              alignItems="flex-start"
                               spacing={1}
                             >
-                              <Typography fontWeight={600} sx={{ minWidth: 84 }}>
+                              <Typography fontWeight={600} sx={{ minWidth: { xs: 52, sm: 84 } }}>
                                 {displayLine.amount}
                               </Typography>
                               <Stack sx={{ flexGrow: 1 }}>
                                 <Typography color="text.secondary">{displayLine.name}</Typography>
-                                {sources.length > 0 && <Typography variant="caption" color="text.secondary">
-                                  Used in: {shoppingSourceLabel(sources)}
-                                </Typography>}
+                                <ShoppingRecipeSources ingredient={displayLine.name} sources={sources} view={shoppingSourceView} />
                               </Stack>
                               <Typography
                                 variant="body2"
-                                sx={{ minWidth: 64, textAlign: "right", fontWeight: 600 }}
+                                sx={{ minWidth: { xs: 20, sm: 64 }, textAlign: "right", fontWeight: 600 }}
                               >
                                 {typeof itemPrice === "number" ? formatGbp(itemPrice) : "—"}
                               </Typography>
