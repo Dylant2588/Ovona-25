@@ -4,7 +4,9 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import type { WeeklyMealPlan, ShoppingListItem } from "../../lib/meal-generator.ts";
-import { reviewedPlan } from "./reviewed-recipe-fixture.ts";
+import { reviewedPlan, recipeDatabase } from "./reviewed-recipe-fixture.ts";
+import { approvePlanForUser, approvalFailure } from "../../lib/recipes/plan-boundary.ts";
+import { loadServerConstraints } from "../../lib/recipes/server-constraints.ts";
 
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
@@ -19,8 +21,11 @@ function plan(amount = 25) {
 function rows(value = plan()) {
   return value.days.map(d => ({ plan_id: value.id, day_id: d.id, date: d.date, week_start: week, created_at: "2026-10-12T12:00:00Z", meals: d }));
 }
-function handler(history: unknown[], authorised = true) {
+function handler(history: unknown[], authorised = true, realApproval = false, allergy?: string) {
   const filters: Array<[string, unknown]> = []; let writes = 0;
+  let approvals = 0;
+  let constraintReads = 0;
+  const safetyDb = recipeDatabase({ allergy });
   const db = { from: (table: string) => {
     const query = {
       select: () => query,
@@ -39,13 +44,34 @@ function handler(history: unknown[], authorised = true) {
     "@/lib/meal-generator": { WORKDAY_COUNT: 7, buildShoppingList },
     "@/lib/retailer-comparison": { compareRetailerBaskets: () => ({ status: "price_comparison_unavailable", claimable: false }) },
     "@/lib/serverAuth": { resolveRequestAuth: async () => ({ user: authorised ? { id: "owner-a" } : null, session: {}, supabase: db }) },
+    "@/lib/recipes/server-constraints": { loadServerConstraints: async () => { constraintReads++; return loadServerConstraints(safetyDb, "owner-a"); } },
+    "@/lib/recipes/plan-boundary": { approvalFailure, approvePlanForUser: async (_db: unknown, owner: string, value: WeeklyMealPlan, _preferences: unknown, injected: { constraints: () => Promise<unknown> }) => {
+      approvals++;
+      return realApproval ? approvePlanForUser(safetyDb, owner, value, undefined, { ...injected, context: async () => ({ calorieTarget: 1650, proteinTarget: 120, mealsPerDay: 3 }) } as never) : value;
+    } },
   };
   new Function("require", "module", "exports", code)((id: string) => {
     if (!(id in deps)) throw Error(`Unexpected dependency ${id}`); return deps[id];
   }, routeModule, routeModule.exports);
   return { get: () => routeModule.exports.GET({ nextUrl: new URL(`http://localhost/api/shopping-list?weekStart=${week}`) }),
-    post: (body: unknown) => routeModule.exports.POST(new Request("http://localhost/api/shopping-list", { method: "POST", body: JSON.stringify(body) })), filters, writes: () => writes };
+    post: (body: unknown) => routeModule.exports.POST(new Request("http://localhost/api/shopping-list", { method: "POST", body: JSON.stringify(body) })), filters, writes: () => writes, approvals: () => approvals, constraintReads: () => constraintReads };
 }
+
+test("both shopping boundaries approve real reviewed recipes against one current saved restriction snapshot", async () => {
+  const current = reviewedPlan(); current.userId = "owner-a";
+  for (const method of ["get", "post"] as const) {
+    const h = handler(rows(current), true, true);
+    const response = method === "get" ? await h.get() : await h.post({ plan: current });
+    assert.equal(response.status, 200); assert.equal(h.approvals(), 1); assert.equal(h.constraintReads(), 1); assert.equal(h.writes(), 0);
+    const forged = structuredClone(current); forged.days[0].meals[0].ingredients[0].name = "Milk";
+    const invalid = handler(rows(forged), true, true);
+    assert.equal((method === "get" ? await invalid.get() : await invalid.post({ plan: forged })).status, 422);
+    assert.equal(invalid.writes(), 0);
+    const restricted = handler(rows(current), true, true, "chicken");
+    assert.equal((method === "get" ? await restricted.get() : await restricted.post({ plan: current, preferences: { profile: { allergies: [] } } })).status, 422);
+    assert.equal(restricted.writes(), 0);
+  }
+});
 
 test("GET derives current quantities from complete saved meals and ignores stale cached shopping rows", async () => {
   for (const amount of [25, 50]) {
