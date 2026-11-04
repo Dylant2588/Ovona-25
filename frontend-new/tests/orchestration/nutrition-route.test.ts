@@ -9,13 +9,13 @@ import { loadReviewedRecipes } from "../../lib/recipes/repository.ts";
 import { buildPlanNutritionSummary } from "../../lib/recipes/plan-nutrition.ts";
 
 const require = createRequire(import.meta.url); const ts = require("typescript");
-function handler(authorised = true, allergy?: string) {
+function handler(authorised = true, allergy?: string, neverFoods: string[] = []) {
   const database = recipeDatabase({ allergy }); let constraintReads = 0; let recipeReads = 0;
   const routeModule = { exports: {} as { POST(request: Request): Promise<Response> } };
   const deps: Record<string, unknown> = {
     "next/server": { NextResponse: { json: (value: unknown, init?: ResponseInit) => Response.json(value, init) } },
     "@/lib/serverAuth": { resolveRequestAuth: async () => ({ user: authorised ? { id: "user-1" } : null, supabase: database }) },
-    "@/lib/recipes/server-constraints": { loadServerConstraints: async () => { constraintReads++; return loadServerConstraints(database, "user-1"); } },
+    "@/lib/recipes/server-constraints": { loadServerConstraints: async () => { constraintReads++; return { ...await loadServerConstraints(database, "user-1"), neverFoods }; } },
     "@/lib/recipes/repository": { loadReviewedRecipes: async () => { recipeReads++; return loadReviewedRecipes(database); } },
     "@/lib/recipes/plan-boundary": { approvalFailure, MealApprovalError, approvePlanForUser: async (_db: unknown, user: string, plan: ReturnType<typeof reviewedPlan>, _preferences: unknown, options: object) => approvePlanForUser(database, user, plan, undefined, { ...options, context: async () => ({ calorieTarget: 1650, proteinTarget: 120, mealsPerDay: 3 }) }) },
     "@/lib/recipes/plan-nutrition": { buildPlanNutritionSummary },
@@ -36,6 +36,7 @@ test("nutrition route uses actual reviewed approval and one source snapshot with
   assert.equal((await h.post({ plan: forged })).status, 422);
   assert.equal((await h.post({ plan: { ...plan, userId: "victim" } })).status, 422);
   assert.equal((await handler(true, "soy").post({ plan })).status, 200);
+  assert.equal((await handler(true, undefined, ["chickpeas"]).post({ plan })).status, 422);
   const excluded = structuredClone(plan); excluded.days[0].meals[0].recipeVersion = 999;
   assert.equal((await h.post({ plan: excluded })).status, 422);
   assert.equal((await handler(false).post({ plan })).status, 401);
