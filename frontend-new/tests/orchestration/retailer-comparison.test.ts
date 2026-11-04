@@ -35,3 +35,25 @@ test("never exposes a price claim from stale, estimated, partial, or single-reta
     }
   }
 });
+
+test("missing retailer suitability is explicitly unverified and blocks restricted qualification", () => {
+  const observations = [observation("alpha", 4), observation("bravo", 3)];
+  const unrestricted = compareRetailerBaskets(items, observations, 10, now);
+  assert.equal(unrestricted.dietaryStatus, "unverified");
+  const restricted = compareRetailerBaskets(items, observations, 10, now, { allergies: ["milk"] });
+  assert.equal(restricted.status, "price_comparison_unavailable");
+  assert.equal(restricted.dietaryStatus, "unverified");
+});
+
+test("retailer restrictions are applied before price ranking including derivatives and exclusions", () => {
+  const evidence = { status: "reviewed" as const, allergens: [], mayContain: [], ingredients: ["chicken"], dietaryTags: ["omnivore"] };
+  const safe = [observation("alpha", 4, { suitability: evidence }), observation("bravo", 5, { suitability: evidence })];
+  const unsafe = observation("alpha", 1, { suitability: { ...evidence, allergens: ["casein"] } });
+  const result = compareRetailerBaskets(items, [...safe, unsafe], 10, now, { allergies: ["milk"] });
+  assert.equal(result.status, "qualified");
+  assert.equal(result.dietaryStatus, "verified");
+  if (result.status === "qualified") assert.equal(result.lowestObservedCompleteBasket, 4);
+  for (const constraints of [{ neverFoods: ["chicken"] }, { dietaryMode: "vegan" }, { allergies: ["unknown"] }]) {
+    assert.equal(compareRetailerBaskets(items, safe, 10, now, constraints).status, "price_comparison_unavailable");
+  }
+});
