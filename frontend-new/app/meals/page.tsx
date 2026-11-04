@@ -3,6 +3,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import NextLink from "next/link";
+import { DailyNutritionPanel } from "@/components/DailyNutritionPanel";
+import type { PlanNutritionSummary } from "@/lib/recipes/plan-nutrition";
 import { planAnchor, planCacheKey, planDayCount, type PlanScope } from "@/lib/plan-scope";
 import { matchesPlanPeriod } from "@/lib/plan-view";
 import { approvedShoppingItems } from "@/lib/shopping-approval";
@@ -694,6 +696,9 @@ function MealsPageContent() {
   const [normalizingList, setNormalizingList] = useState(false);
   const [shoppingListError, setShoppingListError] = useState<string | null>(null);
   const [shoppingApproval, setShoppingApproval] = useState<{ plan: WeeklyMealPlan; preferences: PreferencesInput | null } | null>(null);
+  const [nutritionResult, setNutritionResult] = useState<{ plan: WeeklyMealPlan; summary: PlanNutritionSummary } | null>(null);
+  const [nutritionLoading, setNutritionLoading] = useState(false);
+  const [nutritionError, setNutritionError] = useState<string | null>(null);
   const [shoppingReloadToken, setShoppingReloadToken] = useState(0);
   const [shoppingExpanded, setShoppingExpanded] = useState(false);
   const [loadingStepIndex, setLoadingStepIndex] = useState(0);
@@ -2006,6 +2011,24 @@ function MealsPageContent() {
   const displayShoppingList = approvedShoppingItems(shoppingList, plan, preferences, shoppingApproval, userId, authLoading);
   const shoppingSources = useMemo(() => shoppingMealSources(displayDays), [displayDays]);
 
+  useEffect(() => {
+    let active = true;
+    setNutritionResult(null); setNutritionError(null);
+    if (!plan || !userId || authLoading) { setNutritionLoading(false); return; }
+    setNutritionLoading(true);
+    void (async () => {
+      try {
+        const response = await authFetchWithRetry("/api/meal-plan/nutrition", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan }) });
+        const result = await response.json() as PlanNutritionSummary & { message?: string };
+        if (!response.ok || result.planId !== plan.id) throw new Error(result.message || "Nutrition sources could not be checked for this plan.");
+        if (active) setNutritionResult({ plan, summary: result });
+      } catch (failure) {
+        if (active) setNutritionError(failure instanceof Error ? failure.message : "Nutrition sources are unavailable. Missing nutrient values are unknown.");
+      } finally { if (active) setNutritionLoading(false); }
+    })();
+    return () => { active = false; };
+  }, [plan, userId, authLoading, authFetchWithRetry, preferences]);
+
   const shoppingItemPrices = useMemo(() => {
     const keyToPrice = new Map<string, number | null>();
     if (!basketPricing?.itemPrices?.length || !displayShoppingList.length) {
@@ -2435,6 +2458,12 @@ function MealsPageContent() {
               </Stack>
             </CardContent>
           </Card>
+          <DailyNutritionPanel
+            day={nutritionResult?.plan === plan ? nutritionResult.summary.days.find(day => day.dayId === selectedDay?.id) ?? null : null}
+            targets={macroTargets}
+            loading={nutritionLoading}
+            error={nutritionError}
+          />
           <Stack spacing={2}>
             {displayDays.filter((day) => day.id === expandedDayId).map((day) => {
               const dayIndex = displayDays.findIndex((candidate) => candidate.id === day.id);
