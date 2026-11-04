@@ -8,8 +8,9 @@ import { recipesToCandidates, recipeProteinFamilies } from "./candidates.ts";
 import { normalizePlannerProfile } from "../orchestration/normalize-profile.ts";
 import { DEFAULT_PLANNER_POLICY } from "../orchestration/policy.ts";
 import { orchestrateWeek } from "../orchestration/schedule.ts";
+import { parsePlanScope, planDayCount, type PlanScope } from "../plan-scope.ts";
 
-export type CoverageCohort = { id: string; calorieTarget: number; proteinTarget: number; dietaryMode: string; allergies: string[]; maxPrepMinutes: number; slots: PlannerMealSlot[] };
+export type CoverageCohort = { id: string; scope?: PlanScope; neverFoods?: string[]; dislikes?: string[]; calorieTarget: number; proteinTarget: number; dietaryMode: string; allergies: string[]; maxPrepMinutes: number; slots: PlannerMealSlot[] };
 const THREE: PlannerMealSlot[] = ["breakfast", "lunch", "dinner"];
 const FIVE: PlannerMealSlot[] = ["breakfast", "snack", "lunch", "snack", "dinner"];
 const probe = (id: string, extra: Partial<CoverageCohort> = {}): CoverageCohort => ({ id, calorieTarget: 2000, proteinTarget: 150, dietaryMode: "mixed", allergies: [], maxPrepMinutes: 30, slots: [...THREE], ...extra });
@@ -27,6 +28,10 @@ export function validateCoverageCohorts(value: unknown): asserts value is Covera
   for (const raw of value) {
     if (!object(raw) || typeof raw.id !== "string" || !raw.id.trim() || raw.id.length > 100 || ids.has(raw.id)) throw new Error("Each cohort needs a unique nonempty ID (up to 100 characters).");
     ids.add(raw.id);
+    parsePlanScope(raw.scope);
+    for (const field of ["neverFoods", "dislikes"]) {
+      if (raw[field] !== undefined && (!Array.isArray(raw[field]) || raw[field].length > 40 || raw[field].some((food: unknown) => typeof food !== "string" || !food.trim() || food.length > 160))) throw new Error(`Invalid ${field} list in ${raw.id}.`);
+    }
     if (typeof raw.dietaryMode !== "string" || !DIETS.includes(raw.dietaryMode)) throw new Error(`Invalid dietary mode in ${raw.id}.`);
     if (!Array.isArray(raw.slots) || !raw.slots.length || raw.slots.length > 5 || raw.slots.some(slot => !SLOTS.includes(slot))) throw new Error(`Invalid required slot list in ${raw.id}.`);
     if (!Array.isArray(raw.allergies) || raw.allergies.length > 40 || raw.allergies.some(allergy => typeof allergy !== "string" || allergy.length > 160 || !canonicalAllergens(allergy).length)) throw new Error(`Invalid allergy evidence in ${raw.id}.`);
@@ -36,7 +41,7 @@ export function validateCoverageCohorts(value: unknown): asserts value is Covera
 }
 
 type ProbeResult = { status: "feasible" | "not_feasible" | "indeterminate"; admittedRecipes: number; admittedCalculatedRecipes: number; admittedLegacyRecipes: number; reason?: string; violations?: readonly { day: number; code: string; message: string }[]; plan?: WeekSchedule };
-type SlotCapacity = { dailyDemand: number; weeklyDemand: number; uniqueRecipes: number; calculatedUniqueRecipes: number };
+type SlotCapacity = { dailyDemand: number; weeklyDemand: number; periodDemand: number; uniqueRecipes: number; calculatedUniqueRecipes: number };
 
 /** Pure snapshot report. No database, environment reads, repairs or approvals. */
 export function reportCatalogueCoverage(records: readonly unknown[], cohorts: readonly CoverageCohort[] = DEFAULT_COVERAGE_COHORTS) {
@@ -69,7 +74,9 @@ export function reportCatalogueCoverage(records: readonly unknown[], cohorts: re
   }
   counts.multipleApprovedVersions = [...approvedVersions].filter(([, versions]) => versions.size > 1).map(([id]) => id).sort();
   const results = cohorts.map(cohort => {
-    const constraints: RecipeConstraints = { dietaryModes: [cohort.dietaryMode], allergies: cohort.allergies, maxPrepMinutes: cohort.maxPrepMinutes };
+    const scope = parsePlanScope(cohort.scope);
+    const dayCount = planDayCount(scope);
+    const constraints: RecipeConstraints = { dietaryModes: [cohort.dietaryMode], allergies: cohort.allergies, neverFoods: cohort.neverFoods, dislikes: cohort.dislikes, maxPrepMinutes: cohort.maxPrepMinutes };
     const rejectionReasons: Record<string, number> = {};
     const admitted = valid.filter(recipe => {
       const checked = approveRecipe(recipe, constraints);
@@ -87,17 +94,19 @@ export function reportCatalogueCoverage(records: readonly unknown[], cohorts: re
       // It does not truncate candidates or claim a result the scheduler did not prove.
       const candidates = recipesToCandidates(recipes, constraints);
       const combinations = cohort.slots.reduce((product, slot) => product * candidates.filter(candidate => candidate.slot === slot).length, 1);
-      if (combinations > 20_000) return { ...base, status: "indeterminate", reason: `Diagnostic search budget exceeded (${combinations} possible daily combinations; limit 20000). No feasibility claim made.` };
-      const result = orchestrateWeek(profile, candidates, {});
+      if (scope === "week" && combinations > 20_000) return { ...base, status: "indeterminate", reason: `Diagnostic search budget exceeded (${combinations} possible daily combinations; limit 20000). No feasibility claim made.` };
+      // Daily probes use the production scheduler's bounded node/time budget,
+      // so a broad pool is not rejected on estimated combination count alone.
+      const result = orchestrateWeek(profile, candidates, {}, scope);
       return result.ok ? { ...base, status: "feasible", plan: result.value } : { ...base, status: result.error.code === "planning_search_exhausted" ? "indeterminate" : "not_feasible", reason: result.error.code, violations: result.error.violations };
     };
     const slots = Object.fromEntries(SLOTS.map(slot => {
       const demand = cohort.slots.filter(required => required === slot).length;
-      return [slot, { dailyDemand: demand, weeklyDemand: demand * 7, uniqueRecipes: new Set(admitted.filter(recipe => recipe.slots.includes(slot)).map(recipe => recipe.id)).size, calculatedUniqueRecipes: new Set(calculated.filter(recipe => recipe.slots.includes(slot)).map(recipe => recipe.id)).size }];
+      return [slot, { dailyDemand: demand, weeklyDemand: demand * 7, periodDemand: demand * dayCount, uniqueRecipes: new Set(admitted.filter(recipe => recipe.slots.includes(slot)).map(recipe => recipe.id)).size, calculatedUniqueRecipes: new Set(calculated.filter(recipe => recipe.slots.includes(slot)).map(recipe => recipe.id)).size }];
     })) as Record<PlannerMealSlot, SlotCapacity>;
     const sourceFamilies = new Set(admitted.flatMap(recipeProteinFamilies));
     const policyGaps = cohort.dietaryMode === "vegan" && cohort.slots.length > sourceFamilies.size * 2 ? ["Too few reviewed plant protein families for the daily variety limit of two meals per source; review suitable recipes with additional protein sources."] : [];
-    return { id: cohort.id, cohort: { ...cohort, allergies: [...cohort.allergies], slots: [...cohort.slots] }, rejectionReasons, slots, policyGaps, legacyCompatible: run(admitted), calculatedOnly: run(calculated) };
+    return { id: cohort.id, scope, dayCount, cohort: { ...cohort, allergies: [...cohort.allergies], slots: [...cohort.slots] }, rejectionReasons, slots, policyGaps, legacyCompatible: run(admitted), calculatedOnly: run(calculated) };
   });
   return { reportVersion: "catalogue-coverage-v1", approvalPolicyVersion: APPROVAL_POLICY_VERSION, nutritionPolicyVersion: NUTRITION_POLICY_VERSION, schedulerPolicy: DEFAULT_PLANNER_POLICY, guarantees: { legacyCompatible: "Includes existing reviewed legacy nutrition attestations; not necessarily ingredient calculated.", calculatedOnly: "Only reviewed recipes with reproducible ingredient calculations." }, catalogue: counts, issues, cohorts: results };
 }

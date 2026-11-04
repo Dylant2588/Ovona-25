@@ -1,0 +1,2196 @@
+{
+  "snapshot": {
+    "retrievedAt": "2026-11-04T11:51:14.297Z",
+    "sha256": "cada7edee298a6f0d0ff782b5f968bfc439bbd52c1ec83ff2e4607474c36d41d",
+    "records": 38
+  },
+  "catalogue": {
+    "records": 38,
+    "uniqueRecipeIds": 38,
+    "pending": 0,
+    "rejected": 0,
+    "malformed": 0,
+    "malformedApproved": 0,
+    "approvedLegacy": 38,
+    "approvedCalculated": 0,
+    "multipleApprovedVersions": []
+  },
+  "guarantees": {
+    "legacyCompatible": "Includes existing reviewed legacy nutrition attestations; not necessarily ingredient calculated.",
+    "calculatedOnly": "Only reviewed recipes with reproducible ingredient calculations."
+  },
+  "cohorts": [
+    {
+      "id": "balanced-daily",
+      "scope": "day",
+      "dayCount": 1,
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 10,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 12,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 11,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 0,
+          "weeklyDemand": 0,
+          "periodDemand": 0,
+          "uniqueRecipes": 13,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "rejectionReasons": {
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "ingredient_evidence_conflict": 2
+      },
+      "legacyCompatible": {
+        "admittedRecipes": 28,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 28,
+        "status": "feasible",
+        "witness": {
+          "days": [
+            {
+              "day": 1,
+              "meals": [
+                {
+                  "candidateId": "vanilla-berry-pea-shake:breakfast",
+                  "slot": "breakfast",
+                  "title": "Vanilla Berry Pea Protein Shake",
+                  "similarityKey": "vanilla-berry-pea-shake",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Mixed berries",
+                      "normalizedName": "unreviewed_mixed_berries",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Banana",
+                      "normalizedName": "banana",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 300,
+                      "unit": "ml",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 4,
+                    "carbs": 39,
+                    "protein": 50,
+                    "calories": 371
+                  },
+                  "cost": 0,
+                  "prepMinutes": 5,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "pea"
+                  ],
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.068067,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.068067,
+                  "score": {
+                    "candidate": {
+                      "id": "vanilla-berry-pea-shake:breakfast",
+                      "recipeId": "vanilla-berry-pea-shake",
+                      "recipeVersion": 2,
+                      "slot": "breakfast",
+                      "title": "Vanilla Berry Pea Protein Shake",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Mixed berries",
+                          "normalizedName": "unreviewed_mixed_berries",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Banana",
+                          "normalizedName": "banana",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 300,
+                          "unit": "ml",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 4,
+                        "carbs": 39,
+                        "protein": 50,
+                        "calories": 371
+                      },
+                      "cost": 0,
+                      "prepMinutes": 5,
+                      "servings": 1,
+                      "similarityKey": "vanilla-berry-pea-shake",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "pea"
+                      ],
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 31.13,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 8.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": 0
+                    },
+                    "total": 49.46333333333333,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "white-bean-snack-box:lunch",
+                  "slot": "lunch",
+                  "title": "White Bean Snack Box",
+                  "similarityKey": "white-bean-snack-box",
+                  "ingredients": [
+                    {
+                      "name": "Mashed white beans",
+                      "normalizedName": "unreviewed_mashed_white_beans",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cucumber",
+                      "normalizedName": "cucumber",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 70,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olives",
+                      "normalizedName": "unreviewed_olives",
+                      "quantity": 40,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Whole-grain wrap",
+                      "normalizedName": "wheat",
+                      "quantity": 0.5,
+                      "unit": "piece",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 16,
+                    "carbs": 32,
+                    "protein": 12,
+                    "calories": 320
+                  },
+                  "cost": 0,
+                  "prepMinutes": 8,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "beans"
+                  ],
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.36816,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.36816,
+                  "score": {
+                    "candidate": {
+                      "id": "white-bean-snack-box:lunch",
+                      "recipeId": "white-bean-snack-box",
+                      "recipeVersion": 2,
+                      "slot": "lunch",
+                      "title": "White Bean Snack Box",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Mashed white beans",
+                          "normalizedName": "unreviewed_mashed_white_beans",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cucumber",
+                          "normalizedName": "cucumber",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 70,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olives",
+                          "normalizedName": "unreviewed_olives",
+                          "quantity": 40,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Whole-grain wrap",
+                          "normalizedName": "wheat",
+                          "quantity": 0.5,
+                          "unit": "piece",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 16,
+                        "carbs": 32,
+                        "protein": 12,
+                        "calories": 320
+                      },
+                      "cost": 0,
+                      "prepMinutes": 8,
+                      "servings": 1,
+                      "similarityKey": "white-bean-snack-box",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "beans"
+                      ],
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 14.399999999999999,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 7.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": 0
+                    },
+                    "total": 31.733333333333334,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "smoky-bean-pea-bowl:dinner",
+                  "slot": "dinner",
+                  "title": "Smoky Bean & Pea Protein Bowl",
+                  "similarityKey": "smoky-bean-pea-bowl",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 55,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Black beans",
+                      "normalizedName": "black_beans",
+                      "quantity": 170,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 45,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Diced tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 150,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Bell peppers",
+                      "normalizedName": "pepper",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 10,
+                    "carbs": 95,
+                    "protein": 65,
+                    "calories": 729
+                  },
+                  "cost": 0,
+                  "prepMinutes": 18,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "pea",
+                    "beans"
+                  ],
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 1.464288,
+                  "householdPortionMultiplier": 1,
+                  "servings": 1.464288,
+                  "score": {
+                    "candidate": {
+                      "id": "smoky-bean-pea-bowl:dinner",
+                      "recipeId": "smoky-bean-pea-bowl",
+                      "recipeVersion": 2,
+                      "slot": "dinner",
+                      "title": "Smoky Bean & Pea Protein Bowl",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 55,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Black beans",
+                          "normalizedName": "black_beans",
+                          "quantity": 170,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 45,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Diced tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 150,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Bell peppers",
+                          "normalizedName": "pepper",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 10,
+                        "carbs": 95,
+                        "protein": 65,
+                        "calories": 729
+                      },
+                      "cost": 0,
+                      "prepMinutes": 18,
+                      "servings": 1,
+                      "similarityKey": "smoky-bean-pea-bowl",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "pea",
+                        "beans"
+                      ],
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 32.13,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 4,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -20,
+                      "practical": 0
+                    },
+                    "total": 30.130000000000003,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "restricted-turkey-excluded-daily",
+      "scope": "day",
+      "dayCount": 1,
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 5,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 9,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 8,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "periodDemand": 2,
+          "uniqueRecipes": 8,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "rejectionReasons": {
+        "unknown_ingredient": 6,
+        "never_food_conflict": 12,
+        "prep_time_conflict": 2,
+        "allergy_conflict": 13,
+        "ingredient_evidence_conflict": 2
+      },
+      "legacyCompatible": {
+        "admittedRecipes": 16,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 16,
+        "status": "feasible",
+        "witness": {
+          "days": [
+            {
+              "day": 1,
+              "meals": [
+                {
+                  "candidateId": "vanilla-berry-pea-shake:breakfast",
+                  "slot": "breakfast",
+                  "title": "Vanilla Berry Pea Protein Shake",
+                  "similarityKey": "vanilla-berry-pea-shake",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Mixed berries",
+                      "normalizedName": "unreviewed_mixed_berries",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Banana",
+                      "normalizedName": "banana",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 300,
+                      "unit": "ml",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 4,
+                    "carbs": 39,
+                    "protein": 50,
+                    "calories": 371
+                  },
+                  "cost": 0,
+                  "prepMinutes": 5,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "pea"
+                  ],
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "vanilla-berry-pea-shake:breakfast",
+                      "recipeId": "vanilla-berry-pea-shake",
+                      "recipeVersion": 2,
+                      "slot": "breakfast",
+                      "title": "Vanilla Berry Pea Protein Shake",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Mixed berries",
+                          "normalizedName": "unreviewed_mixed_berries",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Banana",
+                          "normalizedName": "banana",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 300,
+                          "unit": "ml",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 4,
+                        "carbs": 39,
+                        "protein": 50,
+                        "calories": 371
+                      },
+                      "cost": 0,
+                      "prepMinutes": 5,
+                      "servings": 1,
+                      "similarityKey": "vanilla-berry-pea-shake",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "pea"
+                      ],
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 36.578627808136005,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 8.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": 0
+                    },
+                    "total": 54.91196114146934,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "blueberry-protein-oats:snack",
+                  "slot": "snack",
+                  "title": "Blueberry Protein Oats",
+                  "similarityKey": "blueberry-protein-oats",
+                  "ingredients": [
+                    {
+                      "name": "Rolled oats",
+                      "normalizedName": "oats",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Chia seeds",
+                      "normalizedName": "chia_seeds",
+                      "quantity": 20,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 240,
+                      "unit": "ml",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Blueberries",
+                      "normalizedName": "blueberries",
+                      "quantity": 75,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Maple syrup",
+                      "normalizedName": "maple_syrup",
+                      "quantity": 15,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 10,
+                    "carbs": 48,
+                    "protein": 27,
+                    "calories": 380
+                  },
+                  "cost": 0,
+                  "prepMinutes": 5,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "plant"
+                  ],
+                  "format": "snack",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "blueberry-protein-oats:snack",
+                      "recipeId": "blueberry-protein-oats",
+                      "recipeVersion": 2,
+                      "slot": "snack",
+                      "title": "Blueberry Protein Oats",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Rolled oats",
+                          "normalizedName": "oats",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Chia seeds",
+                          "normalizedName": "chia_seeds",
+                          "quantity": 20,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 240,
+                          "unit": "ml",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Blueberries",
+                          "normalizedName": "blueberries",
+                          "quantity": 75,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Maple syrup",
+                          "normalizedName": "maple_syrup",
+                          "quantity": 15,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 10,
+                        "carbs": 48,
+                        "protein": 27,
+                        "calories": 380
+                      },
+                      "cost": 0,
+                      "prepMinutes": 5,
+                      "servings": 1,
+                      "similarityKey": "blueberry-protein-oats",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "plant"
+                      ],
+                      "format": "snack"
+                    },
+                    "components": {
+                      "nutrition": 31.73497267759563,
+                      "preference": 0,
+                      "reuse": 3,
+                      "prep": 8.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": 0
+                    },
+                    "total": 53.068306010928964,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "herbed-chicken-rice-plate:lunch",
+                  "slot": "lunch",
+                  "title": "Herbed Chicken Rice Plate",
+                  "similarityKey": "herbed-chicken-rice-plate",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 130,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 35,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Spinach",
+                      "normalizedName": "spinach",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 11,
+                    "carbs": 33,
+                    "protein": 46,
+                    "calories": 418
+                  },
+                  "cost": 0,
+                  "prepMinutes": 20,
+                  "proteinType": "poultry",
+                  "proteinFamilies": [
+                    "chicken"
+                  ],
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "herbed-chicken-rice-plate:lunch",
+                      "recipeId": "herbed-chicken-rice-plate",
+                      "recipeVersion": 2,
+                      "slot": "lunch",
+                      "title": "Herbed Chicken Rice Plate",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 130,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 35,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Spinach",
+                          "normalizedName": "spinach",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 11,
+                        "carbs": 33,
+                        "protein": 46,
+                        "calories": 418
+                      },
+                      "cost": 0,
+                      "prepMinutes": 20,
+                      "servings": 1,
+                      "similarityKey": "herbed-chicken-rice-plate",
+                      "proteinType": "poultry",
+                      "proteinFamilies": [
+                        "chicken"
+                      ],
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 35.862173649058896,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 3.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": -5.571428571428571
+                    },
+                    "total": 43.62407841096366,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "cocoa-banana-pea-pot:snack",
+                  "slot": "snack",
+                  "title": "Cocoa Banana Pea Protein Pot",
+                  "similarityKey": "cocoa-banana-pea-pot",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Banana",
+                      "normalizedName": "banana",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Rolled oats",
+                      "normalizedName": "oats",
+                      "quantity": 30,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cocoa powder",
+                      "normalizedName": "unreviewed_cocoa_powder",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 220,
+                      "unit": "ml",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 6,
+                    "carbs": 52,
+                    "protein": 55,
+                    "calories": 457
+                  },
+                  "cost": 0,
+                  "prepMinutes": 7,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "pea"
+                  ],
+                  "format": "snack",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "cocoa-banana-pea-pot:snack",
+                      "recipeId": "cocoa-banana-pea-pot",
+                      "recipeVersion": 2,
+                      "slot": "snack",
+                      "title": "Cocoa Banana Pea Protein Pot",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Banana",
+                          "normalizedName": "banana",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Rolled oats",
+                          "normalizedName": "oats",
+                          "quantity": 30,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cocoa powder",
+                          "normalizedName": "unreviewed_cocoa_powder",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 220,
+                          "unit": "ml",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 6,
+                        "carbs": 52,
+                        "protein": 55,
+                        "calories": 457
+                      },
+                      "cost": 0,
+                      "prepMinutes": 7,
+                      "servings": 1,
+                      "similarityKey": "cocoa-banana-pea-pot",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "pea"
+                      ],
+                      "format": "snack"
+                    },
+                    "components": {
+                      "nutrition": 29.564359441408623,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 7.666666666666666,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10,
+                      "practical": 0
+                    },
+                    "total": 41.23102610807529,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "lemon-chicken-rice-skillet:dinner",
+                  "slot": "dinner",
+                  "title": "Lemon Chicken Rice Skillet",
+                  "similarityKey": "lemon-chicken-rice-skillet",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 130,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 35,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Spinach",
+                      "normalizedName": "spinach",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Lime",
+                      "normalizedName": "lime",
+                      "quantity": 1,
+                      "unit": "each",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 11,
+                    "carbs": 40,
+                    "protein": 46,
+                    "calories": 438
+                  },
+                  "cost": 0,
+                  "prepMinutes": 20,
+                  "proteinType": "poultry",
+                  "proteinFamilies": [
+                    "chicken"
+                  ],
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "lemon-chicken-rice-skillet:dinner",
+                      "recipeId": "lemon-chicken-rice-skillet",
+                      "recipeVersion": 2,
+                      "slot": "dinner",
+                      "title": "Lemon Chicken Rice Skillet",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 130,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 35,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Spinach",
+                          "normalizedName": "spinach",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Lime",
+                          "normalizedName": "lime",
+                          "quantity": 1,
+                          "unit": "each",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 11,
+                        "carbs": 40,
+                        "protein": 46,
+                        "calories": 438
+                      },
+                      "cost": 0,
+                      "prepMinutes": 20,
+                      "servings": 1,
+                      "similarityKey": "lemon-chicken-rice-skillet",
+                      "proteinType": "poultry",
+                      "proteinFamilies": [
+                        "chicken"
+                      ],
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 34.76927747419551,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 3.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10,
+                      "practical": -5.571428571428571
+                    },
+                    "total": 36.53118223610028,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "restricted-turkey-soft-avoid-daily",
+      "scope": "day",
+      "dayCount": 1,
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 5,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 9,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 8,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "periodDemand": 2,
+          "uniqueRecipes": 10,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "rejectionReasons": {
+        "unknown_ingredient": 6,
+        "prep_time_conflict": 2,
+        "allergy_conflict": 13,
+        "ingredient_evidence_conflict": 2,
+        "never_food_conflict": 6
+      },
+      "legacyCompatible": {
+        "admittedRecipes": 18,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 18,
+        "status": "feasible",
+        "witness": {
+          "days": [
+            {
+              "day": 1,
+              "meals": [
+                {
+                  "candidateId": "vanilla-berry-pea-shake:breakfast",
+                  "slot": "breakfast",
+                  "title": "Vanilla Berry Pea Protein Shake",
+                  "similarityKey": "vanilla-berry-pea-shake",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Mixed berries",
+                      "normalizedName": "unreviewed_mixed_berries",
+                      "quantity": 120,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Banana",
+                      "normalizedName": "banana",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 300,
+                      "unit": "ml",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 4,
+                    "carbs": 39,
+                    "protein": 50,
+                    "calories": 371
+                  },
+                  "cost": 0,
+                  "prepMinutes": 5,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "pea"
+                  ],
+                  "format": "breakfast",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "vanilla-berry-pea-shake:breakfast",
+                      "recipeId": "vanilla-berry-pea-shake",
+                      "recipeVersion": 2,
+                      "slot": "breakfast",
+                      "title": "Vanilla Berry Pea Protein Shake",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Mixed berries",
+                          "normalizedName": "unreviewed_mixed_berries",
+                          "quantity": 120,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Banana",
+                          "normalizedName": "banana",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 300,
+                          "unit": "ml",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 4,
+                        "carbs": 39,
+                        "protein": 50,
+                        "calories": 371
+                      },
+                      "cost": 0,
+                      "prepMinutes": 5,
+                      "servings": 1,
+                      "similarityKey": "vanilla-berry-pea-shake",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "pea"
+                      ],
+                      "format": "breakfast"
+                    },
+                    "components": {
+                      "nutrition": 36.578627808136005,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 8.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": 0
+                    },
+                    "total": 54.91196114146934,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "blueberry-protein-oats:snack",
+                  "slot": "snack",
+                  "title": "Blueberry Protein Oats",
+                  "similarityKey": "blueberry-protein-oats",
+                  "ingredients": [
+                    {
+                      "name": "Rolled oats",
+                      "normalizedName": "oats",
+                      "quantity": 80,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Chia seeds",
+                      "normalizedName": "chia_seeds",
+                      "quantity": 20,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 240,
+                      "unit": "ml",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Blueberries",
+                      "normalizedName": "blueberries",
+                      "quantity": 75,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Maple syrup",
+                      "normalizedName": "maple_syrup",
+                      "quantity": 15,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 10,
+                    "carbs": 48,
+                    "protein": 27,
+                    "calories": 380
+                  },
+                  "cost": 0,
+                  "prepMinutes": 5,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "plant"
+                  ],
+                  "format": "snack",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "blueberry-protein-oats:snack",
+                      "recipeId": "blueberry-protein-oats",
+                      "recipeVersion": 2,
+                      "slot": "snack",
+                      "title": "Blueberry Protein Oats",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Rolled oats",
+                          "normalizedName": "oats",
+                          "quantity": 80,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Chia seeds",
+                          "normalizedName": "chia_seeds",
+                          "quantity": 20,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 240,
+                          "unit": "ml",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Blueberries",
+                          "normalizedName": "blueberries",
+                          "quantity": 75,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Maple syrup",
+                          "normalizedName": "maple_syrup",
+                          "quantity": 15,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 10,
+                        "carbs": 48,
+                        "protein": 27,
+                        "calories": 380
+                      },
+                      "cost": 0,
+                      "prepMinutes": 5,
+                      "servings": 1,
+                      "similarityKey": "blueberry-protein-oats",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "plant"
+                      ],
+                      "format": "snack"
+                    },
+                    "components": {
+                      "nutrition": 31.73497267759563,
+                      "preference": 0,
+                      "reuse": 3,
+                      "prep": 8.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": 0
+                    },
+                    "total": 53.068306010928964,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "herbed-chicken-rice-plate:lunch",
+                  "slot": "lunch",
+                  "title": "Herbed Chicken Rice Plate",
+                  "similarityKey": "herbed-chicken-rice-plate",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 130,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 35,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Spinach",
+                      "normalizedName": "spinach",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 11,
+                    "carbs": 33,
+                    "protein": 46,
+                    "calories": 418
+                  },
+                  "cost": 0,
+                  "prepMinutes": 20,
+                  "proteinType": "poultry",
+                  "proteinFamilies": [
+                    "chicken"
+                  ],
+                  "format": "lunch",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "herbed-chicken-rice-plate:lunch",
+                      "recipeId": "herbed-chicken-rice-plate",
+                      "recipeVersion": 2,
+                      "slot": "lunch",
+                      "title": "Herbed Chicken Rice Plate",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 130,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 35,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Spinach",
+                          "normalizedName": "spinach",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 11,
+                        "carbs": 33,
+                        "protein": 46,
+                        "calories": 418
+                      },
+                      "cost": 0,
+                      "prepMinutes": 20,
+                      "servings": 1,
+                      "similarityKey": "herbed-chicken-rice-plate",
+                      "proteinType": "poultry",
+                      "proteinFamilies": [
+                        "chicken"
+                      ],
+                      "format": "lunch"
+                    },
+                    "components": {
+                      "nutrition": 35.862173649058896,
+                      "preference": 0,
+                      "reuse": 0,
+                      "prep": 3.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": 0,
+                      "practical": -5.571428571428571
+                    },
+                    "total": 43.62407841096366,
+                    "facts": [
+                      "target contribution",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, prep time, cost."
+                },
+                {
+                  "candidateId": "cocoa-banana-pea-pot:snack",
+                  "slot": "snack",
+                  "title": "Cocoa Banana Pea Protein Pot",
+                  "similarityKey": "cocoa-banana-pea-pot",
+                  "ingredients": [
+                    {
+                      "name": "Pea protein",
+                      "normalizedName": "unreviewed_pea_protein",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Banana",
+                      "normalizedName": "banana",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Rolled oats",
+                      "normalizedName": "oats",
+                      "quantity": 30,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cocoa powder",
+                      "normalizedName": "unreviewed_cocoa_powder",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Water",
+                      "normalizedName": "water",
+                      "quantity": 220,
+                      "unit": "ml",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 6,
+                    "carbs": 52,
+                    "protein": 55,
+                    "calories": 457
+                  },
+                  "cost": 0,
+                  "prepMinutes": 7,
+                  "proteinType": "plant",
+                  "proteinFamilies": [
+                    "pea"
+                  ],
+                  "format": "snack",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "cocoa-banana-pea-pot:snack",
+                      "recipeId": "cocoa-banana-pea-pot",
+                      "recipeVersion": 2,
+                      "slot": "snack",
+                      "title": "Cocoa Banana Pea Protein Pot",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Pea protein",
+                          "normalizedName": "unreviewed_pea_protein",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Banana",
+                          "normalizedName": "banana",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Rolled oats",
+                          "normalizedName": "oats",
+                          "quantity": 30,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cocoa powder",
+                          "normalizedName": "unreviewed_cocoa_powder",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Water",
+                          "normalizedName": "water",
+                          "quantity": 220,
+                          "unit": "ml",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [
+                        "gluten"
+                      ],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 6,
+                        "carbs": 52,
+                        "protein": 55,
+                        "calories": 457
+                      },
+                      "cost": 0,
+                      "prepMinutes": 7,
+                      "servings": 1,
+                      "similarityKey": "cocoa-banana-pea-pot",
+                      "proteinType": "plant",
+                      "proteinFamilies": [
+                        "pea"
+                      ],
+                      "format": "snack"
+                    },
+                    "components": {
+                      "nutrition": 29.564359441408623,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 7.666666666666666,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10,
+                      "practical": 0
+                    },
+                    "total": 41.23102610807529,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                },
+                {
+                  "candidateId": "lemon-chicken-rice-skillet:dinner",
+                  "slot": "dinner",
+                  "title": "Lemon Chicken Rice Skillet",
+                  "similarityKey": "lemon-chicken-rice-skillet",
+                  "ingredients": [
+                    {
+                      "name": "Chicken breast",
+                      "normalizedName": "chicken",
+                      "quantity": 130,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Brown rice",
+                      "normalizedName": "rice",
+                      "quantity": 35,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Spinach",
+                      "normalizedName": "spinach",
+                      "quantity": 60,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Cherry tomatoes",
+                      "normalizedName": "tomato",
+                      "quantity": 100,
+                      "unit": "g",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Lime",
+                      "normalizedName": "lime",
+                      "quantity": 1,
+                      "unit": "each",
+                      "pantry": false
+                    },
+                    {
+                      "name": "Olive oil",
+                      "normalizedName": "olive_oil",
+                      "quantity": 5,
+                      "unit": "g",
+                      "pantry": false
+                    }
+                  ],
+                  "nutrition": {
+                    "fat": 11,
+                    "carbs": 40,
+                    "protein": 46,
+                    "calories": 438
+                  },
+                  "cost": 0,
+                  "prepMinutes": 20,
+                  "proteinType": "poultry",
+                  "proteinFamilies": [
+                    "chicken"
+                  ],
+                  "format": "dinner",
+                  "isLeftover": false,
+                  "recipeServings": 1,
+                  "nutritionPortionMultiplier": 0.9575581395348838,
+                  "householdPortionMultiplier": 1,
+                  "servings": 0.9575581395348838,
+                  "score": {
+                    "candidate": {
+                      "id": "lemon-chicken-rice-skillet:dinner",
+                      "recipeId": "lemon-chicken-rice-skillet",
+                      "recipeVersion": 2,
+                      "slot": "dinner",
+                      "title": "Lemon Chicken Rice Skillet",
+                      "verified": true,
+                      "ingredients": [
+                        {
+                          "name": "Chicken breast",
+                          "normalizedName": "chicken",
+                          "quantity": 130,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Brown rice",
+                          "normalizedName": "rice",
+                          "quantity": 35,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Spinach",
+                          "normalizedName": "spinach",
+                          "quantity": 60,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Cherry tomatoes",
+                          "normalizedName": "tomato",
+                          "quantity": 100,
+                          "unit": "g",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Lime",
+                          "normalizedName": "lime",
+                          "quantity": 1,
+                          "unit": "each",
+                          "pantry": false
+                        },
+                        {
+                          "name": "Olive oil",
+                          "normalizedName": "olive_oil",
+                          "quantity": 5,
+                          "unit": "g",
+                          "pantry": false
+                        }
+                      ],
+                      "allergens": [],
+                      "dietaryTags": [
+                        "mixed"
+                      ],
+                      "nutrition": {
+                        "fat": 11,
+                        "carbs": 40,
+                        "protein": 46,
+                        "calories": 438
+                      },
+                      "cost": 0,
+                      "prepMinutes": 20,
+                      "servings": 1,
+                      "similarityKey": "lemon-chicken-rice-skillet",
+                      "proteinType": "poultry",
+                      "proteinFamilies": [
+                        "chicken"
+                      ],
+                      "format": "dinner"
+                    },
+                    "components": {
+                      "nutrition": 34.76927747419551,
+                      "preference": 0,
+                      "reuse": 4,
+                      "prep": 3.333333333333334,
+                      "cost": 10,
+                      "repetition": 0,
+                      "diversity": -10,
+                      "practical": -5.571428571428571
+                    },
+                    "total": 36.53118223610028,
+                    "facts": [
+                      "target contribution",
+                      "ingredient reuse",
+                      "prep time",
+                      "cost"
+                    ]
+                  },
+                  "explanation": "Selected for target contribution, ingredient reuse, prep time, cost."
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    },
+    {
+      "id": "unsupported-five-minute-daily",
+      "scope": "day",
+      "dayCount": 1,
+      "slots": {
+        "breakfast": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "lunch": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "dinner": {
+          "dailyDemand": 1,
+          "weeklyDemand": 7,
+          "periodDemand": 1,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        },
+        "snack": {
+          "dailyDemand": 2,
+          "weeklyDemand": 14,
+          "periodDemand": 2,
+          "uniqueRecipes": 0,
+          "calculatedUniqueRecipes": 0
+        }
+      },
+      "rejectionReasons": {
+        "prep_time_conflict": 38,
+        "unknown_ingredient": 6,
+        "never_food_conflict": 12,
+        "allergy_conflict": 13,
+        "ingredient_evidence_conflict": 2
+      },
+      "legacyCompatible": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      },
+      "calculatedOnly": {
+        "admittedRecipes": 0,
+        "admittedCalculatedRecipes": 0,
+        "admittedLegacyRecipes": 0,
+        "status": "not_feasible",
+        "reason": "insufficient_candidates",
+        "violations": [
+          {
+            "day": 1,
+            "code": "insufficient_candidates",
+            "message": "No hard-constraint-safe candidates are available."
+          }
+        ]
+      }
+    }
+  ]
+}

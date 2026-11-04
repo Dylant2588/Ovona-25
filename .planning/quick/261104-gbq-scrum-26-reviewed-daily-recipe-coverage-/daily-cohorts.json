@@ -1,0 +1,105 @@
+[
+  {
+    "id": "balanced-daily",
+    "scope": "day",
+    "calorieTarget": 2000,
+    "proteinTarget": 150,
+    "dietaryMode": "mixed",
+    "allergies": [],
+    "maxPrepMinutes": 30,
+    "slots": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ]
+  },
+  {
+    "scope": "day",
+    "calorieTarget": 1830,
+    "proteinTarget": 216,
+    "dietaryMode": "mixed",
+    "allergies": [
+      "Dairy",
+      "Nuts",
+      "Fish",
+      "Shellfish",
+      "Eggs",
+      "Sesame"
+    ],
+    "neverFoods": [
+      "egg",
+      "turkey"
+    ],
+    "dislikes": [
+      "turkey"
+    ],
+    "maxPrepMinutes": 30,
+    "slots": [
+      "breakfast",
+      "snack",
+      "lunch",
+      "snack",
+      "dinner"
+    ],
+    "id": "restricted-turkey-excluded-daily"
+  },
+  {
+    "scope": "day",
+    "calorieTarget": 1830,
+    "proteinTarget": 216,
+    "dietaryMode": "mixed",
+    "allergies": [
+      "Dairy",
+      "Nuts",
+      "Fish",
+      "Shellfish",
+      "Eggs",
+      "Sesame"
+    ],
+    "neverFoods": [
+      "egg"
+    ],
+    "dislikes": [
+      "turkey"
+    ],
+    "maxPrepMinutes": 30,
+    "slots": [
+      "breakfast",
+      "snack",
+      "lunch",
+      "snack",
+      "dinner"
+    ],
+    "id": "restricted-turkey-soft-avoid-daily"
+  },
+  {
+    "scope": "day",
+    "calorieTarget": 1830,
+    "proteinTarget": 216,
+    "dietaryMode": "mixed",
+    "allergies": [
+      "Dairy",
+      "Nuts",
+      "Fish",
+      "Shellfish",
+      "Eggs",
+      "Sesame"
+    ],
+    "neverFoods": [
+      "egg",
+      "turkey"
+    ],
+    "dislikes": [
+      "turkey"
+    ],
+    "maxPrepMinutes": 1,
+    "slots": [
+      "breakfast",
+      "snack",
+      "lunch",
+      "snack",
+      "dinner"
+    ],
+    "id": "unsupported-five-minute-daily"
+  }
+]

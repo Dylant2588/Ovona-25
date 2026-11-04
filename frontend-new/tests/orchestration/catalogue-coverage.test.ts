@@ -122,6 +122,19 @@ test("bounded diagnostic never calls a search-budget rejection proven infeasible
   assert.match(report.cohorts[0].legacyCompatible.reason!, /budget/);
 });
 
+test("a broad daily catalogue runs the production search instead of the weekly combination guard", () => {
+  const ingredients = [["Chicken breast", "chicken", ["meat"]], ["Tofu", "tofu", []], ["Pea protein", "unreviewed_pea_protein", []]] as const;
+  const records = Array.from({ length: 12 }, (_, index) => {
+    const recipe = reviewedRecipe(); const [name, canonicalId, flags] = ingredients[index % ingredients.length];
+    recipe.id = `synthetic-wide-${index}`; recipe.slots = ["breakfast", "lunch", "dinner", "snack"];
+    recipe.macros = { calories: 160, protein: 8, carbs: 20, fat: 5 };
+    recipe.ingredients[0] = { ...recipe.ingredients[0], name, canonicalId, allergens: canonicalId === "tofu" ? ["soy"] : [], dietaryFlags: [...flags] };
+    return recipe;
+  });
+  const report = reportCatalogueCoverage(records, [{ ...cohort, scope: "day", slots: ["breakfast", "snack", "lunch", "snack", "dinner"] }]);
+  assert.equal(report.cohorts[0].legacyCompatible.status, "feasible");
+});
+
 test("malformed approved rows block readiness just as the production loader does", () => {
   const broken = { ...reviewedRecipe(), ingredients: [] };
   const result = reportCatalogueCoverage([...legacyCatalogue(), broken], [cohort]);
@@ -139,6 +152,8 @@ test("file-only CLI is deterministic, rejects bad input and never overwrites inp
     const args = ["scripts/catalogue-coverage.ts", "--input", input, "--cohorts", cohorts];
     const run = () => execFileSync(process.execPath, args, { encoding: "utf8", windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
     const first = run(); assert.equal(first, run()); assert.equal(JSON.parse(first).cohorts[0].legacyCompatible.status, "feasible");
+    fs.writeFileSync(cohorts, JSON.stringify([{ ...cohort, scope: "day", neverFoods: ["turkey"], dislikes: ["turkey"] }]));
+    const daily = run(); assert.equal(daily, run()); assert.equal(JSON.parse(daily).cohorts[0].dayCount, 1);
     assert.equal(fs.readFileSync(input, "utf8"), before);
     const overwrite = spawnSync(process.execPath, [...args, "--output", input], { encoding: "utf8", windowsHide: true });
     assert.equal(overwrite.status, 1); assert.match(overwrite.stderr, /overwrite/);
