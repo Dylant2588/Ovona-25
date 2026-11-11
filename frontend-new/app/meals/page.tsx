@@ -4,6 +4,8 @@
 
 import NextLink from "next/link";
 import { DailyNutritionPanel } from "@/components/DailyNutritionPanel";
+import { ShoppingCostEstimatePanel } from "@/components/ShoppingCostEstimate";
+import type { ShoppingCostEstimate } from "@/lib/shopping-cost";
 import type { PlanNutritionSummary } from "@/lib/recipes/plan-nutrition";
 import { planAnchor, planCacheKey, planDayCount, type PlanScope } from "@/lib/plan-scope";
 import { matchesPlanPeriod } from "@/lib/plan-view";
@@ -678,6 +680,9 @@ function MealsPageContent() {
   const [normalizingList, setNormalizingList] = useState(false);
   const [shoppingListError, setShoppingListError] = useState<string | null>(null);
   const [shoppingApproval, setShoppingApproval] = useState<{ plan: WeeklyMealPlan; preferences: PreferencesInput | null } | null>(null);
+  const [shoppingOwnership, setShoppingOwnership] = useState<{ plan: WeeklyMealPlan; preferences: PreferencesInput | null; keys: string[] } | null>(null);
+  const ownedIngredientKeys = useMemo(() => shoppingOwnership?.plan === plan && shoppingOwnership?.preferences === preferences ? shoppingOwnership.keys : [], [shoppingOwnership, plan, preferences]);
+  const [shoppingCost, setShoppingCost] = useState<{ plan: WeeklyMealPlan; preferences: PreferencesInput | null; ownedKeys: string[]; estimate: ShoppingCostEstimate } | null>(null);
   const [nutritionResult, setNutritionResult] = useState<{ plan: WeeklyMealPlan; summary: PlanNutritionSummary } | null>(null);
   const [nutritionLoading, setNutritionLoading] = useState(false);
   const [nutritionError, setNutritionError] = useState<string | null>(null);
@@ -1901,6 +1906,7 @@ function MealsPageContent() {
 
   useEffect(() => {
     setShoppingApproval(null);
+    setShoppingCost(null);
     if (!plan || !shoppingList.length) {
       setBasketPricing(null);
       setPriceComparison(null);
@@ -1932,6 +1938,8 @@ function MealsPageContent() {
             weekStart,
             plan,
             locale: profileLocale,
+            currency: "GBP",
+            ownedIngredientKeys,
           }),
         });
         if (response.ok) {
@@ -1939,11 +1947,13 @@ function MealsPageContent() {
             items?: ShoppingListItem[];
             planId?: string | null;
             priceComparison?: RetailerComparison;
+            costEstimate?: ShoppingCostEstimate;
           };
           if (active) {
             setBasketPricing(null);
             setPriceComparison(data.planId === plan.id ? data.priceComparison ?? null : null);
             setShoppingApproval(data.planId === plan.id ? { plan, preferences } : null);
+            setShoppingCost(data.planId === plan.id && data.costEstimate ? { plan, preferences, ownedKeys: ownedIngredientKeys, estimate: data.costEstimate } : null);
             if (data.planId === plan.id) setError(previous => previous === "Saved plan loaded. Ingredient and allergy checks are being refreshed before showing the shopping list." ? null : previous);
             setNormalizingList(false);
             return;
@@ -1987,6 +1997,7 @@ function MealsPageContent() {
     profileLocale,
     shoppingList,
     shoppingReloadToken,
+    ownedIngredientKeys,
     userId,
   ]);
 
@@ -3231,6 +3242,12 @@ function MealsPageContent() {
                 }}
               >
                 <Stack spacing={2}>
+                  {shoppingCost?.plan === plan && shoppingCost?.preferences === preferences && shoppingCost?.ownedKeys === ownedIngredientKeys && (
+                    <ShoppingCostEstimatePanel estimate={shoppingCost.estimate} ownedIngredientKeys={ownedIngredientKeys} onOwnershipChange={(key, owned) => {
+                      if (!plan) return;
+                      setShoppingOwnership({ plan, preferences, keys: owned ? [...new Set([...ownedIngredientKeys, key])] : ownedIngredientKeys.filter(item => item !== key) });
+                    }} />
+                  )}
                   <Stack direction="row" spacing={0.5} useFlexGap flexWrap="wrap" role="group" aria-label="Recipe source display" sx={{ mb: 2 }}>
                     <Button size="small" variant={shoppingSourceView === "reveal" ? "outlined" : "text"} aria-pressed={shoppingSourceView === "reveal"} onClick={() => setShoppingSourceView("reveal")}>Reveal recipes</Button>
                     <Button size="small" variant={shoppingSourceView === "inline" ? "outlined" : "text"} aria-pressed={shoppingSourceView === "inline"} onClick={() => setShoppingSourceView("inline")}>Inline icons</Button>
