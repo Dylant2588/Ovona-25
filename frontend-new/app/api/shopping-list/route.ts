@@ -12,6 +12,11 @@ import { approvePlanForUser, approvalFailure } from "@/lib/recipes/plan-boundary
 import { loadServerConstraints, type ConstraintDatabase } from "@/lib/recipes/server-constraints";
 import type { RecipeReader } from "@/lib/recipes/repository";
 import type { RecipeConstraints } from "@/lib/recipes/types";
+import { estimateShoppingCost } from "@/lib/shopping-cost";
+import { ingredientLedgerKey } from "@/lib/ingredient-ledger";
+
+type CostOptions = { currency: string; ownedIngredientKeys: string[] };
+const defaultCostOptions: CostOptions = { currency: "GBP", ownedIngredientKeys: [] };
 
 const toISODate = (value: string) => {
   const parsed = new Date(value);
@@ -63,7 +68,8 @@ const shoppingListResponse = async (
   supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"],
   userId: string,
   constraints: RecipeConstraints,
-  planId?: string
+  planId?: string,
+  costOptions: CostOptions = defaultCostOptions
 ) => {
   const [observationResponse, preferenceResponse] = await Promise.all([
     supabase.from("retailer_price_observations").select("retailer_id, retailer_name, ingredient_key, pack_size, pack_unit, unit_price, currency, estimated, source_reference, provenance_status, observed_at"),
@@ -76,15 +82,21 @@ const shoppingListResponse = async (
     items,
     planId: planId ?? null,
     priceComparison: comparison,
+    costEstimate: estimateShoppingCost(items, costOptions),
   });
 };
 
 /** Use one authoritative constraint snapshot for recipe approval and product evaluation. */
-const approvedShoppingResponse = async (plan: WeeklyMealPlan, supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"], userId: string) => {
+const approvedShoppingResponse = async (plan: WeeklyMealPlan, supabase: Awaited<ReturnType<typeof resolveRequestAuth>>["supabase"], userId: string, costOptions: CostOptions = defaultCostOptions) => {
   try {
     const constraints = await loadServerConstraints(supabase as unknown as ConstraintDatabase, userId);
     const approved = await approvePlanForUser(supabase as unknown as RecipeReader, userId, plan, undefined, { constraints: async () => constraints });
-    return await shoppingListResponse(buildShoppingList(approved), supabase, userId, constraints, plan.id);
+    const items = buildShoppingList(approved);
+    const allowedKeys = new Set(items.map(item => ingredientLedgerKey(item.name, item.unit)));
+    if (costOptions.ownedIngredientKeys.some(key => !allowedKeys.has(key))) {
+      return NextResponse.json({ error: "invalid_owned_ingredient_keys", message: "Owned ingredients must belong to the current approved shopping list." }, { status: 400 });
+    }
+    return await shoppingListResponse(items, supabase, userId, constraints, plan.id, costOptions);
   } catch (error) {
     const failure = approvalFailure(error);
     return NextResponse.json(failure.body, { status: failure.status });
@@ -140,6 +152,15 @@ export async function POST(request: NextRequest) {
     );
   }
   const { plan, weekStart } = body;
+  if (body.currency !== undefined && (typeof body.currency !== "string" || !body.currency.trim() || body.currency.length > 12)) {
+    return NextResponse.json({ error: "invalid_currency" }, { status: 400 });
+  }
+  if (body.ownedIngredientKeys !== undefined && (!Array.isArray(body.ownedIngredientKeys) || body.ownedIngredientKeys.length > 500 ||
+    body.ownedIngredientKeys.some(key => typeof key !== "string" || !key.trim() || key.length > 300))) {
+    return NextResponse.json({ error: "invalid_owned_ingredient_keys" }, { status: 400 });
+  }
+  const costOptions: CostOptions = { currency: body.currency === undefined ? "GBP" : body.currency as string,
+    ownedIngredientKeys: [...new Set((body.ownedIngredientKeys ?? []) as string[])] };
 
   const { supabase, session, user } = await resolveRequestAuth(request);
 
@@ -171,5 +192,5 @@ export async function POST(request: NextRequest) {
   if (!completeDays(plan.days, effectiveWeekStart, count)) return NextResponse.json({ error: "invalid_plan", message: "A complete week with valid final ingredient quantities is required." }, { status: 400 });
   // POST is an ephemeral projection of the caller's current plan. It must not
   // persist a second independently writable source of shopping quantities.
-  return approvedShoppingResponse(plan as unknown as WeeklyMealPlan, supabase, user.id);
+  return approvedShoppingResponse(plan as unknown as WeeklyMealPlan, supabase, user.id, costOptions);
 }
