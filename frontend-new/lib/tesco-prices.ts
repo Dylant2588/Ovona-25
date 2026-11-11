@@ -3,7 +3,7 @@ import type { ShoppingListItem } from "@/lib/meal-generator";
 type PriceCategory = "fresh" | "staples";
 type PriceUnit = "g" | "ml" | "piece" | "large";
 
-type PriceEntry = {
+export type PriceEntry = {
   ingredient: string;
   aliases: string[];
   unit: PriceUnit;
@@ -337,7 +337,36 @@ const findEntry = (
   return (compatible ?? scored[0]).entry;
 };
 
-export const priceBasket = (items: ShoppingListItem[]): BasketPricing => {
+const strictName = (value: string) => value.toLowerCase().replace(/-/g, " ").replace(/\s+/g, " ").trim();
+
+// Only audited equivalents. The legacy catalogue's other aliases may change food
+// state, fat percentage, cut or preparation and are deliberately not inherited.
+const STRICT_ALIASES: Record<string, readonly string[]> = {
+  "Bell peppers (weight)": ["bell peppers", "bell pepper"],
+  "Red onion (weight)": ["red onion"],
+  "Cucumber (weight)": ["cucumber"],
+  "Avocado (weight)": ["avocado"],
+  "Cabbage (head)": ["cabbage"],
+  "Cauliflower (head)": ["cauliflower"],
+  "Spring onions (weight)": ["spring onions"],
+  "Mixed berries (frozen)": ["frozen mixed berries"],
+  "Tinned tuna": ["tuna canned"],
+  "Edamame (frozen)": ["frozen edamame"],
+};
+
+const strictQuantity = (quantity: number, unit: string) => {
+  const name = unit.toLowerCase().trim();
+  if (!Number.isFinite(quantity) || quantity <= 0) return null;
+  if (["g", "gram", "grams"].includes(name)) return { unit: "g" as const, quantity };
+  if (["kg", "kilogram", "kilograms"].includes(name)) return { unit: "g" as const, quantity: quantity * 1000 };
+  if (["ml", "millilitre", "millilitres", "milliliter", "milliliters"].includes(name)) return { unit: "ml" as const, quantity };
+  if (["l", "litre", "litres", "liter", "liters"].includes(name)) return { unit: "ml" as const, quantity: quantity * 1000 };
+  if (["piece", "pieces", "each", "unit"].includes(name)) return { unit: "piece" as const, quantity };
+  if (name === "large") return { unit: "large" as const, quantity };
+  return null;
+};
+
+export const priceBasket = (items: ShoppingListItem[], options: { strict?: boolean; catalogue?: readonly PriceEntry[] } = {}): BasketPricing => {
   const lines: PricedBasketLine[] = [];
   const unmatched = new Set<string>();
   let subtotal = 0;
@@ -345,10 +374,15 @@ export const priceBasket = (items: ShoppingListItem[]): BasketPricing => {
   let staplesCost = 0;
 
   items.forEach((item) => {
-    const normalized = normalizeUnitAndQuantity(item.quantity, item.unit);
-    const amountNeeded = Number(normalized.quantity.toFixed(4));
-    const entry = findEntry(item.displayName ?? item.name, normalized.unit);
-    if (!entry || !unitsCompatible(normalized.unit, entry.unit)) {
+    const normalized = options.strict ? strictQuantity(item.quantity, item.unit) : normalizeUnitAndQuantity(item.quantity, item.unit);
+    const amountNeeded = options.strict ? normalized?.quantity ?? 0 : Number((normalized?.quantity ?? 0).toFixed(4));
+    const strictMatches = options.strict ? (options.catalogue ?? PRICE_DB).filter(entry => {
+      const candidate = strictName(item.name);
+      return normalized?.unit === entry.unit && Number.isFinite(entry.packSize) && entry.packSize > 0 && Number.isFinite(entry.packPrice) && entry.packPrice >= 0 &&
+        (strictName(entry.ingredient) === candidate || (STRICT_ALIASES[entry.ingredient] ?? []).some(alias => strictName(alias) === candidate));
+    }) : [];
+    const entry = options.strict ? (strictMatches.length === 1 ? strictMatches[0] : null) : findEntry(item.displayName ?? item.name, normalized!.unit);
+    if (!entry || !normalized || !Number.isFinite(normalized.quantity) || !unitsCompatible(normalized.unit, entry.unit)) {
       lines.push({
         ingredient: item.displayName ?? item.name,
         packsNeeded: 0,
@@ -365,7 +399,7 @@ export const priceBasket = (items: ShoppingListItem[]): BasketPricing => {
 
     const qty = normalized.quantity;
     const packsNeeded = Math.max(1, Math.ceil(qty / entry.packSize));
-    const amountToBuy = Number((packsNeeded * entry.packSize).toFixed(4));
+    const amountToBuy = options.strict ? packsNeeded * entry.packSize : Number((packsNeeded * entry.packSize).toFixed(4));
     const totalCost = Number((packsNeeded * entry.packPrice).toFixed(2));
     subtotal += totalCost;
     if (entry.category === "fresh") {
