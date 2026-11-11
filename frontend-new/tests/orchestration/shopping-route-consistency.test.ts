@@ -9,6 +9,8 @@ import type { WeeklyMealPlan, ShoppingListItem } from "../../lib/meal-generator.
 import { reviewedPlan, recipeDatabase } from "./reviewed-recipe-fixture.ts";
 import { approvePlanForUser, approvalFailure } from "../../lib/recipes/plan-boundary.ts";
 import { loadServerConstraints } from "../../lib/recipes/server-constraints.ts";
+import * as shoppingCost from "../../lib/shopping-cost.ts";
+import * as ingredientLedger from "../../lib/ingredient-ledger.ts";
 
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
@@ -44,6 +46,8 @@ function handler(history: unknown[], authorised = true, realApproval = false, al
   const deps: Record<string, unknown> = {
     "@/lib/plan-scope": planScope,
     "@/lib/plan-revisions": planRevisions,
+    "@/lib/shopping-cost": shoppingCost,
+    "@/lib/ingredient-ledger": ingredientLedger,
     "next/server": { NextResponse: { json: (v: unknown, init?: ResponseInit) => Response.json(v, init) } },
     "@/lib/meal-generator": { WORKDAY_COUNT: 7, buildShoppingList },
     "@/lib/retailer-comparison": { compareRetailerBaskets: () => ({ status: "price_comparison_unavailable", claimable: false }) },
@@ -162,4 +166,34 @@ test("actual production shopping builder keeps very small positive final ingredi
   const postBody = await posted.json(); const getBody = await reloaded.json();
   assert.equal(postBody.items[0].quantity, 0.00084);
   assert.deepEqual(getBody.items, postBody.items);
+});
+
+test("approved shopping includes illustrative current-revision pack and consumed estimates with no writes", async () => {
+  const current = plan();
+  const h = handler(rows(current));
+  const get = await (await h.get()).json();
+  assert.equal(get.planId, current.id); assert.equal(get.costEstimate.status, "estimated");
+  assert.equal(get.costEstimate.purchaseSubtotal, 3.2); assert.equal(get.costEstimate.consumedSubtotal, 2.47);
+  assert.equal(get.costEstimate.source.observedAt, null); assert.equal(get.costEstimate.source.priceStatus, "date_unknown");
+  const owned = await h.post({ plan: current, currency: "GBP", ownedIngredientKeys: [ingredientLedger.ingredientLedgerKey("Olives", "g")] });
+  const result = await owned.json(); assert.equal(owned.status, 200);
+  assert.deepEqual(result.items, get.items); assert.equal(result.costEstimate.purchaseSubtotal, 0);
+  assert.equal(result.costEstimate.consumedSubtotal, 2.47); assert.equal(result.costEstimate.lines[0].assumedOwned, true);
+  const swapped = plan(); swapped.id = "next-revision";
+  swapped.days.forEach(day => day.meals.forEach(meal => { meal.ingredients = [{ name: "Pea protein powder", amount: 20, unit: "g" }]; }));
+  const next = await (await h.post({ plan: swapped })).json();
+  assert.equal(next.planId, "next-revision"); assert.equal(next.costEstimate.status, "unavailable");
+  assert.equal(next.costEstimate.purchaseSubtotal, null); assert.deepEqual(next.costEstimate.ownedIngredientKeys, []);
+  assert.equal(h.writes(), 0);
+});
+
+test("cost ownership and currency inputs reject invalid or foreign keys without quantity mutation", async () => {
+  const current = plan(); const h = handler([]);
+  for (const options of [{ ownedIngredientKeys: "Olives" }, { ownedIngredientKeys: [123] }, { ownedIngredientKeys: ["Chicken breast|g"] },
+    { currency: 123 }, { ownedIngredientKeys: Array(501).fill("olives|g") }]) {
+    const response = await h.post({ plan: current, ...options }); assert.equal(response.status, 400, JSON.stringify(options));
+  }
+  const unsupported = await (await h.post({ plan: current, currency: "USD" })).json();
+  assert.equal(unsupported.costEstimate.status, "unavailable"); assert.equal(unsupported.costEstimate.currency, null);
+  assert.equal(h.writes(), 0);
 });
