@@ -21,12 +21,16 @@ test("strict pricing reuses pack ceilings, compatible SI units and preserves exa
 test("strict pricing rejects fuzzy, ambiguous form, unsupported conversion and invalid data", () => {
   for (const entry of [item("Pea protein powder", 30), item("Protein powder", 30), item("Tuna", 100), item("Fresh tuna", 100),
     item("Mixed berries", 100), item("Chicken breast cooked", 100), item("Olive oil", 10), item("Apple", 80),
+    item("Prawns cooked", 100), item("Light cream cheese", 100), item("Extra-firm tofu", 100), item("Ground beef", 100),
+    item("Dark chocolate", 100), item("Milk", 100, "ml"), item("Greek yogurt", 100),
     item("Chicken breast", 1, "serving"), item("Chicken breast", 1, "jar"), item("Chicken breast", 1, "unknown"),
     item("Chicken breast", 0), item("Chicken breast", -1), item("Chicken breast", Number.NaN)]) {
     assert.equal(priceBasket([entry], { strict: true }).items[0].matched, false, JSON.stringify(entry));
   }
   assert.equal(priceBasket([item("Chicken breast", 10)], { strict: true, catalogue: [{ ...catalogue[0], packSize: 0 }] }).items[0].matched, false);
   assert.equal(priceBasket([item("Chicken breast", 10)], { strict: true, catalogue: [{ ...catalogue[0], packPrice: -1 }] }).items[0].matched, false);
+  const tiny = priceBasket([item("Chicken breast", .00004)], { strict: true });
+  assert.equal(tiny.items[0].amountNeeded, .00004); assert.equal(tiny.items[0].packsNeeded, 1);
   // Existing consumers retain their explicitly legacy behaviour.
   assert.equal(priceBasket([item("Chicken breast cooked", 100)]).items[0].matched, true);
 });
