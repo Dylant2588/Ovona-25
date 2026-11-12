@@ -37,6 +37,35 @@ const scheduledWeek = () => {
   return result.value;
 };
 
+test("a lower soft-score replacement wins on daily calories and leaves other meals intact", () => {
+  const original = scheduledWeek();
+  const highScore = candidate("a-inaccurate", "breakfast", { proteinType: "new", prepMinutes: 0, cost: 0, nutrition: { calories: 600, protein: 26, carbs: 0, fat: 0 } });
+  const precise = candidate("b-precise", "breakfast", { proteinType: "new", prepMinutes: 30, cost: 19 });
+  const outcome = replaceMeal(original, { day: 1, slot: "breakfast" }, [highScore, precise], profile());
+  assert.ok(outcome.ok);
+  assert.equal(outcome.value.days[0].meals[0].candidateId, precise.id);
+  for (const [dayIndex, day] of original.days.entries()) for (const [mealIndex, meal] of day.meals.entries()) {
+    if (dayIndex === 0 && meal.slot === "breakfast") continue;
+    assert.strictEqual(outcome.value.days[dayIndex].meals[mealIndex], meal);
+  }
+});
+
+test("replacement optimises only its own portion and preserves both snack identities", () => {
+  const p = normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2500, proteinTarget: 150, requiredSlots: ["breakfast", "snack", "lunch", "snack", "dinner"] });
+  const generated = orchestrateWeek(p, [...weekCandidates(), ...Array.from({ length: 7 }, (_, i) => candidate(`extra-snack-${i}`, "snack"))]);
+  assert.ok(generated.ok);
+  const original = generated.value;
+  const replacement = candidate("new-breakfast", "breakfast", { proteinType: "new", nutrition: { calories: 600, protein: 40, carbs: 0, fat: 0 } });
+  const outcome = replaceMeal(original, { day: 1, slot: "breakfast" }, [replacement], p);
+  assert.ok(outcome.ok);
+  const day = outcome.value.days[0];
+  assert.ok(Math.abs(day.meals.reduce((s, m) => s + Math.round(m.nutrition.calories * m.nutritionPortionMultiplier), 0) - 2500) <= 1);
+  for (const [dayIndex, oldDay] of original.days.entries()) for (const [mealIndex, meal] of oldDay.meals.entries()) {
+    if (dayIndex === 0 && meal.slot === "breakfast") continue;
+    assert.strictEqual(outcome.value.days[dayIndex].meals[mealIndex], meal);
+  }
+});
+
 test("replaces exactly one target slot immutably with a score-derived explanation", () => {
   const original = scheduledWeek();
   const target = { day: 1, slot: "breakfast" as const };
