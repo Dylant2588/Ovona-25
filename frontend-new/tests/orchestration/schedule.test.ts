@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { normalizePlannerProfile } from "../../lib/orchestration/normalize-profile.ts";
-import { orchestrateWeek } from "../../lib/orchestration/schedule.ts";
+import { calorieDeviationFor, orchestrateWeek } from "../../lib/orchestration/schedule.ts";
 import { rankCandidates } from "../../lib/orchestration/score.ts";
 import { validateAndRepairWeek } from "../../lib/orchestration/validate.ts";
 import type { VerifiedCandidateMeal } from "../../lib/orchestration/types.ts";
@@ -63,6 +63,34 @@ test("node and deadline limits keep a verified complete incumbent but never retu
   const expired = orchestrateWeek(p, candidates, {}, "day", { maxMilliseconds: 0, now: () => ticks++ });
   assert.equal(expired.ok, false);
   if (!expired.ok) assert.equal(expired.error.code, "planning_search_exhausted");
+  let incumbentTicks = 0;
+  const deadlineIncumbent = orchestrateWeek(p, candidates, {}, "day", { maxMilliseconds: 1, now: () => ++incumbentTicks < 6 ? 0 : 100 });
+  assert.ok(deadlineIncumbent.ok);
+  assert.equal(deadlineIncumbent.value.days[0].meals.length, 1);
+  assert.ok(incumbentTicks >= 6);
+});
+
+test("weekly calorie objective counts every daily miss even when weekly totals cancel", () => {
+  const p = profile();
+  const generated = orchestrateWeek(p, completeCandidates());
+  assert.ok(generated.ok);
+  const days = generated.value.days.map((day, index) => ({ ...day, meals: day.meals.map((meal, mealIndex) => mealIndex === 0 ? {
+    ...meal, nutrition: { ...meal.nutrition, calories: meal.nutrition.calories + (index === 0 ? 40 : index === 1 ? -40 : 0) },
+  } : meal) }));
+  assert.equal(days.flatMap(d => d.meals).reduce((s, m) => s + Math.round(m.nutrition.calories * m.nutritionPortionMultiplier), 0), 14000);
+  assert.equal(calorieDeviationFor(p, { days }), .04);
+  assert.equal(calorieDeviationFor(p, generated.value), 0);
+});
+
+test("bounded weekly improvement evaluates closer complete schedules before soft preferences", () => {
+  const p = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 60, requiredSlots: ["breakfast"], preferredMealTypes: ["favoured"] });
+  const options = Array.from({ length: 3 }, (_, i) => candidate(`a-${i}`, "breakfast", { proteinType: "mixed", cuisine: "favoured", dietaryTags: [], prepMinutes: 0, cost: 0, nutrition: { calories: 1000, protein: 70, carbs: 0, fat: 0 } }))
+    .concat(Array.from({ length: 3 }, (_, i) => candidate(`b-${i}`, "breakfast", { proteinType: "mixed", dietaryTags: [], prepMinutes: 30, cost: 19, nutrition: { calories: 800, protein: 60, carbs: 0, fat: 0 } })));
+  const first = orchestrateWeek(p, options, {}, "week", { maxNodes: 35, now: () => 0 });
+  const improved = orchestrateWeek(p, options, {}, "week", { maxNodes: 1000, now: () => 0 });
+  assert.ok(first.ok && improved.ok);
+  assert.ok(calorieDeviationFor(p, improved.value) < calorieDeviationFor(p, first.value));
+  assert.equal(improved.value.days.length, 7);
 });
 
 const completeCandidates = (): VerifiedCandidateMeal[] =>
