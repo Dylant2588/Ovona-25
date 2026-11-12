@@ -48,6 +48,12 @@ test("an in-band unscaled day is portioned toward its calorie goal", () => {
   assert.ok(Math.abs(Math.round(meal.nutrition.calories * meal.nutritionPortionMultiplier) - 1000) <= 1);
 });
 
+test("rounded macros cannot admit a portion repaired above the hard maximum", () => {
+  const p = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 120, requiredSlots: ["breakfast"] });
+  const result = orchestrateWeek(p, [candidate("boundary", "breakfast", { dietaryTags: [], nutrition: { calories: 533.333333, protein: 78.39995, carbs: 0, fat: 0 } })], {}, "day");
+  assert.equal(result.ok, false);
+});
+
 test("node and deadline limits keep a verified complete incumbent but never return partial days", () => {
   const p = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 60, requiredSlots: ["breakfast"] });
   const candidates = [candidate("only", "breakfast", { dietaryTags: [], nutrition: { calories: 1000, protein: 70, carbs: 0, fat: 0 } })];
