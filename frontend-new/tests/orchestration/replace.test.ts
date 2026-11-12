@@ -66,6 +66,16 @@ test("replacement optimises only its own portion and preserves both snack identi
   }
 });
 
+test("replacement cannot introduce a third meal from one protein family", () => {
+  const generated = scheduledWeek();
+  const original = { days: generated.days.map((day, index) => index ? day : { ...day, meals: day.meals.map((meal, mealIndex) =>
+    mealIndex === 1 || mealIndex === 2 ? { ...meal, proteinFamilies: ["shared"] } : meal) }) };
+  const replacement = candidate("third-shared", "breakfast", { proteinFamilies: ["shared"] });
+  const before = JSON.stringify(original);
+  assert.equal(replaceMeal(original, { day: 1, slot: "breakfast" }, [replacement], profile()).ok, false);
+  assert.equal(JSON.stringify(original), before);
+});
+
 test("replaces exactly one target slot immutably with a score-derived explanation", () => {
   const original = scheduledWeek();
   const target = { day: 1, slot: "breakfast" as const };

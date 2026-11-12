@@ -23,8 +23,9 @@ const recipes = (["breakfast", "lunch", "dinner"] as const).flatMap((slot, index
 })));
 const profile = normalizePlannerProfile({ calorieTarget: 1650, proteinTarget: 120, allergies: ["milk"], maxPrepMinutes: 30, requiredSlots: ["breakfast", "lunch", "dinner"] });
 
-function entry(proposal: unknown, options: { exhaustRanked?: boolean; failApproval?: boolean } = {}) {
+function entry(proposal: unknown, options: { exhaustRanked?: boolean; failApproval?: boolean; calorieTarget?: number } = {}) {
   const calls = { ai: 0, schedules: 0, approvals: 0 };
+  const activeProfile = options.calorieTarget ? normalizePlannerProfile({ calorieTarget: options.calorieTarget, proteinTarget: 120, allergies: ["milk"], maxPrepMinutes: 30, requiredSlots: ["breakfast", "lunch", "dinner"] }) : profile;
   const candidates = recipesToCandidates(recipes, constraints);
   const code = ts.transpileModule(fs.readFileSync("lib/generation/generate-plan.ts", "utf8"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -37,7 +38,7 @@ function entry(proposal: unknown, options: { exhaustRanked?: boolean; failApprov
     "@/lib/meal-generator": { preferenceSignatureFor: () => "test-signature" },
     "@/lib/supabaseServer": { supabaseServer: () => { throw Error("No network in regression"); } },
     "@/lib/orchestration/candidate-adapter": { buildDeterministicPlanningInput: async () => ({ ok: true, value: {
-      context: {}, profile, candidates, recipes, history: { recentCandidateIds: ["history-only"] },
+      context: {}, profile: activeProfile, candidates, recipes, history: { recentCandidateIds: ["history-only"] },
     } }) },
     "@/lib/orchestration/schedule": { orchestrateWeek: (...args: Parameters<typeof orchestrateWeek>) => {
       calls.schedules++;
@@ -53,7 +54,7 @@ function entry(proposal: unknown, options: { exhaustRanked?: boolean; failApprov
       return approvePlanForUser(db, id, plan, undefined, {
         constraints: async () => constraints,
         recipes: async () => ({ ok: true as const, recipes }),
-        context: async () => ({ calorieTarget: 1650, proteinTarget: 120, mealsPerDay: 3 }),
+        context: async () => ({ calorieTarget: activeProfile.calorieTarget, proteinTarget: 120, mealsPerDay: 3 }),
       });
     } },
   };
@@ -63,6 +64,28 @@ function entry(proposal: unknown, options: { exhaustRanked?: boolean; failApprov
   }, generationModule, generationModule.exports);
   return { run: (options = {}) => generationModule.exports.generateWeeklyPlanWithArtifacts("user-1", { supabase: {}, ...options }), calls };
 }
+
+test("actual day/week materialisation preserves calorie-directed portions through final recipe approval", async () => {
+  const original = process.env.OPENAI_API_KEY;
+  delete process.env.OPENAI_API_KEY;
+  try {
+    for (const scope of ["day", "week"]) {
+      const h = entry(null, { calorieTarget: 1700 });
+      const { weeklyPlan } = await h.run({ scope, date: "2026-11-12" });
+      assert.equal(weeklyPlan.days.length, scope === "day" ? 1 : 7);
+      for (const day of weeklyPlan.days) {
+        assert.ok(Math.abs(day.totals.calories - 1700) <= 1, String(day.totals.calories));
+        assert.equal(day.totals.calories, day.meals.reduce((s, m) => s + m.macros.calories, 0));
+        assert.ok(day.totals.protein >= 120 * .98 && day.totals.protein <= 120 * 1.1);
+        for (const meal of day.meals) {
+          assert.ok(meal.portionMultiplier >= .7 && meal.portionMultiplier <= 1.5);
+          assert.equal(meal.ingredients[0].amount, 100 * meal.portionMultiplier);
+        }
+      }
+      assert.equal(h.calls.approvals, 1);
+    }
+  } finally { if (original !== undefined) process.env.OPENAI_API_KEY = original; }
+});
 
 test("actual generation falls back for unavailable, refused and unsafe AI output, retaining real final approval", async () => {
   const original = process.env.OPENAI_API_KEY;

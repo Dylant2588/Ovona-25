@@ -66,7 +66,7 @@ export function unavoidablePracticalViolations(profile: PlannerProfile, candidat
   });
 }
 
-export function remainingPortionLimits(profile: PlannerProfile, selected: readonly Pick<SelectedMeal, "ingredients" | "nutritionPortionMultiplier" | "householdPortionMultiplier">[], choices: readonly VerifiedCandidateMeal[], daysRemaining = 1): PortionLimit[] {
+export function remainingPortionLimits(profile: PlannerProfile, selected: readonly Pick<SelectedMeal, "ingredients" | "nutritionPortionMultiplier" | "householdPortionMultiplier">[], choices: readonly Pick<VerifiedCandidateMeal, "ingredients">[], daysRemaining = 1): PortionLimit[] {
   return WEEKLY_PROTEIN_INGREDIENT_LIMITS.map(limit => {
     const mass = (items: readonly { name: string; normalizedName: string; quantity: number; unit: string }[]) => items.reduce((sum, item) => {
       if (!(limit.pattern.test(item.name) || limit.pattern.test(item.normalizedName))) return sum;

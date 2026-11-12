@@ -3,15 +3,16 @@ import { filterEligibleCandidates } from "./eligibility.ts";
 import { rankCandidates, type ScoreContext } from "./score.ts";
 import type { CandidateHistory } from "./schedule.ts";
 import { validateAndRepairWeek } from "./validate.ts";
+import { remainingPortionLimits } from "./practical-ingredients.ts";
+import { solveMealPortions } from "./portions.ts";
 import type { PlannerMealSlot, PlannerPolicy, PlannerProfile, SelectedMeal, VerifiedCandidateMeal, WeekSchedule, WeekScheduleResult } from "./types.ts";
 
 export type MealReplacementTarget = Readonly<{ day: number; slot: PlannerMealSlot }>;
 
 const similarity = (candidate: VerifiedCandidateMeal) => candidate.similarityKey?.trim().toLowerCase() || candidate.id;
 
-const selectedMeal = (candidate: VerifiedCandidateMeal, score: ReturnType<typeof rankCandidates>[number], profile: PlannerProfile): SelectedMeal => {
+const selectedMeal = (candidate: VerifiedCandidateMeal, score: ReturnType<typeof rankCandidates>[number], profile: PlannerProfile, nutritionPortionMultiplier: number): SelectedMeal => {
   const recipeServings = candidate.servings;
-  const nutritionPortionMultiplier = 1;
   const householdPortionMultiplier = profile.householdSize;
   return {
     candidateId: candidate.id,
@@ -68,26 +69,47 @@ export const replaceMeal = (
     candidate.slot === target.slot && candidate.id !== oldMeal.candidateId && canUseReplacement(candidate, contextSelected, policy),
   );
   const context: ScoreContext = { selected: contextSelected, recentCandidateIds: history.recentCandidateIds ?? [] };
-  const best = rankCandidates(effectiveProfile, safeAlternatives, context)[0];
-  if (!best) return replacementFailure("insufficient_replacement_candidates", target.day, "No safe alternative can replace the requested meal slot.");
-
-  const replacement = selectedMeal(best.candidate, best, effectiveProfile);
-  const replacementWeek: WeekSchedule = {
-    days: result.days.map((day) => day === targetDay ? {
-      ...day,
-      meals: day.meals.map((meal) => meal === oldMeal ? replacement : meal),
-    } : day),
-  };
-  const validated = validateAndRepairWeek(effectiveProfile, replacementWeek, scope);
-  if (!validated.ok) return { ok: false, error: { code: "replacement_validation_failed", violations: validated.error.violations } };
-
-  // A replacement may not silently repair another slot; preserve all non-target selections exactly.
-  for (const day of result.days) {
-    for (const meal of day.meals) {
-      if (day === targetDay && meal === oldMeal) continue;
-      const validatedMeal = validated.value.days.find((item) => item.day === day.day)?.meals.find((item) => item.slot === meal.slot);
-      if (validatedMeal !== meal) return replacementFailure("replacement_validation_failed", target.day, "The replacement would alter another scheduled meal.");
-    }
+  const ranked = rankCandidates(effectiveProfile, safeAlternatives, context);
+  if (!ranked.length) return replacementFailure("insufficient_replacement_candidates", target.day, "No safe alternative can replace the requested meal slot.");
+  const otherDays = result.days.filter(day => day !== targetDay).flatMap(day => day.meals);
+  const families = (meal: Pick<VerifiedCandidateMeal, "proteinType" | "proteinFamilies">) => meal.proteinFamilies?.length
+    ? [...new Set(meal.proteinFamilies.map(f => f.trim().toLowerCase()).filter(Boolean))] : [meal.proteinType?.trim().toLowerCase() || "other"];
+  const targetIndex = targetDay.meals.indexOf(oldMeal);
+  let incumbent: WeekSchedule | null = null, bestError = Infinity;
+  const deadline = Date.now() + 5000;
+  for (const alternative of ranked) {
+    if (Date.now() > deadline) break;
+    if (families(alternative.candidate).some(family => targetDay.meals.filter(meal => meal !== oldMeal && families(meal).includes(family)).length >= 2)) continue;
+    const choices = targetDay.meals.map(meal => meal === oldMeal ? alternative.candidate : meal);
+    const portions = solveMealPortions(effectiveProfile, choices, remainingPortionLimits(effectiveProfile, otherDays, choices), {
+      bounds: targetDay.meals.map(meal => meal === oldMeal ? { min: .7, max: 1.5 } : { min: meal.nutritionPortionMultiplier, max: meal.nutritionPortionMultiplier }),
+      canContinue: () => Date.now() <= deadline,
+    });
+    if (!portions) continue;
+    const replacement = selectedMeal(alternative.candidate, alternative, effectiveProfile, portions[targetIndex]);
+    const replacementWeek: WeekSchedule = {
+      days: result.days.map(day => day === targetDay ? { ...day, meals: day.meals.map(meal => meal === oldMeal ? replacement : meal) } : day),
+    };
+    const validated = validateAndRepairWeek(effectiveProfile, replacementWeek, scope);
+    if (!validated.ok) continue;
+    // Compare by position: two snack slots must retain their own identities.
+    const immutable = result.days.every((day, dayIndex) => day.meals.every((meal, mealIndex) =>
+      (day === targetDay && meal === oldMeal) || validated.value.days[dayIndex]?.meals[mealIndex] === meal));
+    if (!immutable) continue;
+    const safe = validated.value.days.every(day => {
+      const calories = day.meals.reduce((s, m) => s + Math.round(m.nutrition.calories * m.nutritionPortionMultiplier), 0);
+      const protein = day.meals.reduce((s, m) => s + Math.round(m.nutrition.protein * m.nutritionPortionMultiplier), 0);
+      return day.meals.every(m => Number.isFinite(m.nutritionPortionMultiplier) && m.nutritionPortionMultiplier >= .7 && m.nutritionPortionMultiplier <= 1.5) &&
+        calories >= profile.calorieTarget * profile.hardConstraints.calorieBand.min && calories <= profile.calorieTarget * profile.hardConstraints.calorieBand.max &&
+        protein >= profile.proteinTarget * profile.hardConstraints.proteinBand.min && protein <= profile.proteinTarget * profile.hardConstraints.proteinBand.max;
+    });
+    if (!safe) continue;
+    const newDay = validated.value.days.find(day => day.day === target.day)!;
+    const error = Math.abs(newDay.meals.reduce((s, m) => s + Math.round(m.nutrition.calories * m.nutritionPortionMultiplier), 0) - profile.calorieTarget);
+    // Ranked traversal supplies the soft-score/stable-ID tie break.
+    if (error < bestError) { incumbent = validated.value; bestError = error; }
+    if (bestError === 0) break;
   }
-  return validated;
+  if (incumbent) return { ok: true, value: incumbent };
+  return replacementFailure("replacement_validation_failed", target.day, "No safe portion can replace this meal without changing another scheduled meal.");
 };
