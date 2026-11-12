@@ -74,6 +74,10 @@ test("node and deadline limits keep a verified complete incumbent but never retu
   assert.ok(deadlineIncumbent.ok);
   assert.equal(deadlineIncumbent.value.days[0].meals.length, 1);
   assert.ok(incumbentTicks >= 6);
+  let improvementTicks = 0;
+  const cappedImprovement = orchestrateWeek(p, candidates, {}, "day", { now: () => improvementTicks++ });
+  assert.ok(cappedImprovement.ok);
+  assert.ok(improvementTicks < 400, `Improvement consumed ${improvementTicks} clock ticks after a feasible incumbent`);
 });
 
 test("weekly calorie objective counts every daily miss even when weekly totals cancel", () => {
