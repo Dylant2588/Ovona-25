@@ -48,8 +48,12 @@ export function solveMealPortions(profile: PlannerProfile, meals: readonly Porti
 
   const project = (lo: number, hi: number, start: readonly number[]): number[] | null => {
     if (lo > hi) return null;
+    // The same relaxed bounds apply to each narrower objective interval. Do
+    // not spend projection iterations when even the relaxation cannot fit.
+    if (upperBound(protein, calories, hi) < pMin - 1e-7 || upperBound(calories, protein, pMax) < lo - 1e-7) return null;
     for (const [calorieMargin, proteinMargin] of [[0.51, 0.51], [0.51, 0], [0, 0.51], [0, 0]]) {
       const cm = Math.min(meals.length * calorieMargin, (hi - lo) / 4), pm = Math.min(meals.length * proteinMargin, (pMax - pMin) / 4);
+      if (upperBound(protein, calories, hi - cm) < pMin + pm - 1e-7 || upperBound(calories, protein, pMax - pm) < lo + cm - 1e-7) continue;
       const constraints = [
         { amounts: calories, max: hi - cm }, { amounts: calories.map(v => -v), max: -(lo + cm) },
         { amounts: protein, max: pMax - pm }, { amounts: protein.map(v => -v), max: -(pMin + pm) }, ...limits,
