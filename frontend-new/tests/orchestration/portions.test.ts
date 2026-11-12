@@ -6,6 +6,42 @@ import { reviewedRecipe } from "./recipe-fixtures.ts";
 import { normalizePlannerProfile } from "../../lib/orchestration/normalize-profile.ts";
 import type { VerifiedCandidateMeal } from "../../lib/orchestration/types.ts";
 const meal = (calories: number, protein: number) => ({ nutrition: { calories, protein, carbs: 0, fat: 0 } }) as VerifiedCandidateMeal;
+const roundedCalories = (meals: VerifiedCandidateMeal[], portions: number[]) => meals.reduce((sum, m, i) => sum + Math.round(m.nutrition.calories * portions[i]), 0);
+
+test("calorie objective improves an already acceptable unscaled combination", () => {
+  const profile = normalizePlannerProfile({ calorieTarget: 1000, proteinTarget: 60, requiredSlots: ["breakfast", "dinner"] });
+  const meals = [meal(500, 30), meal(550, 35)];
+  const result = solveMealPortions(profile, meals);
+  assert.ok(result);
+  assert.ok(Math.abs(roundedCalories(meals, result) - 1000) <= 1);
+});
+
+test("independent portions aim at calories instead of stopping at the first in-band point", () => {
+  const profile = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 100, requiredSlots: ["breakfast", "dinner"] });
+  const meals = [meal(600, 10), meal(200, 80)];
+  const result = solveMealPortions(profile, meals);
+  assert.ok(result);
+  assert.ok(Math.abs(roundedCalories(meals, result) - 800) <= 1);
+});
+
+test("an infeasible exact calorie target retains the nearest verified protein-safe projection", () => {
+  const profile = normalizePlannerProfile({ calorieTarget: 1000, proteinTarget: 108, requiredSlots: ["breakfast"] });
+  const meals = [meal(1000, 100)];
+  const result = solveMealPortions(profile, meals);
+  assert.ok(result);
+  assert.ok(roundedCalories(meals, result) >= 1058 && roundedCalories(meals, result) <= 1060);
+  assert.ok(Math.round(100 * result[0]) >= 108 * .98);
+});
+
+test("fixed surrounding portions stay fixed while the remaining meal reaches the calorie target", () => {
+  const profile = normalizePlannerProfile({ calorieTarget: 1000, proteinTarget: 60, requiredSlots: ["breakfast", "dinner"] });
+  const meals = [meal(500, 30), meal(500, 30)];
+  const result = solveMealPortions(profile, meals, [], { bounds: [{ min: 1.2, max: 1.2 }, { min: .7, max: 1.5 }] });
+  assert.ok(result);
+  assert.equal(result[0], 1.2);
+  assert.ok(Math.abs(roundedCalories(meals, result) - 1000) <= 1);
+  assert.equal(solveMealPortions(profile, meals, [], { bounds: [{ min: .6, max: 1.2 }, { min: .7, max: 1.5 }] }), null);
+});
 
 test("independent portions solve a day that no shared multiplier can satisfy", () => {
   const profile = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 100, requiredSlots: ["breakfast", "dinner"] });
