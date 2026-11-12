@@ -77,7 +77,7 @@ const portionMultiplierFor = (profile: PlannerProfile, meals: readonly VerifiedC
   const protein = profile.hardConstraints.proteinBand;
   const min = Math.max(0.7, profile.calorieTarget * calorie.min / totals.calories, profile.proteinTarget * protein.min / totals.protein);
   const max = Math.min(1.5, profile.calorieTarget * calorie.max / totals.calories, profile.proteinTarget * protein.max / totals.protein);
-  if (!Number.isFinite(min) || !Number.isFinite(max) || min > max + 0.000001) return null;
+  if (!Number.isFinite(min) || !Number.isFinite(max) || min > max) return null;
   return Number(Math.min(max, Math.max(min, profile.calorieTarget / totals.calories)).toFixed(6));
 };
 
@@ -107,7 +107,14 @@ const selectDay = (
       // A shared portion can meet continuous bands yet fail those final totals.
       const sharedCalories = shared === null ? 0 : choices.reduce((s, m) => s + Math.round(m.nutrition.calories * shared), 0);
       const sharedProtein = shared === null ? 0 : choices.reduce((s, m) => s + Math.round(m.nutrition.protein * shared), 0);
+      const continuousCalories = shared === null ? 0 : choices.reduce((s, m) => s + m.nutrition.calories * shared, 0);
+      const continuousProtein = shared === null ? 0 : choices.reduce((s, m) => s + m.nutrition.protein * shared, 0);
       const sharedFits = shared !== null &&
+        shared >= .7 && shared <= 1.5 &&
+        continuousCalories >= profile.calorieTarget * profile.hardConstraints.calorieBand.min &&
+        continuousCalories <= profile.calorieTarget * profile.hardConstraints.calorieBand.max &&
+        continuousProtein >= profile.proteinTarget * profile.hardConstraints.proteinBand.min &&
+        continuousProtein <= profile.proteinTarget * profile.hardConstraints.proteinBand.max &&
         sharedCalories >= profile.calorieTarget * profile.hardConstraints.calorieBand.min &&
         sharedCalories <= profile.calorieTarget * profile.hardConstraints.calorieBand.max &&
         sharedProtein >= profile.proteinTarget * profile.hardConstraints.proteinBand.min &&
@@ -223,6 +230,8 @@ export const orchestrateWeek = (
     }
   };
   const roundedValid = (schedule: WeekSchedule) => schedule.days.every(day => {
+    if (day.meals.some(m => !Number.isFinite(m.nutritionPortionMultiplier) || m.nutritionPortionMultiplier < .7 || m.nutritionPortionMultiplier > 1.5 ||
+      m.servings !== m.recipeServings * m.nutritionPortionMultiplier * m.householdPortionMultiplier)) return false;
     const c = day.meals.reduce((s, m) => s + Math.round(m.nutrition.calories * m.nutritionPortionMultiplier), 0);
     const p = day.meals.reduce((s, m) => s + Math.round(m.nutrition.protein * m.nutritionPortionMultiplier), 0);
     return c >= profile.calorieTarget * profile.hardConstraints.calorieBand.min && c <= profile.calorieTarget * profile.hardConstraints.calorieBand.max &&
