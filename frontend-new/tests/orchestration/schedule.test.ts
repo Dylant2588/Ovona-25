@@ -30,6 +30,41 @@ const candidate = (id: string, slot: VerifiedCandidateMeal["slot"], extra: Parti
 
 const profile = () => normalizePlannerProfile({ ...validRawProfile, calorieTarget: 2000, proteinTarget: 120 });
 
+test("calorie alignment outranks a preferred first feasible daily recipe", () => {
+  const p = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 60, requiredSlots: ["breakfast"], preferredMealTypes: ["favoured"] });
+  const preferred = candidate("a-preferred", "breakfast", { cuisine: "favoured", dietaryTags: [], prepMinutes: 0, cost: 0, nutrition: { calories: 1000, protein: 70, carbs: 0, fat: 0 } });
+  const precise = candidate("b-precise", "breakfast", { dietaryTags: [], prepMinutes: 30, cost: 19, nutrition: { calories: 800, protein: 60, carbs: 0, fat: 0 } });
+  const result = orchestrateWeek(p, [preferred, precise], {}, "day");
+  assert.ok(result.ok);
+  assert.equal(result.value.days[0].meals[0].candidateId, precise.id);
+  assert.equal(Math.round(result.value.days[0].meals[0].nutrition.calories * result.value.days[0].meals[0].nutritionPortionMultiplier), 800);
+});
+
+test("an in-band unscaled day is portioned toward its calorie goal", () => {
+  const p = normalizePlannerProfile({ calorieTarget: 1000, proteinTarget: 60, requiredSlots: ["breakfast"] });
+  const result = orchestrateWeek(p, [candidate("one", "breakfast", { dietaryTags: [], nutrition: { calories: 1050, protein: 65, carbs: 0, fat: 0 } })], {}, "day");
+  assert.ok(result.ok);
+  const meal = result.value.days[0].meals[0];
+  assert.ok(Math.abs(Math.round(meal.nutrition.calories * meal.nutritionPortionMultiplier) - 1000) <= 1);
+});
+
+test("node and deadline limits keep a verified complete incumbent but never return partial days", () => {
+  const p = normalizePlannerProfile({ calorieTarget: 800, proteinTarget: 60, requiredSlots: ["breakfast"] });
+  const candidates = [candidate("only", "breakfast", { dietaryTags: [], nutrition: { calories: 1000, protein: 70, carbs: 0, fat: 0 } })];
+  const limited = orchestrateWeek(p, candidates, {}, "day", { maxNodes: 8, now: () => 0 });
+  assert.ok(limited.ok);
+  assert.equal(limited.value.days.length, 1);
+  assert.equal(limited.value.days[0].meals.length, 1);
+  assert.deepEqual(limited, orchestrateWeek(p, candidates, {}, "day", { maxNodes: 8, now: () => 0 }));
+  const noNodes = orchestrateWeek(p, candidates, {}, "day", { maxNodes: 0, now: () => 0 });
+  assert.equal(noNodes.ok, false);
+  if (!noNodes.ok) assert.equal(noNodes.error.code, "planning_search_exhausted");
+  let ticks = 0;
+  const expired = orchestrateWeek(p, candidates, {}, "day", { maxMilliseconds: 0, now: () => ticks++ });
+  assert.equal(expired.ok, false);
+  if (!expired.ok) assert.equal(expired.error.code, "planning_search_exhausted");
+});
+
 const completeCandidates = (): VerifiedCandidateMeal[] =>
   (["breakfast", "lunch", "dinner", "snack"] as const).flatMap((slot) =>
     Array.from({ length: 7 }, (_, day) => candidate(`${slot}-${String(day + 1).padStart(2, "0")}`, slot)),
