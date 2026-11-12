@@ -209,7 +209,7 @@ export const orchestrateWeek = (
   // day forever can consume an ingredient or recipe needed later in the week.
   const now = budget.now ?? Date.now;
   const bounded = (value: number | undefined, maximum: number) => value === undefined || !Number.isFinite(value) ? maximum : Math.max(0, Math.min(maximum, Math.floor(value)));
-  const deadline = now() + bounded(budget.maxMilliseconds, 5000);
+  let deadline = now() + bounded(budget.maxMilliseconds, 5000);
   let nodes = bounded(budget.maxNodes, 150_000);
   let truncated = false;
   let deepestDay = 1;
@@ -269,7 +269,14 @@ export const orchestrateWeek = (
     return false;
   };
   visitWeek([], []);
-  if (incumbent && incumbentError > 0) { improving = true; visitWeek([], []); }
+  if (incumbent && incumbentError > 0) {
+    improving = true;
+    // Finding a practical plan retains the original budget. Once it exists,
+    // spend at most a short bounded slice improving it, never five more seconds.
+    deadline = Math.min(deadline, now() + 250);
+    nodes = Math.min(nodes, 2000);
+    visitWeek([], []);
+  }
   if (incumbent) return { ok: true, value: incumbent };
   return { ok: false, error: { code: truncated ? "planning_search_exhausted" : "insufficient_candidates", violations: [{ day: deepestDay, code: "insufficient_candidates",
     message: truncated
