@@ -31,6 +31,10 @@ test("an infeasible exact calorie target retains the nearest verified protein-sa
   assert.ok(result);
   assert.ok(roundedCalories(meals, result) >= 1058 && roundedCalories(meals, result) <= 1060);
   assert.ok(Math.round(100 * result[0]) >= 108 * .98);
+  let projections = 0;
+  const bounded = solveMealPortions(profile, meals, [], { canContinue: () => { projections++; return true; } });
+  assert.ok(bounded);
+  assert.ok(projections < 300, `Provably infeasible narrowed calorie intervals consumed ${projections} iterations`);
 });
 
 test("fixed surrounding portions stay fixed while the remaining meal reaches the calorie target", () => {
